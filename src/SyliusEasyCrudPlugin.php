@@ -5,9 +5,9 @@ namespace Adeliom\SyliusEasyCrudPlugin;
 use Adeliom\SyliusEasyCrudPlugin\CompilerPass\RegisterAdminPass;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-class SyliusEasyCrudPlugin extends Bundle
+class SyliusEasyCrudPlugin extends AbstractBundle
 {
     use SyliusPluginTrait;
 

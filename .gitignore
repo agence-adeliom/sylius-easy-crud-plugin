@@ -5,3 +5,7 @@
 /.php_cs.cache
 ###< friendsofphp/php-cs-fixer ###
 node_modules
+tests/Application
+.idea
+php.ini
+.php-version
