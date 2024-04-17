@@ -58,6 +58,11 @@
       "symfony/web-profiler-bundle": "^5.4",
       "vimeo/psalm": "5.23.1"
     },
+    "autoload": {
+      "psr-4": {
+        "Adeliom\\SyliusEasyCrudPlugin\\": "src/"
+      }
+    },
     "autoload-dev": {
       "psr-4": {
         "Tests\\TailwindTheme\\": "tests/PHPUnit/"
