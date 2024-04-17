@@ -6,6 +6,6 @@
 ###< friendsofphp/php-cs-fixer ###
 node_modules
 tests/Application
-.idea
+.idea/*
 php.ini
 .php-version
