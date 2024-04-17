@@ -1,0 +1,22 @@
+{% form_theme form _self %}
+
+{% block code_editor_row %}
+    {% set configuredHeight = field.customOptions.get('numOfRows') * 16 %}
+
+    <div class="field">
+        {{ form_label(form) }}
+        {{ form_widget(form, {
+            'attr': {
+                'style': configuredHeight is null ? 'max-height: 500px; height:60px' : 'max-height: unset; height: ' ~ configuredHeight ~ 'px',
+                'data-ea-code-editor-field': 'true',
+                'data-language': field.customOptions.get('language')|e('html_attr'),
+                'data-tab-size': field.customOptions.get('tabSize')|e('html_attr'),
+                'data-indent-with-tabs': field.customOptions.get('indentWithTabs') ? 'true' : 'false',
+                'data-show-line-numbers': field.customOptions.get('showLineNumbers') ? 'true' : 'false',
+                'data-number-of-rows': field.customOptions.get('numOfRows')|e('html_attr')
+            },
+            'value': data
+        }) }}
+    </div>
+
+{%- endblock code_editor_row %}

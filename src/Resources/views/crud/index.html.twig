@@ -1,0 +1,21 @@
+{% extends '@SyliusAdmin/Crud/index.html.twig' %}
+
+{% set event_prefix = metadata.applicationName ~ '.admin.' ~ metadata.name ~ '.update' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    {{ sylius_template_event([event_prefix ~ '.stylesheets', 'sylius.admin.index.stylesheets'], { 'metadata': metadata }) }}
+
+    {# we have to override the block because we need access to the "form" variable from the _context, but the sylius event only gives the metadata #}
+    {% include "@SyliusEasyCrudPlugin/crud/assets/css.html.twig" %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ sylius_template_event([event_prefix ~ '.javascripts', 'sylius.admin.index.javascripts'], { 'metadata': metadata }) }}
+
+    {# we have to override the block because we need access to the "form" variable from the _context, but the sylius event only gives the metadata #}
+    {% include "@SyliusEasyCrudPlugin/crud/assets/js.html.twig" %}
+{% endblock %}

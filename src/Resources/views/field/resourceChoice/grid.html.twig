@@ -1,0 +1,13 @@
+<div class="ui relaxed divided list">
+    {% if options.vars.field.getFormTypeOption('multiple') %}
+        {% for resource in data %}
+            <div class="item">
+                {{ resource }}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="item">
+            {{ data }}
+        </div>
+    {% endif %}
+</div>

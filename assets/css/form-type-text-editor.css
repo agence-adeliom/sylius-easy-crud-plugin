@@ -1,0 +1,111 @@
+@import '~trix/dist/trix.css';
+
+.ea-text-editor-content {
+    display: none;
+}
+.ea-text-editor-wrapper {
+    --white: #fff;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-600: #475569;
+    --font-family-monospace: "JetBrains Mono",ui-monospace,"Roboto Mono",SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --form-control-bg: var(--white);
+    --form-input-border-color:  rgba(34, 36, 38, 0.1);
+    --form-input-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.03);
+    --form-type-text-editor-toolbar-bg: var(--white);
+    --form-type-text-editor-toolbar-button-color: var(--gray-600);
+    --form-type-text-editor-toolbar-button-active-color: var(--gray-700);
+    --form-type-text-editor-dialog-bg: var(--white);
+    --form-type-text-editor-content-pre-bg: #e0e1e2;
+    --form-type-text-editor-content-pre-color: #636364;
+    --border-radius: 4px;
+    background: var(--form-control-bg);
+    border: 1px solid var(--form-input-border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--form-input-shadow);
+    padding: 7px;
+}
+.ea-text-editor-wrapper:focus,
+.ea-text-editor-wrapper:focus-within {
+    border-color: #ebebeb;
+    box-shadow: 0 0 0 4px #f6f6f6;
+    outline: 0;
+}
+trix-toolbar {
+    background:  var(--form-type-text-editor-toolbar-bg);
+    border-bottom: 1px solid var(--form-input-border-color);
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    margin: -7px -7px 10px;
+    padding: 0;
+}
+trix-toolbar .trix-button-row {
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+trix-toolbar .trix-button-group {
+    border: 0;
+    margin-bottom: 0;
+}
+trix-toolbar .trix-button {
+    border: 0;
+    color: var(--form-type-text-editor-toolbar-button-color);
+    margin: 0;
+}
+trix-toolbar .trix-button:not(:first-child) {
+    border-left: 0;
+}
+trix-toolbar .trix-button:hover {
+    background: #E0E1E2;
+}
+trix-toolbar .trix-button.trix-active {
+    background: #cacbcd;
+    color: var(--form-type-text-editor-toolbar-button-active-color);
+}
+trix-toolbar .trix-button.trix-button--icon {
+    height: 32px;
+    width: 32px;
+}
+trix-toolbar .trix-button.trix-button--icon::before {
+    background-size: 22px;
+    background-position: center;
+    float: left;
+    height: 32px;
+    width: 32px;
+    text-indent: -999em;
+}
+.ea-dark-scheme trix-toolbar .trix-button.trix-button--icon::before {
+    filter:  invert(1);
+}
+trix-editor {
+    border: 0;
+    padding: 3px;
+}
+
+trix-toolbar .trix-dialog {
+    background: var(--form-type-text-editor-dialog-bg);
+    box-shadow: 0 2px 4px 0 #e8e8e8;
+    border: 0;
+    font-size:  12px;
+    top: 4px;
+    left: 4px;
+}
+
+.trix-content pre {
+    background-color: var(--form-type-text-editor-content-pre-bg);
+    border-radius: var(--border-radius);
+    color: var(--form-type-text-editor-content-pre-color);
+    font-family:  var(--font-family-monospace);
+}
+
+/* there's no way to disable buttons from the Trix toolbar except by hiding them via CSS
+   see https://github.com/basecamp/trix/issues/402 */
+trix-toolbar .trix-button-group--file-tools,
+trix-toolbar .trix-button-group--history-tools {
+    display: none;
+}
+@media(min-width: 1200px) {
+    trix-toolbar .trix-button-group--history-tools {
+        display: flex;
+    }
+}

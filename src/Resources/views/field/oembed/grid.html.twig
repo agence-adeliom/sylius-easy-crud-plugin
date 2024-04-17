@@ -1,0 +1,24 @@
+<div class="ui basic modal">
+    <div class="actions">
+        <div class="ui green ok inverted button">
+            <i class="checkmark icon"></i>
+            Close
+        </div>
+    </div>
+    <div class="content">
+        {% include '@SyliusEasyCrudPlugin/field/oembed/display.html.twig' with {"url": data} %}
+    </div>
+</div>
+<script type="text/javascript">
+    if (typeof window.openOembed === 'undefined') {
+        window.openOembed = (element) => {
+            $(element).prev()
+                .modal('show')
+            ;
+        }
+    }
+</script>
+<button onclick="openOembed(this)"  class="ui labeled icon button">
+    <i class="play circle outline icon"></i>
+    {{ 'play' | trans }}
+</button>

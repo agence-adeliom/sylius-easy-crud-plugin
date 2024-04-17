@@ -1,0 +1,22 @@
+<table class="ui very basic celled table">
+    <tbody>
+    <tr>
+        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property) | trans }}</strong></td>
+        <td>
+            <div class="ui relaxed divided list">
+                {% if field.getFormTypeOption('multiple') %}
+                    {% for resource in data %}
+                        <div class="item">
+                            {{ resource }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="item">
+                        {{ data }}
+                    </div>
+                {% endif %}
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>

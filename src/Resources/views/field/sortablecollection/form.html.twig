@@ -1,0 +1,121 @@
+{% block sortable_collection_row %}
+    {% set field = form.vars.errors.form.config.attributes.field ?? null %}
+
+    {% set row_attr = row_attr|merge({
+        'data-sylius-collection-field': 'true',
+        'data-entry-is-complex': field and field.customOptions.get('entryIsComplex') ? 'true' : 'false',
+        'data-allow-add': allow_add ? 'true' : 'false',
+        'data-allow-delete': allow_delete ? 'true' : 'false',
+        'data-form-type-name-placeholder': prototype is defined ? prototype.vars.name : '',
+        'data-form-type-id': id,
+        'data-form-type-parent-id': form.parent is defined ? form.parent.vars.id : '',
+        'data-form-type-parent-name': form.parent is defined ? form.parent.vars.name : '',
+        'data-sylius-collection-field-full-name': form.vars.full_name
+    }) %}
+    <div class="field">
+        <div {% with { attr: row_attr } %}{{ block('attributes') }}{% endwith %}>
+            {{ block('form_row') }}
+        </div>
+    </div>
+{% endblock sortable_collection_row %}
+
+{% block sortable_collection_widget %}
+    {% from '@SyliusResource/Macros/notification.html.twig' import error %}
+    {% set attr = attr|merge({'class': attr.class|default ~ ' controls collection-widget'}) %}
+
+    {% set isEmptyCollection = value is null or (value is iterable and value is empty) %}
+
+    {% apply spaceless %}
+        <div
+             data-form-type="collection"
+            {{ block('widget_container_attributes') }}
+            {% if prototype is defined and allow_add %}
+                data-prototype='{{ _self.collectionItem(null, id, prototype, allow_delete, button_delete_label, button_move_label, prototype.vars.name ?? '__name__')|e }}'
+                data-prototype-name='{{ prototype.vars.name }}'
+            {%- endif -%}>
+
+            {{ error(form.vars.errors) }}
+
+            {% if prototypes|default is iterable %}
+                {% for key, subPrototype in prototypes %}
+                    <input type="hidden"
+                           data-form-prototype="{{ key }}"
+                           value="{{ _self.collectionItem(null, id, subPrototype, allow_delete, button_delete_label, button_move_label, prototype.vars.name ?? '__name__')|e }}"
+                           data-subprototype-name="{{ subPrototype.vars.name }}"
+                    />
+                {% endfor %}
+            {% endif %}
+
+            <div data-form-collection="list"
+                 class="row collection-list ea-form-collection-items">
+                {% for child in form %}
+                    {{ _self.collectionItem(value, id, child, allow_delete, button_delete_label, button_move_label, loop.index0) }}
+                {% endfor %}
+            </div>
+
+            {% if prototype is defined and allow_add %}
+                <button type="button" style="margin-top: 6px;" class="mini ui primary icon button field-sortable_collection-add-button"
+                   data-form-collection="add">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    {{ button_add_label|trans }}
+                </button>
+            {% endif %}
+        </div>
+    {% endapply %}
+{% endblock sortable_collection_widget %}
+
+{% block sortable_collection_entry_row %}
+    <div class="sortable-collection_row">
+        {{ block('form_row') }}
+    </div>
+{% endblock sortable_collection_entry_row %}
+
+{% block sortable_collection_entry_widget %}
+    {{ form_widget(form) }}
+{% endblock sortable_collection_entry_widget %}
+
+{% macro collectionItem(value, id, form, allow_delete, button_delete_label, button_move_label, index) %}
+    {% set is_array_field = 'EasyCorp\\Bundle\\EasyAdminBundle\\Field\\ArrayField' == form_parent(form).vars.errors.form.config.attributes.field.fieldFqcn ?? false %}
+    {% set is_complex = form_parent(form).vars.errors.form.config.attributes.field.customOptions.get('entryIsComplex') ?? false %}
+    {% set allows_deleting_items = form_parent(form).vars.allow_delete|default(false) %}
+    {% set allow_drag = form_parent(form).vars.allow_drag|default(false) %}
+    {% set render_expanded = form_parent(form).vars.errors.form.config.attributes.field.customOptions.get('renderExpanded') ?? false %}
+    {% set hide_title = form_parent(form).vars.hide_title ?? false %}
+    {% set error = false %}
+    {% apply spaceless %}
+        <div data-form-collection="item"
+             data-form-collection-index="{{ index }}"
+             class="collection-item field-collection-item">
+            <div class="collection-box{% if form|length == 1 %} unique-field{% endif %} field-sortable_collection-item {{ is_complex ? 'field-sortable_collection-item-complex' }} {{ error ? "border-danger"}}" data-form-type-parent-id="{{ form_parent(form).parent.vars.id|default("") }}">
+                <div class="ui styled fluid accordion" data-accordion-id="{{ form.vars.id|default("") }}">
+                    <div class="{{ value is null ? 'active ' : '' }}title">
+                        <i class="dropdown icon"></i>
+                        {% if not hide_title %}
+                            <span>{{ form.vars.data|display_as_string }}</span>
+                        {% endif %}
+                        {% if allow_delete or allow_drag %}
+                            {% if allow_delete %}
+                                <button type="button" title="{{ button_delete_label|trans }}" data-form-collection="delete" class="mini red ui icon right floated button field-sortable_collection-delete-button" style="margin-top:-4px;">
+                                    <i class="icon trash"></i>
+                                </button>
+                            {% endif %}
+                            {% if allow_drag %}
+                                <button type="button" class="mini ui icon right floated button field-sortable_collection-drag-button" drag-handler="{{ form.parent.vars.id|default("") }}" style="margin-top:-4px; margin-right:6px; cursor:move;"
+                                        title="{{ button_move_label|trans }}">
+                                    <i class="fas fa-arrows-alt-v"></i>
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="{{ value is null ? 'active ' : '' }}content">
+                        {% if not form.children|length %}
+                            {{ form_widget(form) }}
+                        {% else %}
+                            {{ form_rest(form) }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endapply %}
+{% endmacro %}

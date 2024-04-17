@@ -1,0 +1,6 @@
+{% form_theme form _self %}
+
+{% block sylius_translations_row %}
+    {% from '@SyliusAdmin/Macro/translationForm.html.twig' import translationForm %}
+    {{ translationForm(_context.form) }}
+{%- endblock sylius_translations_row %}

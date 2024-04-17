@@ -1,0 +1,10 @@
+syliuseasycrudplugin:
+    enum:
+        state:
+            unpublished: Unpublished
+            pending: Pending
+            published: Published
+        publishState:
+            unpublished: Unpublished
+            pending: Pending
+            published: Published

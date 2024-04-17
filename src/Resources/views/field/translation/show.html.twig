@@ -1,0 +1,30 @@
+{% import '@SyliusUi/Macro/flags.html.twig' as flags %}
+
+<div class="ui styled fluid accordion">
+    {% for locale in field.getCustomOption('definedLocalesCodes') %}
+        {% set firstLoop = loop %}
+        {% for localeValue in field.getValue() %}
+            {% if locale == localeValue.locale %}
+                <div data-locale="{{ localeValue.locale }}">
+                    <div class="title{% if firstLoop.first %} active{% endif %}">
+                        <i class="dropdown icon"></i>
+                        {{ flags.fromLocaleCode(localeValue.locale) }} {{ localeValue.locale|sylius_locale_name }}
+                    </div>
+                    <div class="ui content{% if firstLoop.first %} active{% endif %}">
+                        {% set subFields = field.getCustomOption('fieldsDto') %}
+                        {% for subField in subFields %}
+                            {% set subFieldDto = subField.getAsDto() %}
+                            {% set template = subFieldDto.getShowTemplatePath() %}
+                            {% set value = get_resource_property_value(localeValue, subFieldDto.property) %}
+                            {% include template with {
+                                'data': value,
+                                'field': subFieldDto,
+                                'resource': resource
+                            } %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</div>

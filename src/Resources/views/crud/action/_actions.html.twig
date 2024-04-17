@@ -1,0 +1,26 @@
+{% if form.vars.actionsGroups is defined %}
+    {% set actionsGroups = form.vars.actionsGroups %}
+    <div style="position: absolute; right: 30px; z-index: 10; width: 40%; text-align:right; margin-top: {{ marginTop ?? '0' }}">
+            {% if actionsGroups['main'] is defined %}
+                <div class="ui buttons">
+                {% for action in actionsGroups['main'] %}
+                    {{ crud_render_action(action, configuration) }}
+                {% endfor %}
+                </div>
+            {% endif %}
+            {% if actionsGroups['item'] is defined %}
+                <div class="ui buttons" style="margin-top:1rem;">
+                {% for action in actionsGroups['item'] %}
+                    {{ crud_render_action(action, configuration) }}
+                {% endfor %}
+                </div>
+            {% endif %}
+            {% if actionsGroups['subitem'] is defined %}
+                <div class="ui buttons" style="margin-top:1rem;">
+                {% for action in actionsGroups['subitem'] %}
+                    {{ crud_render_action(action, configuration) }}
+                {% endfor %}
+                </div>
+            {% endif %}
+    </div>
+{% endif %}

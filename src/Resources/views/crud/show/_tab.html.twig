@@ -1,0 +1,7 @@
+{% import "@SyliusEasyCrudPlugin/crud/show/_macros.html.twig" as _macros %}
+
+{{ _macros.start_tab(firstMenuItem, menuItem) }}
+
+{{ _macros.show(firstMenuItem, menuItem, fields, columns, resource) }}
+
+{{ _macros.end_tab() }}

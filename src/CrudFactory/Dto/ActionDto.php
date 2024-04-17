@@ -1,0 +1,414 @@
+<?php
+
+namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
+
+use Adeliom\SyliusEasyCrudPlugin\Config\EntityDto;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
+use Sylius\Bundle\GridBundle\Builder\Action\Action as SyliusAction;
+use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
+use Sylius\Bundle\GridBundle\Builder\Action\CreateAction;
+use Sylius\Bundle\GridBundle\Builder\Action\DeleteAction;
+use Sylius\Bundle\GridBundle\Builder\Action\ShowAction;
+use Sylius\Bundle\GridBundle\Builder\Action\UpdateAction;
+use Symfony\Contracts\Translation\TranslatableInterface;
+
+/**
+ * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
+ */
+class ActionDto
+{
+    private ?string $type = null;
+    private ?string $name = null;
+    private TranslatableInterface|string|null $label = null;
+    private ?string $icon = null;
+    private string $cssClass = '';
+    private ?string $htmlElement = null;
+    private array $htmlAttributes = [];
+    private ?string $linkUrl = null;
+    private ?string $templatePath = null;
+    private ?string $controllerMethodName = null;
+    private ?array $controllerMethodContext = null;
+    private ?string $routeName = null;
+    private $routeParameters = [];
+    /* @var callable|string|null */
+    private $url;
+    private array $translationParameters = [];
+    private $displayCallable;
+    private array $subActions = [];
+
+    private ?ActionInterface $syliusAction = null;
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function hasType(string $type): bool
+    {
+        return $this->type === $type;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+    public function isItemAction(): bool
+    {
+        return Action::TYPE_ITEM === $this->type;
+    }
+
+    public function isGlobalAction(): bool
+    {
+        return Action::TYPE_GLOBAL === $this->type;
+    }
+
+    public function isBatchAction(): bool
+    {
+        return Action::TYPE_BATCH === $this->type;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getLabel(): TranslatableInterface|string|false|null
+    {
+        return $this->label;
+    }
+
+    public function setLabel(TranslatableInterface|string|false|null $label): void
+    {
+        $this->label = $label;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): void
+    {
+        $this->icon = $icon;
+    }
+
+    public function getCssClass(): string
+    {
+        return $this->cssClass;
+    }
+
+    public function setCssClass(string $cssClass): void
+    {
+        $this->cssClass = $cssClass;
+    }
+
+    public function getHtmlElement(): string
+    {
+        return $this->htmlElement;
+    }
+
+    public function setHtmlElement(string $htmlElement): void
+    {
+        $this->htmlElement = $htmlElement;
+    }
+
+    public function getHtmlAttributes(): array
+    {
+        return $this->htmlAttributes;
+    }
+
+    public function addHtmlAttributes(array $htmlAttributes): void
+    {
+        $this->htmlAttributes = array_merge($this->htmlAttributes, $htmlAttributes);
+    }
+
+    public function setHtmlAttributes(array $htmlAttributes): void
+    {
+        $this->htmlAttributes = $htmlAttributes;
+    }
+
+    public function setHtmlAttribute(string $attributeName, string $attributeValue): void
+    {
+        $this->htmlAttributes[$attributeName] = $attributeValue;
+    }
+
+    public function getTemplatePath(): ?string
+    {
+        return $this->templatePath;
+    }
+
+    public function setTemplatePath(string $templatePath): void
+    {
+        $this->templatePath = $templatePath;
+    }
+
+    public function getLinkUrl(): string
+    {
+        return $this->linkUrl;
+    }
+
+    public function setLinkUrl(string $linkUrl): void
+    {
+        $this->linkUrl = $linkUrl;
+    }
+
+    public function getControllerMethodName(): ?string
+    {
+        return $this->controllerMethodName;
+    }
+
+    public function setControllerMethodName(string $controllerMethodName): void
+    {
+        $this->controllerMethodName = $controllerMethodName;
+    }
+
+    public function getControllerMethodContext(): array
+    {
+        return $this->controllerMethodContext ?? [];
+    }
+
+    public function setControllerMethodContext(?array $controllerMethodContext = null): void
+    {
+        $this->controllerMethodContext = $controllerMethodContext;
+    }
+
+    public function getRouteName(): ?string
+    {
+        return $this->routeName;
+    }
+
+    public function setRouteName(string $routeName): void
+    {
+        $this->routeName = $routeName;
+    }
+
+    /**
+     * @return array|callable
+     */
+    public function getRouteParameters()/* : array|callable */
+    {
+        return $this->routeParameters;
+    }
+
+    /**
+     * @param array|callable $routeParameters
+     */
+    public function setRouteParameters($routeParameters): void
+    {
+        if (!\is_array($routeParameters) && !\is_callable($routeParameters)) {
+            trigger_deprecation(
+                'agence-adeliom/sylius-easy-crud-bundle',
+                '4.0.5',
+                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
+                '$routeParameters',
+                __METHOD__,
+                '"array" or "callable"',
+                \gettype($routeParameters)
+            );
+        }
+
+        $this->routeParameters = $routeParameters;
+    }
+
+    /**
+     * @return string|callable|null
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string|callable $url
+     */
+    public function setUrl($url): void
+    {
+        if (!\is_string($url) && !\is_callable($url)) {
+            trigger_deprecation(
+                'agence-adeliom/sylius-easy-crud-bundle',
+                '4.0.5',
+                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
+                '$url',
+                __METHOD__,
+                '"string" or "callable"',
+                \gettype($url)
+            );
+        }
+
+        $this->url = $url;
+    }
+
+    public function getTranslationParameters(): array
+    {
+        return $this->translationParameters;
+    }
+
+    public function setTranslationParameters(array $translationParameters): void
+    {
+        $this->translationParameters = $translationParameters;
+    }
+
+    public function shouldBeDisplayedFor(EntityDto $entityDto): bool
+    {
+        return null === $this->displayCallable || (bool)\call_user_func($this->displayCallable, $entityDto->getInstance());
+    }
+
+    public function setDisplayCallable(callable $displayCallable): void
+    {
+        $this->displayCallable = $displayCallable;
+    }
+
+    /**
+     * @internal
+     */
+    public function getAsConfigObject(): Action
+    {
+        $action = Action::new($this->name, $this->label, $this->icon);
+        $this->setCssClass($this->cssClass);
+        $this->setHtmlAttributes($this->htmlAttributes);
+        $this->setTranslationParameters($this->translationParameters);
+
+        if (null !== $this->templatePath) {
+            $this->setTemplatePath($this->templatePath);
+        }
+
+        if ($this->isGlobalAction()) {
+            $this->createAsGlobalAction();
+        } elseif ($this->isBatchAction()) {
+            $this->createAsBatchAction();
+        }
+
+        if ('a' === $this->htmlElement) {
+            $this->displayAsLink();
+        } else {
+            $this->displayAsButton();
+        }
+
+        if (null !== $this->controllerMethodName) {
+            $this->setControllerMethodName($this->controllerMethodName);
+        }
+
+        if (null !== $this->controllerMethodContext && [] !== $this->controllerMethodContext) {
+            $this->setControllerMethodContext($this->getControllerMethodContext());
+        }
+
+        if (null !== $this->routeName) {
+            $this->linkToRoute($this->routeName, $this->routeParameters);
+        }
+
+        if (null !== $this->displayCallable) {
+            $this->displayIf($this->displayCallable);
+        }
+
+        return $action;
+    }
+
+    public function getSubActions(): array
+    {
+        return $this->subActions;
+    }
+
+    public function setSubActions(array $subActions): void
+    {
+        $this->subActions = $subActions;
+    }
+
+    public function addSubAction(Action $action): void
+    {
+        $this->subActions[] = $action;
+    }
+
+    public function setSyliusAction(ActionInterface $action): void
+    {
+        $this->syliusAction = $action;
+    }
+
+    public function getSyliusAction(): ?ActionInterface
+    {
+        return $this->syliusAction;
+    }
+
+    public function convertToGridAction(): ?ActionInterface
+    {
+        $actionRoute = function (ActionDto $actionDto): array {
+            if (null !== $actionDto->getUrl() && '' !== $actionDto->getUrl()) {
+                $route = [
+                    'url' => $actionDto->getUrl(),
+                ];
+            } elseif (null !== $actionDto->getControllerMethodName()) {
+                $route = [
+                    'route' => $actionDto->getRouteName(),
+                    'parameters' => array_merge([
+                        'context' => 'ca:'.$actionDto->getControllerMethodName()
+                    ], $actionDto->getControllerMethodContext()),
+                ];
+            } else {
+                $route = [
+                    'route' => $actionDto->getRouteName(),
+                    'parameters' => $actionDto->getRouteParameters(),
+                ];
+            }
+            return $route;
+        };
+
+        $actionOptions = [];
+        if (!is_null($this->getSyliusAction())) {
+            return $this->getSyliusAction();
+        }
+        if ([] !== $this->getSubActions()) {
+            $subItemWrapper = SyliusAction::create(
+                $this->getName(),
+                'easy_crud_' . $this->getType() . '_sub_action'
+            )->setLabel($this->getLabel());
+
+            $subItems = [];
+            foreach ($this->getSubActions() as $subAction) {
+                /** @var ActionDto $subActionDto */
+                $subActionDto = $subAction->getAsDto();
+                $route = $actionRoute($subActionDto);
+                $subItems[] = array_merge(
+                    [
+                        'label' => $subActionDto->getLabel(),
+                        'icon' => $subActionDto->getIcon(),
+                    ],
+                    $route
+                );
+            }
+
+            $subItemWrapper->setOptions(
+                [
+                    'icon' => $this->getIcon(),
+                    'links' => [
+                        ...$subItems,
+                    ]
+                ]
+            );
+
+            return $subItemWrapper;
+        }
+        $route = $actionRoute($this);
+
+        if ($this->getCssClass()) {
+            $actionOptions['class'] = $this->getCssClass();
+        }
+        if ($this->getHtmlAttributes()) {
+            $actionOptions['attr'] = $this->getHtmlAttributes();
+        }
+
+        $actionOptions = array_merge(
+            ['link' => $route],
+            $actionOptions
+        );
+        return SyliusAction::create($this->getName(), 'easy_crud_' . $this->getType() . '_action')
+            ->setLabel($this->getLabel())
+            ->setIcon($this->getIcon())
+            ->setEnabled(true)
+            ->setOptions($actionOptions);
+    }
+}

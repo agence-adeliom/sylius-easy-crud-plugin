@@ -1,0 +1,10 @@
+{% if css_assets is defined %}
+    {% for asset in form.vars.css_assets %}
+        <link rel="stylesheet" href="{{ asset(asset.value, asset.packageName) }}">
+    {% endfor %}
+{% endif %}
+{% if webpack_encore_assets is defined %}
+    {% for entry in webpack_encore_assets %}
+        encore_entry_link_tags(entry)
+    {% endfor %}
+{% endif %}

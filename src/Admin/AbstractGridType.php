@@ -1,0 +1,141 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Adeliom\SyliusEasyCrudPlugin\Admin;
+
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\BulkActionGroup;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\ItemActionGroup;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\MainActionGroup;
+use Sylius\Bundle\GridBundle\Builder\ActionGroup\SubItemActionGroup;
+use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
+use Sylius\Bundle\GridBundle\Builder\GridBuilder;
+use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
+use Sylius\Bundle\GridBundle\Grid\ResourceAwareGridInterface;
+use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Sylius\Component\Resource\Model\TranslatableInterface;
+
+abstract class AbstractGridType extends AbstractResourceType implements ResourceAwareGridInterface
+{
+    public function toArray(): array
+    {
+        $gridBuilder = $this->createGridBuilder();
+
+        $this->buildGrid($gridBuilder);
+
+        return $gridBuilder->toArray();
+    }
+
+    private function createGridBuilder(): GridBuilderInterface
+    {
+        $resourceClass = $this->getResourceClass();
+        $grid = GridBuilder::create($this::getName(), $resourceClass);
+        $grid->orderBy($this::getDefaultSortColumn(), $this::getDefaultSortOrder());
+
+        if (in_array(TranslatableInterface::class, class_implements($resourceClass))) {
+            $grid->setDriverOption('repository', $this::getRepositoryMethod());
+        }
+        return $grid;
+    }
+
+    protected function processActions(string $pageName): array
+    {
+        $actions = $this->configureActions(
+            $pageName
+        );
+        $actionsDto = $actions->getAsDto($pageName);
+
+        $pageActions = [
+            'main' => $actionsDto->getActionsByType(Action::TYPE_GLOBAL),
+            'bulk' => $actionsDto->getActionsByType(Action::TYPE_BATCH),
+            'item' => $actionsDto->getActionsByType(Action::TYPE_ITEM),
+            'subitem' => $actionsDto->getActionsByType(Action::TYPE_SUB_ITEM),
+        ];
+
+        return $pageActions;
+    }
+
+    protected function transformActionsAsGridDefinition($name, $data)
+    {
+        $action = \Sylius\Component\Grid\Definition\Action::fromNameAndType($name, $data['type']);
+        $action->setOptions($data['options'] ?? []);
+        $action->setIcon($data['icon'] ?? '');
+        $action->setEnabled($data['enabled'] ?? true);
+        $action->setPosition($data['position'] ?? 1);
+        $action->setLabel($data['label'] ?? '');
+        return $action;
+    }
+
+    protected function processDetailAndUpdateActions(string $pageName): array
+    {
+        $pageActions = $this->processActions($pageName);
+        $mainActions = MainActionGroup::create(...$pageActions[Action::TYPE_GLOBAL]);
+        $itemActions = ItemActionGroup::create(...$pageActions[Action::TYPE_ITEM]);
+        $subItemActions = ItemActionGroup::create(...$pageActions[Action::TYPE_SUB_ITEM]);
+        $actions = [
+            'main' => [],
+            'item' => [],
+            'subitem' => [],
+        ];
+        foreach ($mainActions->toArray() as $name => $mainAction) {
+            $actions['main'][] = $this->transformActionsAsGridDefinition($name, $mainAction);
+        }
+        foreach ($itemActions->toArray() as $name => $itemAction) {
+            $actions['item'][] = $this->transformActionsAsGridDefinition($name, $itemAction);
+        }
+        foreach ($subItemActions->toArray() as $name => $subItemAction) {
+            $actions['subitem'][] = $this->transformActionsAsGridDefinition($name, $subItemAction);
+        }
+        return $actions;
+    }
+
+    protected function processGridActions(
+        ?GridBuilderInterface $gridBuilder = null,
+    ) {
+        $pageActions = $this->processActions(Crud::PAGE_INDEX);
+
+        if ($gridBuilder instanceof GridBuilderInterface) {
+            $gridBuilder
+                ->addActionGroup(
+                    MainActionGroup::create(...$pageActions[Action::TYPE_GLOBAL]),
+                )
+                ->addActionGroup(
+                    BulkActionGroup::create(...$pageActions[Action::TYPE_BATCH]),
+                )
+                ->addActionGroup(
+                    ItemActionGroup::create(...$pageActions[Action::TYPE_ITEM]),
+                )
+                ->addActionGroup(
+                    SubItemActionGroup::create(...$pageActions[Action::TYPE_SUB_ITEM]),
+                );
+        } else {
+            return $pageActions;
+        }
+    }
+
+    protected function processGridFilters(
+        ?GridBuilderInterface $gridBuilder = null,
+    ) {
+        $filters = $this->configureFilters();
+
+        if ($gridBuilder instanceof GridBuilderInterface) {
+            foreach ($filters as $filter) {
+                if ($filter instanceof FilterInterface) {
+                    $gridBuilder->addFilter($filter);
+                }
+            }
+        } else {
+            return $filters;
+        }
+    }
+
+    protected function processGridDefaultSort(
+        ?GridBuilderInterface $gridBuilder = null,
+    ): void {
+        foreach ($this->configureDefaultSort() as $name => $direction) {
+            $gridBuilder->addOrderBy($name, $direction);
+        }
+    }
+}

@@ -1,0 +1,7 @@
+/*!
+* IconPicker ('https://github.com/furcan/IconPicker')
+* Version: 1.5.0
+* Author: Furkan MT ('https://github.com/furcan')
+* Dependencies: Font Awesome Free v5.11.2 (https://fontawesome.com/license/free)
+* Copyright 2019 IconPicker, MIT Licence ('https://opensource.org/licenses/MIT')*
+*/

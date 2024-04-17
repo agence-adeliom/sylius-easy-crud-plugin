@@ -1,0 +1,82 @@
+{% macro start_column(size, newLine, label) %}
+    {% if newLine %}
+    </div>
+    </div>
+    <div class="ui attached segment">
+        <div class="ui column stackable grid">
+    {% endif %}
+            <div class="{{ size.value ?? 'one' }} wide column">
+                {% if label %}
+                    <h4 class="ui dividing header">{{ label | trans }}</h4>
+                {% endif %}
+{% endmacro %}
+
+{% macro end_column() %}
+    </div>
+{% endmacro %}
+
+{% macro start_tab(firstMenuItem, menuItem) %}
+    <div class="ui {{ firstMenuItem ? 'active' : '' }} tab" data-tab="{{ menuItem.name }}">
+        <h3 class="ui top attached header">{{ menuItem.label|trans }}</h3>
+{% endmacro %}
+
+{% macro end_tab(firstMen) %}
+    </div>
+{% endmacro %}
+
+{% macro show(firstMenuItem, menuItem, fields, columns, resource) %}
+
+    <div class="ui attached segment">
+        <div class="ui column stackable grid">
+
+            {% set columnStarted = null %}
+
+            {% for column in columns %}
+
+                {% for field in fields %}
+
+                    {% set fieldColumnId = field.getCustomOption('columnId') %}
+                    {% set columnMenuItem = column.menuItem ?? null %}
+
+                    {% if (fieldColumnId == column.id or fieldColumnId is null) and (menuItem is null or menuItem.name == columnMenuItem) %}
+
+                        {% set fieldMenuItem = field.getCustomOption('menuItem').name ?? null %}
+
+                        {% if
+                            (firstMenuItem is not null and firstMenuItem and menuItem is not null and (fieldMenuItem is null or fieldMenuItem == menuItem.name))
+                            or
+                            (firstMenuItem is not null and not firstMenuItem and menuItem is not null and fieldMenuItem == menuItem.name)
+                            or
+                            (firstMenuItem is null and menuItem is null)
+                        %}
+
+                            {% if not columnStarted %}
+                                {{ _self.start_column(column.size, false, column.label) }}
+                                {% set columnStarted = column.id %}
+                            {% elseif columnStarted != column.id %}
+                                {{ _self.end_column() }}
+                                {{ _self.start_column(column.size, column.newLine, column.label) }}
+                                {% set columnStarted = column.id %}
+                            {% endif %}
+
+                            {% set template = field.getShowTemplatePath() %}
+                            {% include template with {
+                                'data': field.value,
+                                'field': field,
+                                'resource': resource
+                            } %}
+
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+            {% endfor %}
+
+            {% if columnStarted %}
+                {{ _self.end_column() }}
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endmacro %}

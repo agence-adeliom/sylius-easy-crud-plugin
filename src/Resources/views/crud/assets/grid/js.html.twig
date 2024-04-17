@@ -1,0 +1,10 @@
+{% if resources.definition.driverConfiguration.js_assets is defined %}
+    {% for path in resources.definition.driverConfiguration.js_assets %}
+        <script src="{{ path }}"></script>
+    {% endfor %}
+{% endif %}
+{% if resources.definition.driverConfiguration.webpack_encore_assets is defined %}
+    {% for entry in resources.definition.driverConfiguration.webpack_encore_assets %}
+        encore_entry_script_tags(entry)
+    {% endfor %}
+{% endif %}

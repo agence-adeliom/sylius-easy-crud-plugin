@@ -1,0 +1,3 @@
+{% if data|default(null) is not null %}
+    <img class="ui small bordered image" src="{{ data|imagine_filter('sylius_small') }}" alt="{{ data }}" />
+{% endif %}

@@ -1,0 +1,14 @@
+{% include configuration.vars.templates.header_title|default('@SyliusEasyCrudPlugin/crud/show/_header.html.twig') %}
+<div class="ui segment">
+    {% if menu and menu.children | length %}
+        {{ knp_menu_render(menu, {
+            'template': '@SyliusEasyCrudPlugin/crud/show/_menu.html.twig',
+            'fields': fields | default([]),
+            'columns': columns,
+            'resource': resource
+        }) }}
+    {% else %}
+        {% import "@SyliusEasyCrudPlugin/crud/show/_macros.html.twig" as _macros %}
+        {{ _macros.show(null, null, fields | default([]), columns | default([]), resource) }}
+    {% endif %}
+</div>

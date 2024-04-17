@@ -1,0 +1,10 @@
+{% if form.vars.js_assets is defined %}
+    {% for asset in form.vars.js_assets %}
+        <script src="{{ asset(asset.value, asset.packageName) }}"></script>
+    {% endfor %}
+{% endif %}
+{% if form.vars.webpack_encore_assets is defined %}
+    {% for entry in form.vars.webpack_encore_assets %}
+        encore_entry_script_tags(entry)
+    {% endfor %}
+{% endif %}

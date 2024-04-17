@@ -1,0 +1,19 @@
+{% form_theme form _self %}
+
+{% block slug_row %}
+    <div data-slug-for="name"
+        class="{% if form.vars.required %}required {% endif %}field{% if form.vars.errors|length > 0 %} error{% endif %} ui loadable form">
+        {{ form_label(form) }}
+        {% if form.vars.value == null %}
+            {{ form_widget(form) }}
+        {% else %}
+            <div class="ui action input">
+                {{ form_widget(form, {'attr': {'readonly': 'readonly'}}) }}
+                <span class="ui icon button toggle-slug-modification">
+                    <i class="lock icon"></i>
+                </span>
+            </div>
+        {% endif %}
+        {{ form_errors(form) }}
+    </div>
+{%- endblock slug_row %}

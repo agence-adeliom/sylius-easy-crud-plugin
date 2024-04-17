@@ -1,0 +1,30 @@
+{% macro default(url, message, id, icon, class) %}
+    <a class="ui {% if message is not empty and icon %}labeled {% endif %}{% if icon is not empty %}icon {% endif %}button {% if class is not empty %} {{ class }} {% endif %}" {% if id is not null %} id="{{ id }}"{% endif %} href="{{ url }}" {{ sylius_test_html_attribute('button', id|default(message)) }}>
+        {% if icon is not empty %}
+            <i class="icon {{ icon }}"></i>
+        {% endif %}
+        {% if message is not empty %}
+            {{ message|trans }}
+        {% endif %}
+    </a>
+{% endmacro %}
+
+{% set routeParams = options.link.parameters|default({}) %}
+{% set route = options.link.route | default(false) %}
+{% set url = options.link.url | default(false) %}
+
+{% if data is defined and data.id is defined and url %}
+    {% set url = options.link.url | replace({'{id}': data.id}) %}
+{% endif %}
+
+{% if url or route %}
+    {% set path = url |
+        default(
+            route ?
+                path(route, routeParams|merge({'id': routeParams.id | default(data.id ?? null)}))
+            : ''
+        )
+    %}
+
+    {{ _self.default(path, action.label, null, action.icon, action.options.class | default(null)) }}
+{% endif %}

@@ -1,0 +1,11 @@
+<table class="ui very basic celled table">
+    <tbody>
+    <tr>
+        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property) | trans }}</strong></td>
+        <td>
+            {% import '@SyliusUi/Macro/labels.html.twig' as label %}
+            {{ label.yesNo(data) }}
+        </td>
+    </tr>
+    </tbody>
+</table>

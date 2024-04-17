@@ -1,0 +1,30 @@
+{
+  "name": "SyliusEasyCrudPlugin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^2.0",
+    "buffer": "^6.0.3",
+    "codemirror": "^5.65.2",
+    "file-loader": "^6.2.0",
+    "postcss-loader": "^6.2.1",
+    "process": "^0.11.10",
+    "resolve-url-loader": "^4.0.0",
+    "sass": "^1.35.1",
+    "sass-loader": "^12.1.0"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.9.3",
+    "bootstrap": "^5.1.0",
+    "dirty-form": "^0.4.0",
+    "jquery": "^3.6.0",
+    "sortablejs": "^1.14.0",
+    "trix": "^1.3.1"
+  }
+}
