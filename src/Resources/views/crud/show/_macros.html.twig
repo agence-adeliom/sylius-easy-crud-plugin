@@ -29,34 +29,31 @@
     <div class="ui attached segment">
         <div class="ui column stackable grid">
 
-            {% set columnStarted = null %}
+            {% set column_started = null %}
 
             {% for column in columns %}
 
                 {% for field in fields %}
 
-                    {% set fieldColumnId = field.getCustomOption('columnId') %}
-                    {% set columnMenuItem = column.menuItem ?? null %}
+                    {% set field_column_id = field.getCustomOption('columnId') %}
+                    {% set column_menu_item = column.menuItem ?? null %}
 
-                    {% if (fieldColumnId == column.id or fieldColumnId is null) and (menuItem is null or menuItem.name == columnMenuItem) %}
+                    {% if (field_column_id == column.id or field_column_id is null) and (menuItem is null or menuItem.name == column_menu_item) %}
 
-                        {% set fieldMenuItem = field.getCustomOption('menuItem').name ?? null %}
+                        {% set field_menu_item = field.getCustomOption('menuItem').name ?? null %}
+                        {% set first_condition = (firstMenuItem is not null and firstMenuItem and menuItem is not null and (field_menu_item is null or field_menu_item == menuItem.name)) %}
+                        {% set second_condition = (firstMenuItem is not null and not firstMenuItem and menuItem is not null and field_menu_item == menuItem.name) %}
+                        {% set third_condition = (firstMenuItem is null and menuItem is null) %}
 
-                        {% if
-                            (firstMenuItem is not null and firstMenuItem and menuItem is not null and (fieldMenuItem is null or fieldMenuItem == menuItem.name))
-                            or
-                            (firstMenuItem is not null and not firstMenuItem and menuItem is not null and fieldMenuItem == menuItem.name)
-                            or
-                            (firstMenuItem is null and menuItem is null)
-                        %}
+                        {% if first_condition or second_condition or third_condition %}
 
-                            {% if not columnStarted %}
+                            {% if not column_started %}
                                 {{ _self.start_column(column.size, false, column.label) }}
-                                {% set columnStarted = column.id %}
-                            {% elseif columnStarted != column.id %}
+                                {% set column_started = column.id %}
+                            {% elseif column_started != column.id %}
                                 {{ _self.end_column() }}
                                 {{ _self.start_column(column.size, column.newLine, column.label) }}
-                                {% set columnStarted = column.id %}
+                                {% set column_started = column.id %}
                             {% endif %}
 
                             {% set template = field.getShowTemplatePath() %}
@@ -72,7 +69,7 @@
 
             {% endfor %}
 
-            {% if columnStarted %}
+            {% if column_started %}
                 {{ _self.end_column() }}
             {% endif %}
 
