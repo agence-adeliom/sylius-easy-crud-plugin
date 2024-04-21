@@ -6,10 +6,27 @@
 ### ¯¯¯¯¯¯¯¯¯¯¯
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
+
+
 # Check coding standard
 test.ecs:
-	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php vendor/bin/ecs check lib/sylius-easy-crud-plugin/src)
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php vendor/bin/ecs check ${PLUGIN_DIR}/src)
 
 # Fix coding standard
 test.ecs.fix:
-	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php vendor/bin/ecs --fix check lib/sylius-easy-crud-plugin/src)
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php vendor/bin/ecs --fix check ${PLUGIN_DIR}/src)
+
+
+HELP += $(call help,test.yaml,			Lint the symfony Yaml files)
+test.yaml: ## Lint the symfony Yaml files
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php bin/console lint:yaml --parse-tags ${PLUGIN_DIR}/src/Resources)
+
+HELP += $(call help,test.schema,			Validate MySQL Schema)
+test.schema: ## Validate MySQL Schema
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php bin/console doctrine:cache:clear-metadata)
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php bin/console doctrine:schema:validate)
+
+HELP += $(call help,test.twig,			Validate Twig templates)
+test.twig: ## Validate Twig templates
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php bin/console lint:twig --no-debug ${PLUGIN_DIR}/src/Resources/views)
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose exec php vendor/bin/twigcs ${PLUGIN_DIR}/src/Resources/views --severity error --display blocking)

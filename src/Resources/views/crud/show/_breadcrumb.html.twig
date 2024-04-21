@@ -6,13 +6,13 @@
     )
 %}
 
-{% set breadcrumb = configuration.vars.breadcrumb|default(metadata.applicationName~'.ui.'~metadata.pluralName) %}
+{% set breadcrumb = configuration.vars.breadcrumb|default(metadata.applicationName ~ '.ui.' ~ metadata.pluralName) %}
 
 {% set breadcrumbs = [
-        { label: 'sylius.ui.administration'|trans, url: path('sylius_admin_dashboard') },
-        { label: breadcrumb|trans, url: index_url },
-        { label: resource.name|default(resource.code|default(resource.id)) },
-        { label: 'sylius.ui.show'|trans }
+        {label: 'sylius.ui.administration'|trans, url: path('sylius_admin_dashboard')},
+        {label: breadcrumb|trans, url: index_url},
+        {label: resource.name|default(resource.code|default(resource.id))},
+        {label: 'sylius.ui.show'|trans}
     ]
 %}
 r

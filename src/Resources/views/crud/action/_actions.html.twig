@@ -1,23 +1,23 @@
 {% if form.vars.actionsGroups is defined %}
-    {% set actionsGroups = form.vars.actionsGroups %}
+    {% set actions_groups = form.vars.actionsGroups %}
     <div style="position: absolute; right: 30px; z-index: 10; width: 40%; text-align:right; margin-top: {{ marginTop ?? '0' }}">
-            {% if actionsGroups['main'] is defined %}
+            {% if actions_groups['main'] is defined %}
                 <div class="ui buttons">
-                {% for action in actionsGroups['main'] %}
+                {% for action in actions_groups['main'] %}
                     {{ crud_render_action(action, configuration) }}
                 {% endfor %}
                 </div>
             {% endif %}
-            {% if actionsGroups['item'] is defined %}
+            {% if actions_groups['item'] is defined %}
                 <div class="ui buttons" style="margin-top:1rem;">
-                {% for action in actionsGroups['item'] %}
+                {% for action in actions_groups['item'] %}
                     {{ crud_render_action(action, configuration) }}
                 {% endfor %}
                 </div>
             {% endif %}
-            {% if actionsGroups['subitem'] is defined %}
+            {% if actions_groups['subitem'] is defined %}
                 <div class="ui buttons" style="margin-top:1rem;">
-                {% for action in actionsGroups['subitem'] %}
+                {% for action in actions_groups['subitem'] %}
                     {{ crud_render_action(action, configuration) }}
                 {% endfor %}
                 </div>

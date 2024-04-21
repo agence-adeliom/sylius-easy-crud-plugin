@@ -1,7 +1,7 @@
 <table class="ui very basic celled table">
     <tbody>
     <tr>
-        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property) | trans }}</strong></td>
+        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property)|trans }}</strong></td>
         <td>
             <div class="ui basic modal">
                 <div class="actions">
@@ -16,7 +16,7 @@
             </div>
             <button onclick="openOembed(this)"  class="ui labeled icon button">
                 <i class="play circle outline icon"></i>
-                {{ 'play' | trans }}
+                {{ 'play'|trans }}
             </button>
             <script type="text/javascript">
                 if (typeof window.openOembed === 'undefined') {

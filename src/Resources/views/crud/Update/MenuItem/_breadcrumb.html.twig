@@ -2,15 +2,15 @@
 
 {# MODIFIE ICI POUR QUE L'ON RETOURNE SUR LA LISTE DES MENUS #}
 {% set index_url = path(
-    configuration.vars.index.route.name|default(configuration.getRouteName('index') | replace({'_item' : ''}))
+    configuration.vars.index.route.name|default(configuration.getRouteName('index')|replace({'_item' : ''}))
 )
 %}
 
-{% set breadcrumb = configuration.vars.breadcrumb|default(metadata.applicationName~'.ui.'~metadata.pluralName) %}
+{% set breadcrumb = configuration.vars.breadcrumb|default(metadata.applicationName ~ '.ui.' ~ metadata.pluralName) %}
 
 {% set breadcrumbs = [
-    { label: 'sylius.ui.administration'|trans, url: path('sylius_admin_dashboard') },
-    { label: breadcrumb|trans, url: index_url },
+    {label: 'sylius.ui.administration'|trans, url: path('sylius_admin_dashboard')},
+    {label: breadcrumb|trans, url: index_url},
 ]
 %}
 

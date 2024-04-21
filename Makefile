@@ -12,6 +12,7 @@ GITHUB_TOKEN ?= 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
 SYLIUS_VERSION=1.12.6
 SYMFONY_VERSION=6.4
 PLUGIN_NAME=agence-adeliom/sylius-easy-crud-plugin
+PLUGIN_DIR=lib/sylius-easy-crud-plugin
 
 ###
 ### DEV

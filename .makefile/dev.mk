@@ -107,6 +107,7 @@ platform:
 	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose run --rm php composer config repositories.adeliom '{"type":"vcs","url":"git@github.com:agence-adeliom/sylius-easy-crud-plugin.git"}')
 	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose run --rm php composer config extra.symfony.require "~${SYMFONY_VERSION}")
 	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose run --rm php composer require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}")
+	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose run --rm php composer require --no-install --no-scripts --no-progress --dev friendsoftwig/twigcs)
 	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose run --rm php composer dump-autoload)
 	cd ${APP_DIR} && (ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) docker-compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
 	make platform_up

@@ -2,7 +2,7 @@
     {{ block('choice_widget') }}
 
     {% set main_form_name = id|slice(0, id|length - name|length) %}
-    {% set isTranslation = form.vars.is_translation | default(false) %}
+    {% set isTranslation = form.vars.is_translation|default(false) %}
 
     <script>
         var allFields_{{ main_form_name }} = {{ all_fields|json_encode|raw }};

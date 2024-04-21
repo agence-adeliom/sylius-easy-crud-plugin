@@ -1,6 +1,6 @@
 {% extends '@SyliusAdmin/layout.html.twig' %}
 
-{% set header = configuration.vars.header|default(metadata.applicationName~'.ui.show_'~metadata.name) %}
+{% set header = configuration.vars.header|default(metadata.applicationName ~ '.ui.show_' ~ metadata.name) %}
 {% set event_prefix = metadata.applicationName ~ '.admin.' ~ metadata.name ~ '.show' %}
 
 {% block title %}{{ header|trans }} {{ parent() }}{% endblock %}
@@ -9,16 +9,16 @@
     {# TODO FIX THE Variable "form" does not exist. error   #}
     {#    {% include configuration.vars.templates.header_title|default('@SyliusEasyCrudPlugin/crud/show/_header.html.twig') %}#}
     <div class="ui segment">
-        {% if menu and menu.children is defined and menu.children | length %}
+        {% if menu and menu.children is defined and menu.children|length %}
             {{ knp_menu_render(menu, {
                 'template': '@SyliusEasyCrudPlugin/crud/show/_menu.html.twig',
-                'fields': fields | default([]),
+                'fields': fields|default([]),
                 'columns': columns,
                 'resource': resource
             }) }}
         {% else %}
             {% import "@SyliusEasyCrudPlugin/crud/show/_macros.html.twig" as _macros %}
-            {{ _macros.show(null, null, fields | default([]), columns | default([]), resource) }}
+            {{ _macros.show(null, null, fields|default([]), columns|default([]), resource) }}
         {% endif %}
     </div>
 {% endblock %}
@@ -26,7 +26,7 @@
 {% block stylesheets %}
     {{ parent() }}
 
-    {{ sylius_template_event([event_prefix ~ '.stylesheets', 'sylius.admin.show.stylesheets'], { 'metadata': metadata }) }}
+    {{ sylius_template_event([event_prefix ~ '.stylesheets', 'sylius.admin.show.stylesheets'], {'metadata': metadata}) }}
 
     {% include "@SyliusEasyCrudPlugin/crud/assets/show/css.html.twig" %}
 {% endblock %}
@@ -34,7 +34,7 @@
 {% block javascripts %}
     {{ parent() }}
 
-    {{ sylius_template_event([event_prefix ~ '.javascripts', 'sylius.admin.show.javascripts'], { 'metadata': metadata }) }}
+    {{ sylius_template_event([event_prefix ~ '.javascripts', 'sylius.admin.show.javascripts'], {'metadata': metadata}) }}
 
     {% include "@SyliusEasyCrudPlugin/crud/assets/show/js.html.twig" %}
 {% endblock %}
