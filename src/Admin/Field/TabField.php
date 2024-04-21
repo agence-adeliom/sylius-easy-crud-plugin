@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
@@ -20,5 +22,4 @@ final class TabField implements FieldInterface
             ->setFormTypeOption('mapped', false)
         ;
     }
-
 }

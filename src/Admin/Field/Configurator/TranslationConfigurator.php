@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
@@ -25,5 +27,4 @@ final class TranslationConfigurator implements FieldConfiguratorInterface
         $field->setCustomOption('definedLocalesCodes', $this->localeProvider->getDefinedLocalesCodes());
         $field->setCustomOption('defaultLocaleCode', $this->localeProvider->getDefaultLocaleCode());
     }
-
 }

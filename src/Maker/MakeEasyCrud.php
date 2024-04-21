@@ -56,7 +56,7 @@ final class MakeEasyCrud extends AbstractMaker
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Customize the namespace for generated admins',
-                'Admin'
+                'Admin',
             )
         ;
 
@@ -118,7 +118,7 @@ final class MakeEasyCrud extends AbstractMaker
             ],
         );
 
-        $yamlPath = 'config/packages/sylius_resource_' . strtolower($entity->getShortName())  . '.yml';
+        $yamlPath = 'config/packages/sylius_resource_' . strtolower($entity->getShortName()) . '.yml';
         $generator->generateFile(
             $yamlPath,
             __DIR__ . '/../Resources/skeleton/resource.tpl.php',

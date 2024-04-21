@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
-use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
+use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
@@ -124,5 +126,4 @@ final class SortableCollectionField implements FieldInterface
 
         return $this;
     }
-
 }

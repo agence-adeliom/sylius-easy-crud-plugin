@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Embed\Embed;
@@ -16,7 +18,7 @@ class OembedController extends AbstractController
 
         if (!$url) {
             try {
-                $content = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+                $content = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
                 $url = $content['url'] ?? null;
             } catch (\Exception) {
                 $url = null;
@@ -27,7 +29,7 @@ class OembedController extends AbstractController
             throw new BadRequestException("The parameter 'url' is missing");
         }
 
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (!filter_var($url, \FILTER_VALIDATE_URL)) {
             throw new BadRequestException("The parameter 'url' is invalid");
         }
 

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
-use Adeliom\SyliusEasyCrudPlugin\Form\ChoiceMaskType;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
+use Adeliom\SyliusEasyCrudPlugin\Form\ChoiceMaskType;
 
 final class ChoiceMaskField implements FieldInterface
 {

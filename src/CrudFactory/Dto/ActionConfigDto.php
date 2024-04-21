@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
@@ -13,18 +15,20 @@ use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 final class ActionConfigDto
 {
     private ?string $pageName = null;
+
     private ?string $routePrefix = null;
-    /**
-     * @var array<string,array<string,ActionDto>>
-     */
+
+    /** @var array<string,array<string,ActionDto>> */
     private array $actions = [
         Crud::PAGE_DETAIL => [],
         Crud::PAGE_EDIT => [],
         Crud::PAGE_INDEX => [],
         Crud::PAGE_NEW => [],
     ];
+
     /** @var string[] */
     private array $disabledActions = [];
+
     /** @var string[] */
     private array $actionPermissions = [];
 
@@ -136,6 +140,7 @@ final class ActionConfigDto
     public function getActionsByType(string $type): array
     {
         $actions = $this->getActions();
+
         return
             array_filter(
                 $this->convertAsGridActions(
@@ -144,17 +149,18 @@ final class ActionConfigDto
                         static function (ActionDto $action) use ($type) {
                             if ($type === Action::TYPE_SUB_ITEM) {
                                 return $action->hasType(Action::TYPE_ITEM) && count($action->getSubActions());
-                            } elseif ($type === Action::TYPE_ITEM) {
-                                return $action->hasType(Action::TYPE_ITEM) && !count($action->getSubActions());
-                            } else {
-                                return $action->hasType($type);
                             }
-                        }
-                    )
+                            if ($type === Action::TYPE_ITEM) {
+                                return $action->hasType(Action::TYPE_ITEM) && !count($action->getSubActions());
+                            }
+
+                            return $action->hasType($type);
+                        },
+                    ),
                 ),
                 static function (?ActionInterface $action) use ($type) {
-                    return !is_null($action);
-                }
+                    return null !== $action;
+                },
             );
     }
 
@@ -167,6 +173,7 @@ final class ActionConfigDto
              */
             $gridActions[] = $actionDto->convertToGridAction();
         }
+
         return $gridActions;
     }
 }

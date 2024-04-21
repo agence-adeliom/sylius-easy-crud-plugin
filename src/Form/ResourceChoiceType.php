@@ -20,7 +20,7 @@ use Webmozart\Assert\Assert;
 class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 {
     public function __construct(
-        protected ServiceRegistryInterface $resourceRepositoryRegistry
+        protected ServiceRegistryInterface $resourceRepositoryRegistry,
     ) {
     }
 
@@ -30,8 +30,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
         Assert::nullOrString($options['choice_value']);
 
         if ($options['useResourceTransformers']) {
-
-            if (! $options['multiple']) {
+            if (!$options['multiple']) {
                 $builder->addModelTransformer(
                     new ReversedTransformer(
                         new ResourceToIdentifierTransformer(
@@ -56,7 +55,6 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                     )
                     ->addViewTransformer(new CollectionToStringTransformer(','));
             }
-
         }
     }
 
@@ -79,12 +77,13 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                     Assert::string($options['resource']);
                     $repository = $this->resourceRepositoryRegistry->get($options['resource']);
 
-                    if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']){
+                    if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
                         Assert::isArray($options['repositoryArguments']);
+
                         return $repository->$options['repositoryMethod'](...$options['repositoryArguments']);
-                    } else {
-                        return $repository->findAll();
                     }
+
+                    return $repository->findAll();
                 },
                 'repository' => function (Options $options) {
                     Assert::string($options['resource']);

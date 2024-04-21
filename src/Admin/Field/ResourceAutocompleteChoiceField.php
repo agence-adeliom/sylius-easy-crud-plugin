@@ -91,5 +91,4 @@ final class ResourceAutocompleteChoiceField implements FieldInterface
 
         return $this;
     }
-
 }

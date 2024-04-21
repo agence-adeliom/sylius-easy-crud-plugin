@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin;
 
 use Adeliom\SyliusEasyCrudPlugin\CompilerPass\RegisterAdminPass;

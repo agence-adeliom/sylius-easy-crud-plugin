@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
+use function Symfony\Component\String\u;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\Translation\TranslatableInterface;
-
-use function Symfony\Component\String\u;
 
 /**
  * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
@@ -16,36 +17,63 @@ use function Symfony\Component\String\u;
 final class FieldDto
 {
     private ?string $fieldFqcn = null;
+
     private ?string $propertyName = null;
+
     private mixed $value = null;
+
     private mixed $formattedValue = null;
+
     private $formatValueCallable;
+
     private $label;
+
     private ?string $formType = null;
+
     private KeyValueStore $formTypeOptions;
+
     private ?bool $sortable = null;
+
     private ?string $sortablePath = null;
+
     private ?bool $virtual = null;
+
     private ?string $permission = null;
+
     private ?string $textAlign = null;
+
     private $help;
+
     private string $cssClass = '';
+
     // how many columns the field takes when rendering
     // (defined as Bootstrap 5 grid classes; e.g. 'col-md-6 col-xxl-3')
     private ?string $columns = null;
+
     // same as $columns but used when the user doesn't define columns explicitly
     private string $defaultColumns = '';
+
     private array $translationParameters = [];
+
     private ?string $templateName = 'crud/field/text';
+
     private ?string $templatePath = null;
+
     private ?string $gridTemplatePath = null;
+
     private ?string $showTemplatePath = null;
+
     private array $formThemePaths = [];
+
     private AssetsDto $assets;
+
     private KeyValueStore $customOptions;
+
     private KeyValueStore $doctrineMetadata;
+
     /** @internal */
     private $uniqueId;
+
     private KeyValueStore $displayedOn;
 
     public function __construct()
@@ -59,7 +87,7 @@ final class FieldDto
             Crud::PAGE_INDEX => Crud::PAGE_INDEX,
             Crud::PAGE_DETAIL => Crud::PAGE_DETAIL,
             Crud::PAGE_NEW => Crud::PAGE_NEW,
-            Crud::PAGE_EDIT => Crud::PAGE_EDIT
+            Crud::PAGE_EDIT => Crud::PAGE_EDIT,
         ]);
     }
 

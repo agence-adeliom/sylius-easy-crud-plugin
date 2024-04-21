@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
@@ -19,7 +21,7 @@ final class FieldCollection implements CollectionInterface
      */
     private function __construct(
         iterable $fields,
-        protected FieldConfiguratorCollection $fieldConfiguratorCollection
+        protected FieldConfiguratorCollection $fieldConfiguratorCollection,
     ) {
         $this->fields = $this->processFields($fields);
     }

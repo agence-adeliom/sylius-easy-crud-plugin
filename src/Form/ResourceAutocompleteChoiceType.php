@@ -40,7 +40,6 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
         Assert::nullOrString($options['choice_value']);
 
         if ($options['useResourceTransformers']) {
-
             if (!$options['multiple']) {
                 $builder->addModelTransformer(
                     new ResourceToIdentifierTransformer(
@@ -63,7 +62,6 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
                     ->addViewTransformer(new CollectionToStringTransformer(','))
                 ;
             }
-
         }
     }
 
@@ -82,11 +80,11 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
                 [
                     'repositoryMethod' => $options['repositoryMethod'],
                     'repositoryArguments' => json_encode(
-                        $options['repositoryArguments']
-                    )
+                        $options['repositoryArguments'],
+                    ),
                 ],
-                $parameters
-            )
+                $parameters,
+            ),
         );
 
         $view->vars['load_edit_url'] = $this->router->generate(
@@ -97,13 +95,12 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
                     'repositoryMethod' => 'findBy',
                     'repositoryArguments' => json_encode([
                          [
-                             $options['choice_value'] =>
-                                 "\${$options['choice_value']}"
-                         ]
+                             $options['choice_value'] => "\${$options['choice_value']}",
+                         ],
                     ]),
                 ],
-                $parameters
-            )
+                $parameters,
+            ),
         );
 
         $view->vars['remote_criteria_type'] = $options['remote_criteria_type'];
@@ -122,7 +119,7 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
         $resolver->setDefault('repositoryArguments', [
             'phrase' => '$phrase',
             'locale' => "expr:service('sylius.context.locale').getLocaleCode()",
-            'limit' => 10
+            'limit' => 10,
         ]);
         $resolver->setDefault('choice_value', 'id');
         $resolver->setDefault('choice_name', 'name');

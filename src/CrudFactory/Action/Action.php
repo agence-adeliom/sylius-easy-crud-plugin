@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\ActionDto;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
-use Symfony\Contracts\Translation\TranslatableInterface;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -14,18 +14,26 @@ use function Symfony\Component\String\u;
 class Action
 {
     public const BATCH_DELETE = 'batchDelete';
+
     public const DELETE = 'delete';
+
     public const DETAIL = 'detail';
+
     public const EDIT = 'edit';
+
     public const INDEX = 'index';
+
     public const NEW = 'new';
 
     // these are the actions applied to a specific entity instance
     public const TYPE_ITEM = 'item';
+
     public const TYPE_SUB_ITEM = 'subitem';
+
     // these are the actions that are not associated to an entity
     // (they are available only in the INDEX page)
     public const TYPE_GLOBAL = 'main';
+
     // these are actions that can be applied to one or more entities at the same time
     public const TYPE_BATCH = 'bulk';
 
@@ -102,7 +110,7 @@ class Action
      */
     public function addCssClass(string $cssClass): self
     {
-        $this->dto->setCssClass(trim($this->dto->getCssClass().' '.$cssClass));
+        $this->dto->setCssClass(trim($this->dto->getCssClass() . ' ' . $cssClass));
 
         return $this;
     }
@@ -137,7 +145,7 @@ class Action
 
     public function linkToControllerMethod(
         string $methodName,
-        ?array $methodContext = null
+        ?array $methodContext = null,
     ): self {
         $this->dto->setControllerMethodName($methodName);
         $this->dto->setControllerMethodContext($methodContext);
@@ -172,7 +180,7 @@ class Action
                 '$url',
                 __METHOD__,
                 '"string" or "callable"',
-                \gettype($url)
+                \gettype($url),
             );
         }
 
@@ -227,10 +235,11 @@ class Action
     public function addSubAction(self $action): static
     {
         $this->dto->addSubAction($action);
+
         return $this;
     }
 
-    public function setSyliusAction(ActionInterface $action): Action
+    public function setSyliusAction(ActionInterface $action): self
     {
         $this->dto->setSyliusAction($action);
 

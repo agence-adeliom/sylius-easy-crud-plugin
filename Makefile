@@ -25,7 +25,7 @@ PLUGIN_NAME=agence-adeliom/sylius-easy-crud-plugin
 ### Commands to test the code quality
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
--include .makefile/qa.mk
+-include .makefile/ci.mk
 
 
 

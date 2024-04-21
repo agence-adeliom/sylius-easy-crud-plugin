@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
@@ -27,13 +29,14 @@ class SyliusCrudResourceController extends ResourceController
          */
         if ($request->query->has('context')) {
             $response = $this->processCustomAction(
-                (string)$request->query->get('context'),
-                $request
+                (string) $request->query->get('context'),
+                $request,
             );
             if ($response instanceof Response) {
                 return $response;
             }
         }
+
         return parent::indexAction($request);
     }
 
@@ -53,12 +56,14 @@ class SyliusCrudResourceController extends ResourceController
             if (!(method_exists($this, $method))) {
                 throw new HttpException('403', 'Method ' . $method . ' not exists in file ' . $controller);
             }
+
             return $this->$method(
                 $configuration,
                 $resources,
-                $request
+                $request,
             );
         }
+
         return null;
     }
 
@@ -102,8 +107,8 @@ class SyliusCrudResourceController extends ResourceController
                         'resource' => $resource,
                         'form' => $form->createView(),
                         $this->metadata->getName() => $resource,
-                    ]
-                )
+                    ],
+                ),
             );
         }
 
@@ -121,7 +126,7 @@ class SyliusCrudResourceController extends ResourceController
         $repositoryMethod = $request->query->get('repositoryMethod');
         $repositoryArguments = json_decode(
             $request->query->get('repositoryArguments'),
-            true
+            true,
         );
 
         try {
@@ -147,7 +152,7 @@ class SyliusCrudResourceController extends ResourceController
         $request->attributes->set('_format', 'json');
         $request->attributes->set('_sylius', [
             'serialization_groups' => [
-                'Autocomplete'
+                'Autocomplete',
             ],
             'permission' => true,
             'repository' => [
@@ -170,6 +175,7 @@ class SyliusCrudResourceController extends ResourceController
             $exportableDatas[] = $data;
         }
         $request->setRequestFormat($request->get('format'));
+
         return $this->createRestView($configuration, $exportableDatas, null, $request->get('groups'));
     }
 
@@ -203,5 +209,4 @@ class SyliusCrudResourceController extends ResourceController
 
         return $formType;
     }
-
 }

@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\SortableCollectionField;
-use Doctrine\ORM\PersistentCollection;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\EntityDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
+use Doctrine\ORM\PersistentCollection;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -37,7 +37,7 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
             CurrencyType::class,
             LanguageType::class,
             LocaleType::class,
-            TimezoneType::class
+            TimezoneType::class,
         ];
         if (\in_array($entryTypeFqcn, $autocompletableFormTypes, true)) {
             $field->setFormTypeOption('entry_options.attr.data-ea-widget', 'ea-autocomplete');
@@ -80,7 +80,7 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
                 return $this->countNumElements($field->getValue());
             }
 
-            $collectionItemsAsText[] = (string)$item;
+            $collectionItemsAsText[] = (string) $item;
         }
 
         $isDetailAction = false;

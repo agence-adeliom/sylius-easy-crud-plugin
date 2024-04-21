@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
-
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Sylius\Component\Resource\Model\ResourceInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
 use function Symfony\Component\String\u;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * * Inspired by EasyAdmin Symfony Bundle
@@ -21,7 +21,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         /**
          * @readonly
          */
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -35,10 +35,10 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         $isExpanded = $field->getCustomOption(ChoiceMaskField::OPTION_RENDER_EXPANDED);
 
         $choices = $this->getChoices(
-            $field->getCustomOption(ChoiceMaskField::OPTION_CHOICES)
+            $field->getCustomOption(ChoiceMaskField::OPTION_CHOICES),
         ); //, $entityDto, $field
         $map = $this->getMap(
-            $field->getCustomOption(ChoiceMaskField::OPTION_MAP)
+            $field->getCustomOption(ChoiceMaskField::OPTION_MAP),
         ); // , $entityDto, $field
         if (empty($choices)) {
             throw new \InvalidArgumentException(sprintf('The "%s" choice field must define its possible choices using the setChoices() method.', $field->getProperty()));
@@ -62,7 +62,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
             'attr.data-ea-autocomplete-render-items-as-html',
             $field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ?
                 'false' :
-                'true'
+                'true',
         );
 
         $fieldValue = $field->getValue();
@@ -134,6 +134,6 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
 
         $badgeTypeCssClass = empty($badgeType) ? '' : u($badgeType)->ensureStart('badge-')->toString();
 
-        return $commonBadgeCssClass.' '.$badgeTypeCssClass;
+        return $commonBadgeCssClass . ' ' . $badgeTypeCssClass;
     }
 }

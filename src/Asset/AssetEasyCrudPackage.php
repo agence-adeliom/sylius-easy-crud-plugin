@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Asset;
 
 use Symfony\Component\Asset\Context\RequestStackContext;
@@ -27,8 +29,8 @@ final class AssetEasyCrudPackage implements PackageInterface
     {
         $this->package = new PathPackage(
             '/bundles/syliuseasycrudplugin',
-            new JsonManifestVersionStrategy(__DIR__.'/../Resources/public/manifest.json'),
-            new RequestStackContext($requestStack)
+            new JsonManifestVersionStrategy(__DIR__ . '/../Resources/public/manifest.json'),
+            new RequestStackContext($requestStack),
         );
     }
 

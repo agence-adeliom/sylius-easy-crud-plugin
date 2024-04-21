@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
@@ -11,12 +13,16 @@ final class AssetsDto
 {
     /** @var AssetDto[] */
     private array $webpackEncoreAssets = [];
+
     /** @var AssetDto[] */
     private array $cssAssets = [];
+
     /** @var AssetDto[] */
     private array $jsAssets = [];
+
     /** @var AssetDto[] */
     private array $headContents = [];
+
     /** @var AssetDto[] */
     private array $bodyContents = [];
 

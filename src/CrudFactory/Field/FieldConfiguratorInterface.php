@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;

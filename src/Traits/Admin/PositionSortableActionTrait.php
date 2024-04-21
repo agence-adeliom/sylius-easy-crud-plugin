@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Traits\Admin;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Context\AdminContext;
@@ -11,7 +13,7 @@ trait PositionSortableActionTrait
 {
     public function sortPositionAction(AdminContext $context): Response
     {
-        $requestContent = json_decode($context->getRequest()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $requestContent = json_decode($context->getRequest()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         [$leftPrimaryKeyValue, $leftParentProperty] = $requestContent['l'] ? explode(':', $requestContent['l']) : [null, null];
         [$rightPrimaryKeyValue, $rightParentProperty] = $requestContent['r'] ? explode(':', $requestContent['r']) : [null, null];
         [$primaryKeyValue, $parentProperty] = $requestContent['c'] ? explode(':', $requestContent['c']) : [null, null];
@@ -36,7 +38,7 @@ trait PositionSortableActionTrait
 
         if (!empty($leftEntity)) {
             try {
-                if ($leftEntity->{'get'.ucfirst($parentProperty)}() !== $entity->{'get'.ucfirst($parentProperty)}()) {
+                if ($leftEntity->{'get' . ucfirst($parentProperty)}() !== $entity->{'get' . ucfirst($parentProperty)}()) {
                     $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsFirstChildOf($entity, $leftEntity);
                 } else {
                     $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsNextSiblingOf($entity, $leftEntity);

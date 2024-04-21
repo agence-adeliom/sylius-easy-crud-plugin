@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Twig;
 
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
@@ -31,7 +33,6 @@ class CrudRenderExtension extends AbstractExtension
     {
         return [
             new TwigFunction('crud_render_action', [$this, 'renderAction'], ['is_safe' => ['html']]),
-
         ];
     }
 
@@ -45,7 +46,6 @@ class CrudRenderExtension extends AbstractExtension
             new TwigFilter('path_info', [$this, 'pathInfo'], ['is_safe' => ['html']]),
         ];
     }
-
 
     public function renderAction(Action $action, RequestConfiguration $requestConfiguration, $data = null): mixed
     {
@@ -75,8 +75,8 @@ class CrudRenderExtension extends AbstractExtension
             'data' => $data,
             'options' => $options,
             'grid' => [
-                'requestConfiguration' => $requestConfiguration
-            ]
+                'requestConfiguration' => $requestConfiguration,
+            ],
         ]);
     }
 
@@ -102,7 +102,7 @@ class CrudRenderExtension extends AbstractExtension
         $size = ['B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
         $factor = (int) floor(log($bytes) / log(1024));
 
-        return (int) ($bytes / (1024 ** $factor)).@$size[$factor];
+        return (int) ($bytes / (1024 ** $factor)) . @$size[$factor];
     }
 
     // Code adapted from https://stackoverflow.com/a/48606773/2804294 (License: CC BY-SA 3.0)

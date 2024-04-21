@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
@@ -16,14 +18,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SortableCollectionType extends CollectionType implements AdminFormTypeInterface
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototypeOptions = array_replace([
                 'required' => $options['required'],
-                'label' => $options['prototype_name'].'label__',
+                'label' => $options['prototype_name'] . 'label__',
             ], $options['entry_options']);
 
             if (null !== $options['prototype_data']) {
@@ -39,14 +41,14 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             $options['entry_options'],
             $options['allow_add'],
             $options['allow_delete'],
-            $options['delete_empty']
+            $options['delete_empty'],
         );
 
         $builder->addEventSubscriber($resizeListener);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
@@ -68,7 +70,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
@@ -88,7 +90,8 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         }
 
         /** @var FormInterface $prototype */
-        if ($prototype = $form->getConfig()->getAttribute('prototype')) {
+        $prototype = $form->getConfig()->getAttribute('prototype');
+        if ($prototype) {
             if ($view->vars['prototype']->vars['multipart']) {
                 $view->vars['multipart'] = true;
             }
@@ -102,12 +105,13 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $entryOptionsNormalizer = static function (Options $options, $value) {
             $value['block_name'] = 'entry';
+
             return $value;
         };
 
@@ -136,7 +140,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBlockPrefix(): string
     {
@@ -149,7 +153,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             'js' => [
                 (Asset::new('form-type-collection-sortable.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
                 (Asset::new('form-nested-accordion.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
-            ]
+            ],
         ];
     }
 

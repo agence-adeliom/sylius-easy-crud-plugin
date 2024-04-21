@@ -20,7 +20,6 @@ use Sylius\Component\Resource\Translation\Provider\TranslationLocaleProviderInte
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -29,7 +28,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Webmozart\Assert\Assert;
-use Symfony\Component\Form\FormView;
 
 final class FieldResourceTranslationsType extends AbstractType implements AdminFormTypeInterface
 {
@@ -42,7 +40,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
 
     public function __construct(
         TranslationLocaleProviderInterface $localeProvider,
-        PropertyAccessor $propertyAccessor
+        PropertyAccessor $propertyAccessor,
     ) {
         $this->definedLocalesCodes = $localeProvider->getDefinedLocalesCodes();
         $this->defaultLocaleCode = $localeProvider->getDefaultLocaleCode();
@@ -75,13 +73,12 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
 
             if (!empty($translations)) {
                 foreach ($translations as $localeCode => $translation) {
-
                     if (!isset($translationsByLocale[$localeCode])) {
                         $translationsByLocale[$localeCode] = $translation;
                     } elseif (is_array($translationsByLocale[$localeCode]) && is_array($translation)) {
                         $translationsByLocale[$localeCode] = array_merge(
                             $translationsByLocale[$localeCode],
-                            $translation
+                            $translation,
                         );
                     }
 
@@ -94,7 +91,6 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                             unset($translations[$localeCode]);
                         }
                     }
-
                 }
             }
 
@@ -102,8 +98,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-
-            /** @var PersistentCollection | ArrayCollection $translations */
+            /** @var PersistentCollection|ArrayCollection $translations */
             $translations = $event->getData();
 
             if ($translations instanceof PersistentCollection) {
@@ -128,6 +123,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                     if (null === $translation) {
                         if (isset($translationsObjectsByLocale[$localeCode])) {
                             $translations[$localeCode] = $translationsObjectsByLocale[$localeCode];
+
                             continue;
                         }
                         unset($translations[$localeCode]);
@@ -151,7 +147,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                             $objectClassName = $reflectionExtractor->getTypes($className, $property)[0]->getClassName();
                             $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
                                 AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE
+                                AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
                             ]);
                             $this->propertyAccessor->setValue($translation, $property, $objectValue);
                         } elseif (
@@ -170,7 +166,6 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
             }
 
             $event->setData($translations);
-
         });
     }
 
@@ -186,7 +181,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                },
                'entry_options' => function (string $localeCode): array {
                    return [
-                       'required' => $localeCode === $this->defaultLocaleCode
+                       'required' => $localeCode === $this->defaultLocaleCode,
                    ];
                },
            ]);

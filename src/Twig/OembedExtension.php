@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Twig;
 
 use Embed\Embed;
@@ -12,9 +14,7 @@ class OembedExtension extends AbstractExtension
 {
     private ?Extractor $embed = null;
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $url;
 
     /**

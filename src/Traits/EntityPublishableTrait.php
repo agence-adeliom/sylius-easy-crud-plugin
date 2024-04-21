@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Traits;
 
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
@@ -21,7 +23,7 @@ trait EntityPublishableTrait
     #[Groups('main')]
     #[Assert\Expression(
         expression: 'this.getUnpublishDate() == null or this.getUnpublishDate() > this.getPublishDate()',
-        message: 'The unpublish date must be greater than the publish date'
+        message: 'The unpublish date must be greater than the publish date',
     )]
     #[ORM\Column(name: 'unpublish_date', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $unpublishDate = null;
@@ -108,7 +110,7 @@ trait EntityPublishableTrait
     {
         $now = new \DateTime();
 
-        if (is_null($this->getPublishDate()) && is_null($this->getUnpublishDate())) {
+        if (null === $this->getPublishDate() && null === $this->getUnpublishDate()) {
             return true;
         }
 

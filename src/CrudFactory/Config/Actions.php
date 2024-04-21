@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
@@ -11,7 +13,6 @@ use Sylius\Bundle\GridBundle\Builder\Action\ShowAction;
 use Sylius\Bundle\GridBundle\Builder\Action\UpdateAction;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Component\Resource\Metadata\Metadata;
-
 use function Symfony\Component\Translation\t;
 
 /**
@@ -20,8 +21,10 @@ use function Symfony\Component\Translation\t;
 final class Actions
 {
     private ActionConfigDto $dto;
-    protected ?Metadata $metadata = null;
-    protected ?RequestConfiguration $requestConfiguration = null;
+
+    private ?Metadata $metadata = null;
+
+    private ?RequestConfiguration $requestConfiguration = null;
 
     private function __construct(ActionConfigDto $actionConfigDto)
     {
@@ -189,8 +192,8 @@ final class Actions
             if ($action) {
                 return Action::new(
                     Action::EDIT,
-                    $this->metadata->getApplicationName().'.ui.edit_.'.$this->metadata->getName(),
-                    null
+                    $this->metadata->getApplicationName() . '.ui.edit_.' . $this->metadata->getName(),
+                    null,
                 )->setSyliusAction($action);
             }
         }
@@ -198,25 +201,26 @@ final class Actions
         if (Action::DETAIL === $actionName) {
             return Action::new(
                 Action::DETAIL,
-                $this->metadata->getApplicationName().'.ui.show_.'.$this->metadata->getName(),
-                null
+                $this->metadata->getApplicationName() . '.ui.show_.' . $this->metadata->getName(),
+                null,
             )->setSyliusAction(ShowAction::create([]));
         }
 
         if (Action::INDEX === $actionName) {
             $action = SyliusAction::create(Action::INDEX, 'easy_crud_main_action')
-                ->setLabel($this->metadata->getApplicationName().'.ui.'.$this->metadata->getPluralName())
+                ->setLabel($this->metadata->getApplicationName() . '.ui.' . $this->metadata->getPluralName())
                 ->setOptions([
                     'link' => [
                         'route' => $this->requestConfiguration->getRouteName('index'),
                         //'parameters' =>
-                    ]
+                    ],
                 ])
                 ->setIcon('list');
+
             return Action::new(
                 Action::INDEX,
-                $this->metadata->getApplicationName().'.ui.'.$this->metadata->getPluralName(),
-                'null'
+                $this->metadata->getApplicationName() . '.ui.' . $this->metadata->getPluralName(),
+                'null',
             )->setSyliusAction($action);
         }
 
@@ -258,17 +262,11 @@ final class Actions
         return $this;
     }
 
-    /**
-     * @param Metadata|null $metadata
-     */
     public function setMetadata(?Metadata $metadata): void
     {
         $this->metadata = $metadata;
     }
 
-    /**
-     * @param RequestConfiguration|null $requestConfiguration
-     */
     public function setRequestConfiguration(?RequestConfiguration $requestConfiguration): void
     {
         $this->requestConfiguration = $requestConfiguration;

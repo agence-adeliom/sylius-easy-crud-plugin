@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\Config\EntityDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Sylius\Bundle\GridBundle\Builder\Action\Action as SyliusAction;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
-use Sylius\Bundle\GridBundle\Builder\Action\CreateAction;
-use Sylius\Bundle\GridBundle\Builder\Action\DeleteAction;
-use Sylius\Bundle\GridBundle\Builder\Action\ShowAction;
-use Sylius\Bundle\GridBundle\Builder\Action\UpdateAction;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
@@ -18,22 +16,38 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 class ActionDto
 {
     private ?string $type = null;
+
     private ?string $name = null;
+
     private TranslatableInterface|string|null $label = null;
+
     private ?string $icon = null;
+
     private string $cssClass = '';
+
     private ?string $htmlElement = null;
+
     private array $htmlAttributes = [];
+
     private ?string $linkUrl = null;
+
     private ?string $templatePath = null;
+
     private ?string $controllerMethodName = null;
+
     private ?array $controllerMethodContext = null;
+
     private ?string $routeName = null;
+
     private $routeParameters = [];
+
     /* @var callable|string|null */
     private $url;
+
     private array $translationParameters = [];
+
     private $displayCallable;
+
     private array $subActions = [];
 
     private ?ActionInterface $syliusAction = null;
@@ -209,7 +223,7 @@ class ActionDto
                 '$routeParameters',
                 __METHOD__,
                 '"array" or "callable"',
-                \gettype($routeParameters)
+                \gettype($routeParameters),
             );
         }
 
@@ -237,7 +251,7 @@ class ActionDto
                 '$url',
                 __METHOD__,
                 '"string" or "callable"',
-                \gettype($url)
+                \gettype($url),
             );
         }
 
@@ -256,7 +270,7 @@ class ActionDto
 
     public function shouldBeDisplayedFor(EntityDto $entityDto): bool
     {
-        return null === $this->displayCallable || (bool)\call_user_func($this->displayCallable, $entityDto->getInstance());
+        return null === $this->displayCallable || (bool) \call_user_func($this->displayCallable, $entityDto->getInstance());
     }
 
     public function setDisplayCallable(callable $displayCallable): void
@@ -336,7 +350,7 @@ class ActionDto
 
     public function convertToGridAction(): ?ActionInterface
     {
-        $actionRoute = function (ActionDto $actionDto): array {
+        $actionRoute = function (self $actionDto): array {
             if (null !== $actionDto->getUrl() && '' !== $actionDto->getUrl()) {
                 $route = [
                     'url' => $actionDto->getUrl(),
@@ -345,7 +359,7 @@ class ActionDto
                 $route = [
                     'route' => $actionDto->getRouteName(),
                     'parameters' => array_merge([
-                        'context' => 'ca:'.$actionDto->getControllerMethodName()
+                        'context' => 'ca:' . $actionDto->getControllerMethodName(),
                     ], $actionDto->getControllerMethodContext()),
                 ];
             } else {
@@ -354,17 +368,18 @@ class ActionDto
                     'parameters' => $actionDto->getRouteParameters(),
                 ];
             }
+
             return $route;
         };
 
         $actionOptions = [];
-        if (!is_null($this->getSyliusAction())) {
+        if (null !== $this->getSyliusAction()) {
             return $this->getSyliusAction();
         }
         if ([] !== $this->getSubActions()) {
             $subItemWrapper = SyliusAction::create(
                 $this->getName(),
-                'easy_crud_' . $this->getType() . '_sub_action'
+                'easy_crud_' . $this->getType() . '_sub_action',
             )->setLabel($this->getLabel());
 
             $subItems = [];
@@ -377,7 +392,7 @@ class ActionDto
                         'label' => $subActionDto->getLabel(),
                         'icon' => $subActionDto->getIcon(),
                     ],
-                    $route
+                    $route,
                 );
             }
 
@@ -386,8 +401,8 @@ class ActionDto
                     'icon' => $this->getIcon(),
                     'links' => [
                         ...$subItems,
-                    ]
-                ]
+                    ],
+                ],
             );
 
             return $subItemWrapper;
@@ -403,8 +418,9 @@ class ActionDto
 
         $actionOptions = array_merge(
             ['link' => $route],
-            $actionOptions
+            $actionOptions,
         );
+
         return SyliusAction::create($this->getName(), 'easy_crud_' . $this->getType() . '_action')
             ->setLabel($this->getLabel())
             ->setIcon($this->getIcon())

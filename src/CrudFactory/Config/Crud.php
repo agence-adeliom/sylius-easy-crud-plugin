@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config;
 
 /**
@@ -8,7 +10,10 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config;
 class Crud
 {
     public const PAGE_DETAIL = 'detail';
+
     public const PAGE_EDIT = 'edit';
+
     public const PAGE_INDEX = 'index';
+
     public const PAGE_NEW = 'new';
 }

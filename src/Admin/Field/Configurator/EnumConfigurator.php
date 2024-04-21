@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
@@ -55,5 +57,4 @@ final class EnumConfigurator implements FieldConfiguratorInterface
 
         return $choices;
     }
-
 }

@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
 use Adeliom\SyliusEasyCrudPlugin\Form\CodeEditorType;
-
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 final class CodeEditorField implements FieldInterface
@@ -13,16 +14,20 @@ final class CodeEditorField implements FieldInterface
     use FieldTrait;
 
     public const OPTION_INDENT_WITH_TABS = 'indentWithTabs';
+
     public const OPTION_LANGUAGE = 'language';
+
     public const OPTION_NUM_OF_ROWS = 'numOfRows';
+
     public const OPTION_TAB_SIZE = 'tabSize';
+
     public const OPTION_SHOW_LINE_NUMBERS = 'showLineNumbers';
 
     private const ALLOWED_LANGUAGES = [
         'css', 'dockerfile', 'js', 'javascript', 'json',
         'markdown', 'nginx', 'php', 'shell',
         'sql', 'twig', 'xml',
-        'yaml-frontmatter', 'yaml'
+        'yaml-frontmatter', 'yaml',
     ];
 
     /**
@@ -60,7 +65,7 @@ final class CodeEditorField implements FieldInterface
             throw new \InvalidArgumentException(sprintf(
                 'The "%s" language is not available for code highlighting (allowed languages: %s).',
                 __METHOD__,
-                implode(', ', self::ALLOWED_LANGUAGES)
+                implode(', ', self::ALLOWED_LANGUAGES),
             ));
         }
 
@@ -75,7 +80,7 @@ final class CodeEditorField implements FieldInterface
             throw new \InvalidArgumentException(sprintf(
                 'The argument of the "%s()" method must be 1 or higher (%d given).',
                 __METHOD__,
-                $rows
+                $rows,
             ));
         }
 
@@ -90,7 +95,7 @@ final class CodeEditorField implements FieldInterface
             throw new \InvalidArgumentException(sprintf(
                 'The argument of the "%s()" method must be 1 or higher (%d given).',
                 __METHOD__,
-                $tabSize
+                $tabSize,
             ));
         }
 

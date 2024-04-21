@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -36,16 +35,13 @@ final class FieldCollectionType extends AbstractType
             $entryType = $options['entry_type']($entry);
 
             if ($entryType !== FormType::class) {
-
                 Assert::isCallable($options['entry_type']);
 
                 $builder->add($entryName, $entryType, array_replace([
                     'property_path' => '[' . $entryName . ']',
                     'block_name' => 'entry',
                 ], $entryOptions));
-
             } else {
-
                 $formField = $builder
                     ->getFormFactory()
                     ->createNamedBuilder(
@@ -55,24 +51,20 @@ final class FieldCollectionType extends AbstractType
                         array_replace([
                               'property_path' => '[' . $entryName . ']',
                               'block_name' => 'entry',
-                              'data_class' => $options['data_translation_class']
-                        ], $entryOptions)
+                              'data_class' => $options['data_translation_class'],
+                        ], $entryOptions),
                     );
 
                 foreach ($options['fields'] as $field) {
-
                     $formField->add(
                         $field['name'],
                         $field['type'],
-                        $field['type'] !== CodeEditorType::class ? $field['options'] : array_merge($field['options'], $field['customOptions'] ?? [])
+                        $field['type'] !== CodeEditorType::class ? $field['options'] : array_merge($field['options'], $field['customOptions'] ?? []),
                     );
-
                 }
 
                 $builder->add($formField);
             }
-
-
         }
     }
 

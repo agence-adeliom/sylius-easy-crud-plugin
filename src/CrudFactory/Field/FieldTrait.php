@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
@@ -7,7 +9,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
-use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use Sylius\Bundle\GridBundle\Builder\Field\TwigField;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -161,7 +162,7 @@ trait FieldTrait
 
     public function addCssClass(string $cssClass): self
     {
-        $this->dto->setCssClass($this->dto->getCssClass().' '.$cssClass);
+        $this->dto->setCssClass($this->dto->getCssClass() . ' ' . $cssClass);
 
         return $this;
     }
@@ -235,7 +236,7 @@ trait FieldTrait
         foreach ($pathsOrAssets as $pathOrAsset) {
             if (\is_string($pathOrAsset)) {
                 $this->dto->addCssAsset(new AssetDto($pathOrAsset));
-            } elseif (!is_null($pathOrAsset)) {
+            } elseif (null !== $pathOrAsset) {
                 $this->dto->addCssAsset($pathOrAsset->getAsDto());
             }
         }
@@ -266,7 +267,7 @@ trait FieldTrait
         foreach ($pathsOrAssets as $pathOrAsset) {
             if (\is_string($pathOrAsset)) {
                 $this->dto->addJsAsset(new AssetDto($pathOrAsset));
-            } elseif (!is_null($pathOrAsset)) {
+            } elseif (null !== $pathOrAsset) {
                 $this->dto->addJsAsset($pathOrAsset->getAsDto());
             }
         }
@@ -401,7 +402,7 @@ trait FieldTrait
      */
     public function setColumns(int|string $cols): self
     {
-        $this->dto->setColumns(\is_int($cols) ? 'col-md-'.$cols : $cols);
+        $this->dto->setColumns(\is_int($cols) ? 'col-md-' . $cols : $cols);
 
         return $this;
     }
@@ -416,7 +417,7 @@ trait FieldTrait
      */
     public function setDefaultColumns(int|string $cols): self
     {
-        $this->dto->setDefaultColumns(\is_int($cols) ? 'col-md-'.$cols : $cols);
+        $this->dto->setDefaultColumns(\is_int($cols) ? 'col-md-' . $cols : $cols);
 
         return $this;
     }
@@ -432,8 +433,9 @@ trait FieldTrait
         $syliusField = TwigField::create($propertyName, 'twig');
         $syliusField->setOptions([
             'template' => $field->getAsDto()->getGridTemplatePath(),
-            'vars' => $field->getAsDto()->getFormTypeOptions()
+            'vars' => $field->getAsDto()->getFormTypeOptions(),
         ]);
+
         return $syliusField;
     }
 }

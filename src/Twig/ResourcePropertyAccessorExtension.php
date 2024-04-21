@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Twig;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -9,7 +11,7 @@ use Twig\TwigFunction;
 class ResourcePropertyAccessorExtension extends AbstractExtension
 {
     public function __construct(
-        protected PropertyAccessor $propertyAccessor
+        protected PropertyAccessor $propertyAccessor,
     ) {
     }
 
@@ -21,8 +23,8 @@ class ResourcePropertyAccessorExtension extends AbstractExtension
         return [
             new TwigFunction(
                 'get_resource_property_value',
-                [$this, 'propertyValue']
-            )
+                [$this, 'propertyValue'],
+            ),
         ];
     }
 
@@ -31,6 +33,7 @@ class ResourcePropertyAccessorExtension extends AbstractExtension
         if ($this->propertyAccessor->isReadable($resource, $propertyPath)) {
             return $this->propertyAccessor->getValue($resource, $propertyPath);
         }
+
         return null;
     }
 }

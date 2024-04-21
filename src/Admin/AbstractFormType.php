@@ -49,11 +49,11 @@ abstract class AbstractFormType extends AbstractGridType
         protected LocaleProviderInterface $localeProvider,
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
-        private Security $security
+        private Security $security,
     ) {
         parent::__construct(
             $dataClass,
-            $validationGroups
+            $validationGroups,
         );
         $this->user = $security->getUser();
         $this->crudAdminFactory->initContext($this->getResourceClass());
@@ -76,23 +76,18 @@ abstract class AbstractFormType extends AbstractGridType
 
         $fields = FieldCollection::new(
             $this->configureFields($pageName, $context),
-            $this->crudAdminFactory->getFieldConfiguratorCollection()
+            $this->crudAdminFactory->getFieldConfiguratorCollection(),
         );
 
         $menuItem = null;
         $column = 0;
 
         foreach ($fields as $fieldDto) {
-
-            /**
-             * @var FieldDto $fieldDto
-             */
             if (
                 $fieldDto->getDisplayedOn()->has(Crud::PAGE_EDIT) ||
                 $fieldDto->getDisplayedOn()->has(Crud::PAGE_NEW) ||
                 $fieldDto->getDisplayedOn()->has(Crud::PAGE_DETAIL)
             ) {
-
                 $formFieldOptions = $fieldDto->getFormTypeOptions();
 
                 // the names of embedded Doctrine entities contain dots, which are not allowed
@@ -129,16 +124,15 @@ abstract class AbstractFormType extends AbstractGridType
                     $fieldDto->getFieldFqcn() !== TabField::class &&
                     $fieldDto->getFieldFqcn() !== ColumnField::class
                 ) {
-
                     if (
                         $fieldDto->getFieldFqcn() === TranslationField::class
                     ) {
                         $subFieldsDto = FieldCollection::new(
                             $fieldDto->getCustomOption('fieldsDto'),
-                            $this->crudAdminFactory->getFieldConfiguratorCollection()
+                            $this->crudAdminFactory->getFieldConfiguratorCollection(),
                         );
                         $formFieldOptions['data_translation_class'] = call_user_func(
-                            $options['data_class'] . '::getTranslationClass'
+                            $options['data_class'] . '::getTranslationClass',
                         );
                         $subFields = [];
                         foreach ($subFieldsDto as $subFieldDto) {
@@ -169,7 +163,7 @@ abstract class AbstractFormType extends AbstractGridType
                         }
                         $formFieldOptions['fields'] = $subFields;
                         $formFieldOptions['data_translation_class'] = call_user_func(
-                            $options['data_class'] . '::getTranslationClass'
+                            $options['data_class'] . '::getTranslationClass',
                         );
                     }
 
@@ -179,7 +173,7 @@ abstract class AbstractFormType extends AbstractGridType
                             $name,
                             $formFieldType,
                             null,
-                            $formFieldOptions
+                            $formFieldOptions,
                         );
 
                     $formFieldOptions['field'] = $fieldDto;
@@ -210,7 +204,7 @@ abstract class AbstractFormType extends AbstractGridType
             $this->crudAdminFactory->getViewVars(),
             [
                 'actionsGroups' => $actions,
-            ]
+            ],
         );
     }
 
@@ -223,7 +217,7 @@ abstract class AbstractFormType extends AbstractGridType
     {
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_DETAIL),
-            $this->crudAdminFactory->getFieldConfiguratorCollection()
+            $this->crudAdminFactory->getFieldConfiguratorCollection(),
         );
 
         $menuItem = null;
@@ -236,7 +230,6 @@ abstract class AbstractFormType extends AbstractGridType
             if (
                 $fieldDto->getDisplayedOn()->has(Crud::PAGE_DETAIL)
             ) {
-
                 if ($fieldDto->getProperty()) {
                     $propertyAccessor = $this->crudAdminFactory->getPropertyAccessor();
                     $propertyPath = $fieldDto->getProperty();
@@ -250,11 +243,11 @@ abstract class AbstractFormType extends AbstractGridType
                     [$menuItem, $column] = $this->crudAdminFactory->addTab(
                         $fieldDto->getProperty(),
                         $fieldDto->getLabel(),
-                        '@SyliusEasyCrudPlugin/crud/show/_tab.html.twig'
+                        '@SyliusEasyCrudPlugin/crud/show/_tab.html.twig',
                     );
                 }
 
-                if ($fieldDto->getFieldFqcn() === ColumnField::class && !is_null($menuItem)) {
+                if ($fieldDto->getFieldFqcn() === ColumnField::class && null !== $menuItem) {
                     $column = $this->crudAdminFactory->addColumn($menuItem, $fieldDto);
                 }
 
@@ -268,7 +261,6 @@ abstract class AbstractFormType extends AbstractGridType
                 } else {
                     unset($fields[$key]);
                 }
-
             } else {
                 unset($fields[$key]);
             }
@@ -281,7 +273,7 @@ abstract class AbstractFormType extends AbstractGridType
                 'fields' => $fields,
                 'actionsGroups' => $actions,
             ],
-            $this->crudAdminFactory->getViewVars()
+            $this->crudAdminFactory->getViewVars(),
         );
     }
 
@@ -289,7 +281,7 @@ abstract class AbstractFormType extends AbstractGridType
     {
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_INDEX),
-            $this->crudAdminFactory->getFieldConfiguratorCollection()
+            $this->crudAdminFactory->getFieldConfiguratorCollection(),
         );
 
         foreach ($fields as $fieldDto) {
@@ -304,7 +296,7 @@ abstract class AbstractFormType extends AbstractGridType
 
                 $field = call_user_func(
                     $fieldDto->getFieldFqcn() . '::create',
-                    $fieldDto->getProperty()
+                    $fieldDto->getProperty(),
                 );
 
                 $field->setLabel($fieldDto->getLabel());
@@ -314,31 +306,31 @@ abstract class AbstractFormType extends AbstractGridType
                 $field->setOption('template', $fieldDto->getGridTemplatePath());
 
                 $field->addOptions([
-                    'vars' => ['field' => $fieldDto]
+                    'vars' => ['field' => $fieldDto],
                 ]);
 
                 $gridBuilder->addField(
-                    $field
+                    $field,
                 );
             }
         }
 
         parent::processGridDefaultSort(
-            $gridBuilder
+            $gridBuilder,
         );
 
         parent::processGridActions(
-            $gridBuilder
+            $gridBuilder,
         );
 
         parent::processGridFilters(
-            $gridBuilder
+            $gridBuilder,
         );
     }
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new("default", 'default');
+        yield TabField::new('default', 'default');
     }
 
     /**

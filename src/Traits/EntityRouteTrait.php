@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Traits;
 
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
@@ -14,7 +16,7 @@ use Symfony\Component\Routing\Route;
 
 trait EntityRouteTrait
 {
-    #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ["persist", "remove"])]
+    #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ['persist', 'remove'])]
     protected Collection $routes;
 
     public function __construct()
@@ -46,10 +48,12 @@ trait EntityRouteTrait
             if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
                 if ($route instanceof RouteObjectInterface) {
                     $route->setContent($this);
+
                     return $route;
                 }
             }
         }
+
         return null;
     }
 
@@ -80,21 +84,21 @@ trait EntityRouteTrait
     public function getRouteOptions(TranslationInterface $translation): array
     {
         return [
-            'add_locale_pattern' => false
+            'add_locale_pattern' => false,
         ];
     }
 
     public function getRouteRequirements(TranslationInterface $translation): array
     {
         return [
-            '_locale' => $translation->getLocale()
+            '_locale' => $translation->getLocale(),
         ];
     }
 
     public function getRouteDefaults(TranslationInterface $translation): array
     {
         return [
-            '_locale' => $translation->getLocale()
+            '_locale' => $translation->getLocale(),
         ];
     }
 
@@ -138,6 +142,7 @@ trait EntityRouteTrait
         if ($isPreview) {
             $url .= '-preview';
         }
+
         return $url;
     }
 

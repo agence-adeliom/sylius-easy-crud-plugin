@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
@@ -28,7 +30,7 @@ final class TranslationField implements FieldInterface
 
     public function addField(FieldInterface $field): self
     {
-        if (is_null($this->fields)) {
+        if (null === $this->fields) {
             $this->fields = [];
         }
         $this->fields[] = $field;
@@ -42,7 +44,7 @@ final class TranslationField implements FieldInterface
         if (is_array($locales) && count($locales) > 0) {
             $this->setFormTypeOption('entries', $locales);
         }
+
         return $this;
     }
-
 }

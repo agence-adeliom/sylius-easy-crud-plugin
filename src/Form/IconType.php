@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -24,7 +26,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
             'delete_label' => 'Delete',
             'border_radius' => '5px',
             'fonts' => [
-                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css'
+                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
             ],
         ]);
 
@@ -65,7 +67,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
     public static function configureAdminAssets(): array
     {
         return [
-            'css' => 'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css'
+            'css' => 'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
         ];
     }
 

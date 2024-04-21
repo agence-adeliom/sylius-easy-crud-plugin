@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\CollectionInterface;
@@ -82,7 +84,7 @@ final class ActionCollection implements CollectionInterface
     {
         return self::new(array_filter(
             $this->actions,
-            static fn (ActionDto $action): bool => $action->isItemAction()
+            static fn (ActionDto $action): bool => $action->isItemAction(),
         ));
     }
 
@@ -90,7 +92,7 @@ final class ActionCollection implements CollectionInterface
     {
         return self::new(array_filter(
             $this->actions,
-            static fn (ActionDto $action): bool => $action->isGlobalAction()
+            static fn (ActionDto $action): bool => $action->isGlobalAction(),
         ));
     }
 
@@ -98,7 +100,7 @@ final class ActionCollection implements CollectionInterface
     {
         return self::new(array_filter(
             $this->actions,
-            static fn (ActionDto $action): bool => $action->isBatchAction()
+            static fn (ActionDto $action): bool => $action->isBatchAction(),
         ));
     }
 }

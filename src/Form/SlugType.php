@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
@@ -23,7 +25,7 @@ class SlugType extends AbstractType implements AdminFormTypeInterface
     {
         return [
             'js' => [
-                (Asset::new('field-slug.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME)
+                (Asset::new('field-slug.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
             ],
         ];
     }

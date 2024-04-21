@@ -37,13 +37,14 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
         if (in_array(TranslatableInterface::class, class_implements($resourceClass))) {
             $grid->setDriverOption('repository', $this::getRepositoryMethod());
         }
+
         return $grid;
     }
 
     protected function processActions(string $pageName): array
     {
         $actions = $this->configureActions(
-            $pageName
+            $pageName,
         );
         $actionsDto = $actions->getAsDto($pageName);
 
@@ -65,6 +66,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
         $action->setEnabled($data['enabled'] ?? true);
         $action->setPosition($data['position'] ?? 1);
         $action->setLabel($data['label'] ?? '');
+
         return $action;
     }
 
@@ -88,6 +90,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
         foreach ($subItemActions->toArray() as $name => $subItemAction) {
             $actions['subitem'][] = $this->transformActionsAsGridDefinition($name, $subItemAction);
         }
+
         return $actions;
     }
 

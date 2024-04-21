@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CodeEditorField;
@@ -53,11 +55,11 @@ class CodeEditorType extends AbstractType implements AdminFormTypeInterface
     {
         return [
             'js' => [
-                (Asset::new('field-code-editor.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME)
+                (Asset::new('field-code-editor.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
             ],
             'css' => [
-                (Asset::new('field-code-editor.css'))->package(AssetEasyCrudPackage::PACKAGE_NAME)
-            ]
+                (Asset::new('field-code-editor.css'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
+            ],
         ];
     }
 

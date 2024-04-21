@@ -7,7 +7,6 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection;
 /**
  * This file allow to put all field configurator services into a collection
  */
-
 class FieldConfiguratorCollection
 {
     private array $handlers;

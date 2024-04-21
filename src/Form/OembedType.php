@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\UrlType;

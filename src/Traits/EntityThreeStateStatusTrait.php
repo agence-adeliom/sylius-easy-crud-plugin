@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Traits;
 
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Enum;
 
 use Adeliom\SyliusEasyCrudPlugin\Helper\Enum;

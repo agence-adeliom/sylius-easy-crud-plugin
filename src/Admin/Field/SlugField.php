@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
-use Adeliom\SyliusEasyCrudPlugin\Form\CodeEditorType;
-
 use Adeliom\SyliusEasyCrudPlugin\Form\SlugType;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

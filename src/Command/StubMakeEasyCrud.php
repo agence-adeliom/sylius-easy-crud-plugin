@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Command;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-
 final class StubMakeEasyCrud extends StubCommand
 {
     protected static $defaultName = 'make:easy-crud';

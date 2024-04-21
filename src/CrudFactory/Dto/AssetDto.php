@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
@@ -10,15 +12,24 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
 final class AssetDto
 {
     private string $value;
+
     // the Symfony Asset package name which this asset belongs to
     private ?string $packageName = null;
+
     private bool $async = false;
+
     private bool $defer = false;
+
     private bool $preload = false;
+
     private bool $nopush = false;
+
     private ?string $webpackPackageName = null;
+
     private string $webpackEntrypointName = '_default';
+
     private array $htmlAttributes = [];
+
     private KeyValueStore $loadedOn;
 
     public function __construct(string $value)
@@ -26,7 +37,7 @@ final class AssetDto
         $this->value = $value;
         $this->loadedOn = KeyValueStore::new([
          'grid' => 'grid',
-         'edit' => 'edit'
+         'edit' => 'edit',
         ]);
     }
 

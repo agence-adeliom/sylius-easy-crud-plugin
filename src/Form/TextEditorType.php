@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
@@ -23,11 +25,11 @@ class TextEditorType extends AbstractType implements AdminFormTypeInterface
     {
         return [
             'js' => [
-                (Asset::new('text-editor.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME)
+                (Asset::new('text-editor.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
             ],
             'css' => [
-                (Asset::new('text-editor.css'))->package(AssetEasyCrudPackage::PACKAGE_NAME)
-            ]
+                (Asset::new('text-editor.css'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
+            ],
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
@@ -15,8 +17,8 @@ class ImageType extends AbstractType implements AdminFormTypeInterface
 {
     public function __construct(
         private ImageUploaderInterface $imageUploader,
-    )
-    {}
+    ) {
+    }
 
     public function getParent(): string
     {
@@ -44,7 +46,7 @@ class ImageType extends AbstractType implements AdminFormTypeInterface
     {
         return [
             'js' => [
-                (Asset::new('field-image.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME)
+                (Asset::new('field-image.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
             ],
         ];
     }

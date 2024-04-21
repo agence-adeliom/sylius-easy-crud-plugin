@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CodeEditorField;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
-
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Sylius\Component\Resource\Model\ResourceInterface;
 
 final class CodeEditorConfigurator implements FieldConfiguratorInterface
@@ -16,5 +17,6 @@ final class CodeEditorConfigurator implements FieldConfiguratorInterface
     }
 
     public function configure(FieldDto $field, ?ResourceInterface $resource = null, ?string $pageName = null): void
-    {}
+    {
+    }
 }

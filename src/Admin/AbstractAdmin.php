@@ -28,8 +28,8 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
         return [
             'method' => 'createListQueryBuilder',
             'arguments' => [
-                "expr:service('sylius.context.locale').getLocaleCode()"
-            ]
+                "expr:service('sylius.context.locale').getLocaleCode()",
+            ],
         ];
     }
 
@@ -58,6 +58,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
             ->addGlobalAction(Crud::PAGE_DETAIL, Action::INDEX)
 
         ;
+
         return $actions;
     }
 
@@ -72,7 +73,6 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
     }
 
     /**
-     * @return string
      * @throws \ReflectionException
      */
     public function configureRepository(): string
@@ -103,18 +103,17 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     protected function getResourceFieldValueInRequest(string $formName, string $fieldName, string $queryKey = 'id'): ?string
     {
-        if($this->locator->has('request_stack')) {
+        if ($this->locator->has('request_stack')) {
             $request = $this->locator->get('request_stack')?->getMainRequest();
 
             if ($request) {
                 $resourceValue = $request->query->get($queryKey) ?? $request->request->get(sprintf('%s[%s]', $formName, $fieldName));
                 if ($resourceValue) {
                     return $resourceValue;
-                } else {
-                    $form = $request->request->all($formName);
-                    if (isset($form[$fieldName]) && null !== $form[$fieldName]) {
-                        return $form[$fieldName];
-                    }
+                }
+                $form = $request->request->all($formName);
+                if (isset($form[$fieldName]) && null !== $form[$fieldName]) {
+                    return $form[$fieldName];
                 }
             }
         }

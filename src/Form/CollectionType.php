@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This Collection only add the missing labels which
  * aren't checked for defined in the Sylius template
@@ -13,7 +15,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends \Symfony\Component\Form\Extension\Core\Type\CollectionType
 {
-
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         parent::buildView($view, $form, $options);

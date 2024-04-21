@@ -12,7 +12,6 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfigurationFactory;
-use Sylius\Component\Grid\View\GridViewFactoryInterface;
 use Sylius\Component\Resource\Metadata\Metadata;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -23,14 +22,19 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 class CrudAdminFactory
 {
     public array $formThemes = [];
+
     public array $cssAssets = [];
+
     public array $jsAssets = [];
+
     public array $webpackEncoreAssets = [];
 
     protected ?MenuItem $menu = null;
 
     public array $columns = [];
+
     protected ?Metadata $metadata = null;
+
     protected ?RequestConfiguration $requestConfiguration = null;
 
     public function __construct(
@@ -60,7 +64,7 @@ class CrudAdminFactory
                 $this->requestConfiguration = $this->requestConfigurationFactory
                     ->create(
                         $this->metadata,
-                        $this->requestStack->getCurrentRequest()
+                        $this->requestStack->getCurrentRequest(),
                     );
             }
         }
@@ -108,7 +112,6 @@ class CrudAdminFactory
 
     public function manageFieldAssets(FieldDto $fieldDto): void
     {
-
         if (is_array($fieldDto->getFormThemes())) {
             foreach ($fieldDto->getFormThemes() as $theme) {
                 $this->formThemes[$theme] = $theme;
@@ -139,14 +142,15 @@ class CrudAdminFactory
         $menuItem = new MenuItem($name, $this->getMenuFactory());
         $menuItem->setAttribute(
             'template',
-            is_null($template) ?
+            null === $template ?
                 '@SyliusEasyCrudPlugin/crud/form/_tab.html.twig' :
-                $template
+                $template,
         );
         $menuItem->setLabel($label);
         $this->getMenu()->addChild($menuItem);
         $column = $this->newColumn($menuItem, 'default_column', null);
         $this->columns[] = $column;
+
         return [$menuItem, $column];
     }
 
@@ -157,9 +161,10 @@ class CrudAdminFactory
             $fieldDto->getProperty(),
             $fieldDto->getLabel(),
             $fieldDto->getCustomOption('columnSize'),
-            $fieldDto->getCustomOption('newLine')
+            $fieldDto->getCustomOption('newLine'),
         );
         $this->columns[] = $column;
+
         return $column;
     }
 
@@ -168,15 +173,15 @@ class CrudAdminFactory
         string $name = null,
         string $label = null,
         ?ColumnSizeEnum $size = ColumnSizeEnum::WIDE_16_OF_16,
-        ?bool $newLine = true
+        ?bool $newLine = true,
     ): array {
         return [
-            'id' => md5((string)rand()),
+            'id' => md5((string) rand()),
             'name' => $name ?? 'default_column',
             'size' => $size,
             'label' => $label ?? null,
             'newLine' => $newLine,
-            'menuItem' => !is_null($menuItem) ? $menuItem->getName() : null
+            'menuItem' => null !== $menuItem ? $menuItem->getName() : null,
         ];
     }
 
@@ -187,22 +192,22 @@ class CrudAdminFactory
             [
                 '@SyliusAdmin/Form/theme.html.twig',
             ]
-            + $this->formThemes
+            + $this->formThemes,
         );
         $vars['css_assets'] = $this->cssAssets;
         $vars['js_assets'] = $this->jsAssets;
         $vars['webpack_encore_assets'] = $this->webpackEncoreAssets;
         $vars['menu'] = $this->getMenu();
         $vars['columns'] = count($this->columns) ? $this->columns : [[
-           'id' => md5((string)rand()),
+           'id' => md5((string) rand()),
            'name' => 'default',
            'label' => null,
            'size' => ColumnSizeEnum::WIDE_16_OF_16,
            'menuItem' => $this->menu->count() ?
                $this->menu->getFirstChild() :
-               null
+               null,
        ]];
+
         return $vars;
     }
-
 }
