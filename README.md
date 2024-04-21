@@ -1,39 +1,30 @@
 # Sylius Easy Crud Bundle
 
-Allow to add custom CRUD with custom resource and provide some custom fields for Sylius.
+Like us, you're a fan of EasyAdmin and Sylius, use this plugin to quickly create custom administration interfaces in Sylius, the same way you can create them in EasyAdmin.
 
 ## Installation
-
-Install with composer
 
 ```bash
 composer require agence-adeliom/sylius-easy-crud-plugin
 ```
 
-Add 
+Then, into `config/bundles.php` add :
 
-`Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],` 
-
-into 
-
-`config/bundles.php`
+```php
+`Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],
+```
 
 ## Documentation
 
-1. Start using easy crud for a custom entity : [Start here](./docs/start_using_easy_crud.md)
-
-2. Discover about [existing fields](./docs/discover_fields.md)
-
-3. Create [your own fields](./docs/create_your_own_fields.md)
-
-4. [Contribute](./docs/contribution.md)
+- Learn how to [generate a custom CRUD](./docs/start_using_easy_crud.md) into Sylius Admin
+- [Discover all fields](./docs/discover_fields.md) you can use to build your CRUD (grid, form, show, action, fitters)
+- Learn how create your [own fields](./docs/create_your_own_fields.md)
+- You want to [help and contribute](./docs/contribution.md)
 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-
 ## Authors
 
-Adeliom team
-  
+Adeliom

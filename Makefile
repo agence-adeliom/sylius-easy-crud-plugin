@@ -6,7 +6,7 @@ GITHUB_TOKEN ?= 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
 -include .makefile/global.mk
 
 ###
-### ENV VERSIONS
+### VERSIONS
 ### ¯¯¯
 
 SYLIUS_VERSION=1.12.6
@@ -14,16 +14,18 @@ SYMFONY_VERSION=6.4
 PLUGIN_NAME=agence-adeliom/sylius-easy-crud-plugin
 
 ###
-### DEVELOPMENT
+### DEV
+### Commands to install sylius standard version and this plugin automatically
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
 -include .makefile/dev.mk
 
 ###
-### CI
+### QA
+### Commands to test the code quality
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
--include .makefile/ci.mk
+-include .makefile/qa.mk
 
 
 

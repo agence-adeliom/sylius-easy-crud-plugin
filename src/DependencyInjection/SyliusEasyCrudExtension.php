@@ -51,7 +51,7 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
 
     protected function getMigrationsDirectory(): string
     {
-        return '@SyliusEasyCrudPlugin/Migrations';
+        return '@SyliusEasyCrudPlugin/src/Migrations';
     }
 
     protected function getNamespacesOfMigrationsExecutedBefore(): array

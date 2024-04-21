@@ -17,13 +17,21 @@ HELP += $(call help,install,			Install the project)
 install: application platform sylius ## Install the plugin
 .PHONY: install
 
-HELP += $(call help,reset,			Stop docker and remove dependencies)
+HELP += $(call help,reset,			Stop docker and remove project)
 reset: ## Stop docker and remove dependencies
 	${MAKE} platform_down || true
 	rm -rf ${APP_DIR}/node_modules ${APP_DIR}/package-lock.json
 	rm -rf ${APP_DIR}
 	rm -rf vendor composer.lock
 .PHONY: rese
+
+HELP += $(call help,stop,			Stop project)
+stop:
+	make platform_down
+
+HELP += $(call help,stop,			Start project)
+up:
+	make platform_up
 
 ###
 ### TEST APPLICATION
@@ -40,9 +48,12 @@ php.ini: php.ini.dist
 	ln -s php.ini.dist php.ini
 
 ${APP_DIR}:
-	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="~${SYLIUS_VERSION}" ${APP_DIR})
+	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
 	cd ${APP_DIR} && chmod -R 777 public
 	make apply_dist
+	make override_sylius_config
+
+override_sylius_config:
 
 apply_dist:
 	ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST)))); \
@@ -61,26 +72,28 @@ sylius: sylius_install install_bundle
 
 sylius_install:
 	cd ${APP_DIR} && docker-compose exec -it -u root php rm -rf public/media/image
+	cd ${APP_DIR} && docker-compose run php bin/console doctrine:database:drop --if-exists --force
 	cd ${APP_DIR} && docker-compose run php bin/console sylius:install -s default -n
 
 install_bundle:
 	cd ${APP_DIR} && docker-compose run php composer require --no-interaction ${PLUGIN_NAME}="*@dev"
-	echo "navigate to http://localhost:8050/"
-
-
-symlink_plugin:
-	#cd ${APP_DIR} && rm -rf vendor/agence-adeliom/sylius-easy-crud-plugin
+	echo "navigate to https://localhost:8050/"
 
 ###
 ### PLATFORM
 ### ¯¯¯¯¯¯¯¯
 
-DOCKER_USER ?= "$(shell id -u):$(shell id -g)"
-ENV ?= "dev"
-
 platform:
 	@if [ ! -e compose.override.yml ]; then \
-		cd ${APP_DIR} && cp compose.override.dist.yml compose.override.yml; \
+		(cd ${APP_DIR} && cp compose.override.dist.yml compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|          - public-media:/srv/sylius/public/media:rw|          - public-media:/srv/sylius/public/media:rw\n          - ../../../sylius-easy-crud-plugin:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|            - public-media:/srv/sylius/public/media:ro,nocopy|            - public-media:/srv/sylius/public/media:ro,nocopy\n            - ../../../sylius-easy-crud-plugin:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\SyliusEasyCrudPlugin\\\SyliusEasyCrudPlugin::class => ['all' => true],\n];|g" config/bundles.php); \
+		(cd ${APP_DIR} && sed -i'' -e 's|            "App\\": "src/",|            "App\\": "src/",\n            "Adeliom\\SyliusEasyCrudPlugin\\": "lib/sylius-easy-crud-plugin/src/"|g' composer.json); \
+		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\SyliusEasyCrudPlugin\\\\": "lib/sylius-easy-crud-plugin/src/",\n            "App\\\\": "src/"|g' composer.json); \
+		(cd ${APP_DIR} && rm -rf compose.override.yml-e); \
+		(cd ${APP_DIR} && rm -rf config/bundles.php-e); \
+		(cd ${APP_DIR} && rm -rf composer.json-e); \
 	fi
 
 	make platform_up
@@ -91,6 +104,7 @@ platform:
 	cd ${APP_DIR} && docker-compose run --rm php composer config repositories.adeliom '{"type":"vcs","url":"git@github.com:agence-adeliom/sylius-easy-crud-plugin.git"}'
 	cd ${APP_DIR} && docker-compose run --rm php composer config extra.symfony.require "~${SYMFONY_VERSION}"
 	cd ${APP_DIR} && docker-compose run --rm php composer require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}"
+	cd ${APP_DIR} && docker-compose run --rm php composer dump-autoload
 	cd ${APP_DIR} && docker-compose run --rm php composer install --no-interaction --no-scripts --prefer-dist
 	make platform_up
 	cd ${APP_DIR} && docker-compose run --rm nodejs
