@@ -9,3 +9,4 @@ tests/Application
 .idea/*
 php.ini
 .php-version
+.makefile/composer.mk

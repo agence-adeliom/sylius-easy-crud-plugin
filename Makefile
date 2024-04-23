@@ -1,8 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL=/bin/bash
 
-GITHUB_TOKEN ?= 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
-
+-include .makefile/composer.mk
 -include .makefile/global.mk
 
 ###
