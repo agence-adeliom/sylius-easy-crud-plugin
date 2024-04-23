@@ -6,16 +6,20 @@
 ### ¯¯¯¯¯¯¯¯¯¯¯
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
-
+test.all: test.ecs.fix test.ecs test.yaml test.twig test.schema test.phpstan
 
 # Check coding standard
 test.ecs:
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose exec php vendor/bin/ecs check ${PLUGIN_DIR}/src)
 
+HELP += $(call help,test.phpstan,			Run PHPStan)
+test.phpstan: ## Run PHPStan
+	cd ${APP_DIR} && (ENV=$(ENV) docker-compose exec php vendor/bin/phpstan analyse --level=7 -c phpstan.neon ${PLUGIN_DIR}/src)
+
+
 # Fix coding standard
 test.ecs.fix:
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose exec php vendor/bin/ecs --fix check ${PLUGIN_DIR}/src)
-
 
 HELP += $(call help,test.yaml,			Lint the symfony Yaml files)
 test.yaml: ## Lint the symfony Yaml files

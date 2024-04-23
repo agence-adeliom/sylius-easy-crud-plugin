@@ -115,13 +115,18 @@ platform:
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer dump-autoload)
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
 	make platform_up
+	make platform_assets
+
+platform_assets:
+	rm -rf ${APP_DIR}/node_modules
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm nodejs)
+	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm nodejs "npm run build")
 
 platform_debug:
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose -f compose.yml -f compose.override.yml -f compose.debug.yml up -d)
 
 platform_up:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose up -d)
+	cd ${APP_DIR} && (ENV=$(ENV) docker-compose up -d --force-recreate)
 
 platform_down:
 	cd ${APP_DIR} && (ENV=$(ENV) docker-compose down)
