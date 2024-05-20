@@ -1,3 +1,7 @@
+## Configure your custom CRUD
+
+Here is the list of default fields available with this plugin and configuration example.
+
 ### ResourceChoiceField
 
 Is a field that allow you to choose a single resource in a select field

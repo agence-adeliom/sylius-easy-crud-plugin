@@ -1,13 +1,6 @@
 .DEFAULT_GOAL := help
-SHELL=/bin/bash
+shell=/bin/bash
 APP_DIR=tests/Application
-SYMFONY=cd ${APP_DIR} && symfony
-COMPOSER=symfony composer
-CONSOLE=cd ${APP_DIR} && docker-compose run --rm php bin/console
-COMPOSE=docker-compose
-DOCKER=cd ${APP_DIR} && docker-compose run --rm php bin/console sylius:install -s default -n
-YARN=yarn
-NPM=npm
 
 ###
 ### DEVELOPMENT
@@ -25,11 +18,11 @@ reset: ## Stop docker and remove dependencies
 	rm -rf vendor composer.lock
 .PHONY: rese
 
-HELP += $(call help,stop,			Stop project)
+HELP += $(call help,stop,				Stop project)
 stop:
 	make platform_down
 
-HELP += $(call help,stop,			Start project)
+HELP += $(call help,up,				Start project)
 up:
 	make platform_up
 
@@ -48,11 +41,11 @@ php.ini: php.ini.dist
 	ln -s php.ini.dist php.ini
 
 ${APP_DIR}:
-	(${COMPOSER} create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
+	(symfony composer create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
 	cd ${APP_DIR} && chmod -R 777 public
 	echo "COMPOSE_PROJECT_NAME=sylius-easy-crud-plugin" >> ${APP_DIR}/.env
 	make apply_dist
-	make override_sylius_config
+	#make override_sylius_config
 
 override_sylius_config:
 
@@ -71,30 +64,30 @@ apply_dist:
 ### ¯¯¯¯¯¯¯¯
 sylius: sylius_install install_bundle messenger.setup
 
-DOCKER_USER ?= "$(shell id -u):$(shell id -g)"
-ENV ?= "dev"
-
 sylius_install:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose exec -it -u root php rm -rf public/media/image)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run php bin/console doctrine:database:drop --if-exists --force)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run php bin/console sylius:install -s default -n)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root php rm -rf public/media/image)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root mysql mysql --execute 'UPDATE mysql.user SET host = "%" WHERE user = "root"')
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run php bin/console doctrine:database:drop --if-exists --force)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console sylius:install -s default -n)
 
 install_bundle:
-	cd ${APP_DIR} && docker-compose run php composer require --no-interaction ${PLUGIN_NAME}="*@dev"
-	echo "navigate to http://localhost:8050/"
+	cd ${APP_DIR} && docker compose run php composer require --no-interaction ${PLUGIN_NAME}="*@dev"
+	echo "navigate to http://localhost:$(ENV)"
 
 messenger.setup: ## Setup Messenger transports
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run php bin/console messenger:setup-transports)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run php bin/console messenger:setup-transports)
 
 ###
 ### PLATFORM
 ### ¯¯¯¯¯¯¯¯
 
 platform:
-	@if [ ! -e compose.override.yml ]; then \
+	@if [ ! -e ${APP_DIR}/compose.override.yml ]; then \
 		(cd ${APP_DIR} && cp compose.override.dist.yml compose.override.yml); \
-		(cd ${APP_DIR} && sed -i'' -e 's|          - public-media:/srv/sylius/public/media:rw|          - public-media:/srv/sylius/public/media:rw\n          - ../../../sylius-easy-crud-plugin:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
-		(cd ${APP_DIR} && sed -i'' -e 's|            - public-media:/srv/sylius/public/media:ro,nocopy|            - public-media:/srv/sylius/public/media:ro,nocopy\n            - ../../../sylius-easy-crud-plugin:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|3306:3306|${DOCKER_MYSQL_PORT}:3306|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|          - public-media:/srv/sylius/public/media:rw|          - public-media:/srv/sylius/public/media:rw\n          - ../../:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|- "80:80"|- "$(DOCKER_PHP_PORT):80"\n        depends_on:\n            - php|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|            - public-media:/srv/sylius/public/media:ro,nocopy|            - public-media:/srv/sylius/public/media:ro,nocopy\n            - ../../:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\SyliusEasyCrudPlugin\\\SyliusEasyCrudPlugin::class => ['all' => true],\n];|g" config/bundles.php); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            "App\\": "src/",|            "App\\": "src/",\n            "Adeliom\\SyliusEasyCrudPlugin\\": "lib/sylius-easy-crud-plugin/src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\SyliusEasyCrudPlugin\\\\": "lib/sylius-easy-crud-plugin/src/",\n            "App\\\\": "src/"|g' composer.json); \
@@ -104,45 +97,48 @@ platform:
 	fi
 
 	make platform_up
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer config github-oauth.github.com ${GITHUB_TOKEN})
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer config minimum-stability dev)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer config extra.symfony.allow-contrib true)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer config repositories.plugin '{"type": "path", "url": "../../"}')
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer config repositories.adeliom '{"type":"vcs","url":"git@github.com:agence-adeliom/sylius-easy-crud-plugin.git"}')
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer config extra.symfony.require "~${SYMFONY_VERSION}")
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}")
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer require --no-install --no-scripts --no-progress --dev friendsoftwig/twigcs)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer dump-autoload)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config github-oauth.github.com ${GITHUB_TOKEN})
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config minimum-stability dev)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config extra.symfony.allow-contrib true)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config repositories.plugin '{"type": "path", "url": "../../"}')
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config repositories.adeliom '{"type":"vcs","url":"$(PLUGIN_URL)"}')
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config extra.symfony.require "~${SYMFONY_VERSION}")
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}")
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress --dev friendsoftwig/twigcs)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress --dev symfony/maker-bundle)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer dump-autoload)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
 	make platform_up
 	make platform_assets
 
 platform_assets:
 	rm -rf ${APP_DIR}/node_modules
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm nodejs)
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm nodejs "npm run build")
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs "npm run build")
 
 platform_debug:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose -f compose.yml -f compose.override.yml -f compose.debug.yml up -d)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose -f compose.yml -f compose.override.yml -f compose.debug.yml up -d)
 
 platform_up:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose up -d --force-recreate)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose up -d --force-recreate)
 
 platform_down:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose down)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose down)
 
 platform_clean:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose down -v)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose down -v)
 
+HELP += $(call help,php-shell,			Go into docker php shell)
 php-shell:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose exec php sh)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php sh)
 
+HELP += $(call help,node-shell,			Go into docker node shell)
 node-shell:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm -i nodejs sh)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs sh)
 
+HELP += $(call help,node-watch,			Run assets build as watch)
 node-watch:
-	cd ${APP_DIR} && (ENV=$(ENV) docker-compose run --rm -i nodejs "npm run watch")
-
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs "npm run watch")
 
 
 
