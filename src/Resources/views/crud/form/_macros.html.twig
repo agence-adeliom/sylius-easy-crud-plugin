@@ -24,39 +24,37 @@
     </div>
 {% endmacro %}
 
-{% macro form(firstMenuItem, menuItem, form, fields, view = 'update') %}
+{% macro form(firstMenuItem, menuItem, form, fields, view='update') %}
 
     <div class="ui attached segment">
         <div class="ui column stackable grid">
 
-            {% set columnStarted = null %}
+            {% set column_started = null %}
 
             {% for column in form.vars.columns %}
 
                 {% for child in form.children %}
 
-                    {% set fieldColumnId = child.vars.errors.form.config.attributes.columnId ?? null %}
-                    {% set columnMenuItem = column.menuItem ?? null %}
+                    {% set field_column_id = child.vars.errors.form.config.attributes.columnId ?? null %}
+                    {% set column_menu_item = column.menuItem ?? null %}
 
-                    {% if not child.isRendered and (fieldColumnId == column.id or fieldColumnId is null) and (menuItem is null or menuItem.name == columnMenuItem) %}
+                    {% if not child.isRendered and (field_column_id == column.id or field_column_id is null) and (menuItem is null or menuItem.name == column_menu_item) %}
 
-                        {% set fieldMenuItem = child.vars.errors.form.config.attributes.menuItem.name ?? null %}
+                        {% set field_menu_item = child.vars.errors.form.config.attributes.menuItem.name ?? null %}
 
-                        {% if
-                            (firstMenuItem is not null and firstMenuItem and menuItem is not null and (fieldMenuItem is null or fieldMenuItem == menuItem.name))
-                            or
-                            (firstMenuItem is not null and not firstMenuItem and menuItem is not null and fieldMenuItem == menuItem.name)
-                            or
-                            (firstMenuItem is null and menuItem is null)
-                        %}
+                        {% set cond_1 = (firstMenuItem is not null and firstMenuItem and menuItem is not null and (field_menu_item is null or field_menu_item == menuItem.name)) %}
+                        {% set cond_2 = (firstMenuItem is not null and not firstMenuItem and menuItem is not null and field_menu_item == menuItem.name) %}
+                        {% set cond_3 = (firstMenuItem is null and menuItem is null) %}
 
-                            {% if not columnStarted %}
+                        {% if cond_1 or cond_2 or cond_3 %}
+
+                            {% if not column_started %}
                                 {{ _self.start_column(column.size, false, column.label) }}
-                                {% set columnStarted = column.id %}
-                            {% elseif columnStarted != column.id %}
+                                {% set column_started = column.id %}
+                            {% elseif column_started != column.id %}
                                 {{ _self.end_column() }}
                                 {{ _self.start_column(column.size, column.newLine, column.label) }}
-                                {% set columnStarted = column.id %}
+                                {% set column_started = column.id %}
                             {% endif %}
 
                             {{ form_row(child) }}
@@ -67,7 +65,7 @@
 
             {% endfor %}
 
-            {% if columnStarted %}
+            {% if column_started %}
                 {{ _self.end_column() }}
             {% endif %}
 

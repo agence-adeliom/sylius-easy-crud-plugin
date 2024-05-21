@@ -32,7 +32,9 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     {
         $resourceClass = $this->getResourceClass();
         $grid = GridBuilder::create($this::getName(), $resourceClass);
-        $grid->orderBy($this::getDefaultSortColumn(), $this::getDefaultSortOrder());
+        if ('' !== $this::getDefaultSortColumn()) {
+            $grid->orderBy($this::getDefaultSortColumn(), $this::getDefaultSortOrder());
+        }
 
         if (in_array(TranslatableInterface::class, class_implements($resourceClass))) {
             $grid->setDriverOption('repository', $this::getRepositoryMethod());

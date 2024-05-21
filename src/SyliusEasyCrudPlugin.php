@@ -13,6 +13,11 @@ class SyliusEasyCrudPlugin extends AbstractBundle
 {
     use SyliusPluginTrait;
 
+    public function getPath(): string
+    {
+        return __DIR__;
+    }
+
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

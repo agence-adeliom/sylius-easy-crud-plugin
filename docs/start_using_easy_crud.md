@@ -10,14 +10,10 @@ mappings:
     App:
         type: attribute
 ```
-- Execute:
-`php bin/console doctrine:migrations:diff`
-- Execute:
-`php bin/console doctrine:migrations:migrate`
 
 2. Transform your entity as a Sylius Resource :
 
-- Add `ResourceInterface` to your entity model class :
+- Implement entity file with `ResourceInterface` :
   ```php  
     use Sylius\Component\Resource\Model\ResourceInterface;
     class Post implements ResourceInterface { 
@@ -25,12 +21,17 @@ mappings:
 - Extends the created Repo with `EntityRepository` :
 ```php  
     use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository
-    class PostRepository implements EntityRepository { 
-        # remove constructor
+    class PostRepository extends EntityRepository { 
+        # and remove constructor
   ```
 - Register your entity as described here :
   [Sylius resource](https://docs.sylius.com/en/latest/cookbook/entities/custom-model.html#register-your-entity-as-a-sylius-resource)
-- `php bin/console cache:clear`
+- Execute:
+`php bin/console cache:clear`
+- Execute:
+  `php bin/console doctrine:migrations:diff`
+- Execute:
+  `php bin/console doctrine:migrations:migrate`
 
 3. Generate your easy CRUD:
 
@@ -40,19 +41,13 @@ With this Admin class you will be able to configure easily and with a method for
     - The Sylius default edit, create and show view
     - Create other custom view
 
-
 - Execute: `php bin/console make:easy-crud` and choose the "Post" entity
-- Declare the admin form info `config/packages/sylius_resource.yaml`
+- Modify config/packages/_sylius.yaml and import created `sylius_resource_post.yaml` :
 ```yaml
-sylius_resource:
-    resources:
-        app.post:
-            ...
-            classes:
-                ...
-                form: App\Admin\Post\PostAdmin
+imports:
+  - { resource: "../resources/sylius_resource_post.yaml" } 
 ```
-- Declare the admin route and configuration into : `config/routes.yaml`
+- Declare the admin route and configuration into : `config/routes/sylius_admin.yaml`
 ```yaml
 app_admin_post:
     resource: |
@@ -63,7 +58,7 @@ app_admin_post:
         redirect: update
         grid: app_admin_post
         form: 
-            type: App\Admin\Post\PostAdmin
+            type: App\Admin\PostAdmin
             options:
                 context: $context
         vars:

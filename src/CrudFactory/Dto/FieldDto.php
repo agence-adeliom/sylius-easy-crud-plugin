@@ -103,7 +103,7 @@ final class FieldDto
 
     public function getUniqueId(): string
     {
-        return $this->uniqueId;
+        return $this->uniqueId->toRfc4122();
     }
 
     public function setUniqueId(string $uniqueId): void

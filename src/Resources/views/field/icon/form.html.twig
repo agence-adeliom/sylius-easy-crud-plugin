@@ -5,9 +5,9 @@
         class: row_attr.class|default('') ~ ' form-group'
     }) %}
     <div class="">
-        <div {% with { attr: row_attr|merge({
+        <div {% with {attr: row_attr|merge({
             'data-row-id': id
-        }) } %}{{ block('attributes') }}{% endwith %}>
+        })} %}{{ block('attributes') }}{% endwith %}>
             {{- form_label(form) -}}
             <div class="w-field-icon">
                 {{ form_widget(form) }}

@@ -61,9 +61,9 @@ final class <?= $class_name ?> extends AbstractAdmin implements ServiceSubscribe
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        /*
         yield TabField::new('tab1', 'Tab 1');
 
+        /*
         yield Field::new('title')
             ->setDisabled(false)
             ->setRequired(true)

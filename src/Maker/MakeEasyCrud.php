@@ -118,7 +118,7 @@ final class MakeEasyCrud extends AbstractMaker
             ],
         );
 
-        $yamlPath = 'config/packages/sylius_resource_' . strtolower($entity->getShortName()) . '.yml';
+        $yamlPath = 'config/resources/sylius_resource_' . strtolower($entity->getShortName()) . '.yaml';
         $generator->generateFile(
             $yamlPath,
             __DIR__ . '/../Resources/skeleton/resource.tpl.php',
@@ -136,7 +136,10 @@ final class MakeEasyCrud extends AbstractMaker
 
         $this->writeSuccessMessage($io);
 
-        $io->info(sprintf('Don\'t forget to import `%s` in your sylius_resource configuration file', $yamlPath));
+        $io->info(sprintf(
+            'Don\'t forget to import `%s` in your config/packages/_sylius.yaml configuration file',
+            $yamlPath,
+        ));
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

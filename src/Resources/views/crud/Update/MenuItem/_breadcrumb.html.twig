@@ -2,7 +2,7 @@
 
 {# MODIFIE ICI POUR QUE L'ON RETOURNE SUR LA LISTE DES MENUS #}
 {% set index_url = path(
-    configuration.vars.index.route.name|default(configuration.getRouteName('index')|replace({'_item' : ''}))
+    configuration.vars.index.route.name|default(configuration.getRouteName('index')|replace({'_item': ''}))
 )
 %}
 
@@ -16,14 +16,14 @@
 
 {% if resource.parent %}
     {% set breadcrumbs = breadcrumbs|merge([
-        { label: '...' },
-        { label: resource.parent.name|default(resource.parent.code|default(resource.parent.id)), url: path('easy_admin_menu_item_update', {id: resource.parent.id})},
+        {label: '...'},
+        {label: resource.parent.name|default(resource.parent.code|default(resource.parent.id)), url: path('easy_admin_menu_item_update', {id: resource.parent.id})},
     ]) %}
 {% endif %}
 
 {% set breadcrumbs = breadcrumbs|merge([
-    { label: resource.name|default(resource.code|default(resource.id)) },
-    { label: 'sylius.ui.edit'|trans }
+    {label: resource.name|default(resource.code|default(resource.id))},
+    {label: 'sylius.ui.edit'|trans}
 ])
 %}
 

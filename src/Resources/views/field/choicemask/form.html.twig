@@ -2,7 +2,7 @@
     {{ block('choice_widget') }}
 
     {% set main_form_name = id|slice(0, id|length - name|length) %}
-    {% set isTranslation = form.vars.is_translation|default(false) %}
+    {% set is_translation = form.vars.is_translation|default(false) %}
 
     <script>
         var allFields_{{ main_form_name }} = {{ all_fields|json_encode|raw }};
@@ -15,7 +15,7 @@
                 if(rowId.endsWith('__')){
                     rowId = rowId.replace('__', '_');
                 }
-                {% if isTranslation -%}
+                {% if is_translation -%}
                 return '[id^="' + rowId + field + '_"]';
                 {% else -%}
                 return '[id="' + rowId + field + '"]';
@@ -25,7 +25,7 @@
             if (map_{{ main_form_name }}[val] == undefined) {
                 allFields_{{ main_form_name }}.forEach(function (field) {
                     document.querySelectorAll(controlGroupIdFunc(field)).forEach(function (elm){
-                        {% if isTranslation -%}
+                        {% if is_translation -%}
                         let elmField = null;
                         const translationAccordion = elm.closest('.accordion > [data-locale]');
                         if (translationAccordion){
@@ -43,7 +43,7 @@
             }
             allFields_{{ main_form_name }}.forEach(function (field) {
                 document.querySelectorAll(controlGroupIdFunc(field)).forEach(function (elm){
-                    {% if isTranslation -%}
+                    {% if is_translation -%}
                     let elmField = null;
                     const translationAccordion = elm.closest('.accordion > [data-locale]');
                     if (translationAccordion){
@@ -63,7 +63,7 @@
             });
             map_{{ main_form_name }}[val].forEach(function (field) {
                 document.querySelectorAll(controlGroupIdFunc(field)).forEach(function (elm){
-                    {% if isTranslation -%}
+                    {% if is_translation -%}
                     let elmField = null;
                     const translationAccordion = elm.closest('.accordion > [data-locale]');
                     if (translationAccordion){

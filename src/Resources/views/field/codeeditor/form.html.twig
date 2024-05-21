@@ -1,13 +1,13 @@
 {% form_theme form _self %}
 
 {% block code_editor_row %}
-    {% set configuredHeight = field.customOptions.get('numOfRows') * 16 %}
+    {% set configured_height = field.customOptions.get('numOfRows') * 16 %}
 
     <div class="field">
         {{ form_label(form) }}
         {{ form_widget(form, {
             'attr': {
-                'style': configuredHeight is null ? 'max-height: 500px; height:60px' : 'max-height: unset; height: ' ~ configuredHeight ~ 'px',
+                'style': configured_height is null ? 'max-height: 500px; height:60px' : 'max-height: unset; height: ' ~ configured_height ~ 'px',
                 'data-ea-code-editor-field': 'true',
                 'data-language': field.customOptions.get('language')|e('html_attr'),
                 'data-tab-size': field.customOptions.get('tabSize')|e('html_attr'),

@@ -1,11 +1,11 @@
 {% form_theme form _self %}
 
 {% block text_editor_widget %}
-    {{ form_widget(form, { attr: attr|merge({
+    {{ form_widget(form, {attr: attr|merge({
         class: 'ea-text-editor-content d-none',
         'data-number-of-rows': numOfRows|default(5),
         'data-trix-editor-config': trixEditorConfig|default(null)|json_encode,
-    }) }) }}
+    })}) }}
 
     <div class="ea-text-editor-wrapper">
         <trix-editor input="{{ id }}" class="trix-content"></trix-editor>

@@ -2,23 +2,23 @@
 
 <div class="ui styled fluid accordion">
     {% for locale in field.getCustomOption('definedLocalesCodes') %}
-        {% set firstLoop = loop %}
-        {% for localeValue in field.getValue() %}
-            {% if locale == localeValue.locale %}
-                <div data-locale="{{ localeValue.locale }}">
-                    <div class="title{% if firstLoop.first %} active{% endif %}">
+        {% set first_loop = loop %}
+        {% for locale_value in field.getValue() %}
+            {% if locale == locale_value.locale %}
+                <div data-locale="{{ locale_value.locale }}">
+                    <div class="title{% if first_loop.first %} active{% endif %}">
                         <i class="dropdown icon"></i>
-                        {{ flags.fromLocaleCode(localeValue.locale) }} {{ localeValue.locale|sylius_locale_name }}
+                        {{ flags.fromLocaleCode(locale_value.locale) }} {{ locale_value.locale|sylius_locale_name }}
                     </div>
-                    <div class="ui content{% if firstLoop.first %} active{% endif %}">
-                        {% set subFields = field.getCustomOption('fieldsDto') %}
-                        {% for subField in subFields %}
-                            {% set subFieldDto = subField.getAsDto() %}
-                            {% set template = subFieldDto.getShowTemplatePath() %}
-                            {% set value = get_resource_property_value(localeValue, subFieldDto.property) %}
+                    <div class="ui content{% if first_loop.first %} active{% endif %}">
+                        {% set sub_fields = field.getCustomOption('fieldsDto') %}
+                        {% for sub_field in sub_fields %}
+                            {% set sub_field_dto = sub_field.getAsDto() %}
+                            {% set template = sub_field_dto.getShowTemplatePath() %}
+                            {% set value = get_resource_property_value(locale_value, sub_field_dto.property) %}
                             {% include template with {
                                 'data': value,
-                                'field': subFieldDto,
+                                'field': sub_field_dto,
                                 'resource': resource
                             } %}
                         {% endfor %}
