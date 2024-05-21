@@ -16,7 +16,7 @@ final class ColumnField implements FieldInterface
     public static function new(?string $label = null, $fieldsConfig = []): self
     {
         return (new self())
-            ->setProperty(rand(0, 1000))
+            ->setProperty('_'.rand(0, 1000))
             ->setLabel($label)
             ->setFormType(HiddenType::class)
             ->hideOnIndex()
