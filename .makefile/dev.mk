@@ -66,7 +66,7 @@ sylius: sylius_install install_bundle messenger.setup
 
 sylius_install:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root php rm -rf public/media/image)
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root mysql mysql --execute 'UPDATE mysql.user SET host = "%" WHERE user = "root"')
+	#cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root mysql mysql --execute 'UPDATE mysql.user SET host = "%" WHERE user = "root"')
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run php bin/console doctrine:database:drop --if-exists --force)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console sylius:install -s default -n)
 
