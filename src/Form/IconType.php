@@ -64,6 +64,9 @@ class IconType extends AbstractType implements AdminFormTypeInterface
         return 'icon';
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [
@@ -71,6 +74,9 @@ class IconType extends AbstractType implements AdminFormTypeInterface
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function configureAdminFormThemes(): array
     {
         return ['@SyliusEasyCrudPlugin/field/icon/form.html.twig'];

@@ -197,11 +197,17 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         return 'sylius_translations';
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [];
     }
 
+    /**
+     * @return string[]
+     */
     public static function configureAdminFormThemes(): array
     {
         return ['@SyliusEasyCrudPlugin/field/translation/form.html.twig'];

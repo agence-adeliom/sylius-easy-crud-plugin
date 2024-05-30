@@ -129,7 +129,8 @@ final class MakeEasyCrud extends AbstractMaker
                 'repository' => $repository,
             ],
         );
-        $resourceConfigGenerator = new ResourceConfigGeneratorService();
+
+        // $resourceConfigGenerator = new ResourceConfigGeneratorService();
         // TODO: adapt ResourceConfigGeneratorService to generate needed files here
 
         $generator->writeChanges();
@@ -147,6 +148,9 @@ final class MakeEasyCrud extends AbstractMaker
         // No dependencies needed
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function entityChoices(): array
     {
         $choices = [];
@@ -166,6 +170,11 @@ final class MakeEasyCrud extends AbstractMaker
         return $choices;
     }
 
+    /**
+     * @param class-string $class
+     *
+     * @return iterable<string, string>
+     */
     private function defaultFieldsFor(string $class): iterable
     {
         $entityManager = $this->managerRegistry->getManagerForClass($class);

@@ -15,6 +15,8 @@ interface AdminFormTypeInterface
 
     /**
      * Declare here the form themes that make your admin field working as expected
+     *
+     * @return string[]
      */
     public static function configureAdminFormThemes(): array;
 }

@@ -21,6 +21,9 @@ class TextEditorType extends AbstractType implements AdminFormTypeInterface
         return 'text_editor';
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [
@@ -33,6 +36,9 @@ class TextEditorType extends AbstractType implements AdminFormTypeInterface
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function configureAdminFormThemes(): array
     {
         return ['@SyliusEasyCrudPlugin/field/texteditor/form.html.twig'];

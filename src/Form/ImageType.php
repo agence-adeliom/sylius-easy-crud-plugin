@@ -42,6 +42,9 @@ class ImageType extends AbstractType implements AdminFormTypeInterface
         return 'upload_image';
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [
@@ -51,6 +54,9 @@ class ImageType extends AbstractType implements AdminFormTypeInterface
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function configureAdminFormThemes(): array
     {
         return ['@SyliusEasyCrudPlugin/field/image/form.html.twig'];

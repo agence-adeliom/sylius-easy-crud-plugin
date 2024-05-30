@@ -51,6 +51,9 @@ class CodeEditorType extends AbstractType implements AdminFormTypeInterface
         ]);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [
@@ -63,6 +66,9 @@ class CodeEditorType extends AbstractType implements AdminFormTypeInterface
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public static function configureAdminFormThemes(): array
     {
         return ['@SyliusEasyCrudPlugin/field/codeeditor/form.html.twig'];

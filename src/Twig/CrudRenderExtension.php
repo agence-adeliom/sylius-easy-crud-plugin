@@ -11,8 +11,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
-use Twig\Extension\ExtensionInterface;
-use Twig\Extension\RuntimeExtensionInterface;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
@@ -36,23 +34,33 @@ class CrudRenderExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return TwigFilter[]
+     */
     public function getFilters(): array
     {
         return [
             new TwigFilter('display_flatten_array', [$this, 'flattenArray']),
             new TwigFilter('display_filesize', [$this, 'fileSize']),
-            new TwigFilter('as_apply_filter_if_exists', [$this, 'applyFilterIfExists'], ['needs_environment' => true]),
             new TwigFilter('display_as_string', [$this, 'representAsString']),
             new TwigFilter('path_info', [$this, 'pathInfo'], ['is_safe' => ['html']]),
         ];
     }
 
-    public function renderAction(Action $action, RequestConfiguration $requestConfiguration, $data = null): mixed
+    /**
+     * @param array<string, mixed>|null $data
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function renderAction(Action $action, RequestConfiguration $requestConfiguration, ?array $data = null): string
     {
         $type = $action->getType();
         $actionTemplates =
             $this->parameterBag->get('sylius.grid.templates.action');
-        if (!isset($actionTemplates[$type])) {
+
+        if (!is_array($actionTemplates) || !isset($actionTemplates[$type])) {
             throw new \InvalidArgumentException(sprintf('Missing template for action type "%s".', $type));
         }
 
@@ -80,21 +88,25 @@ class CrudRenderExtension extends AbstractExtension
         ]);
     }
 
-    public function flattenArray($array, $parentKey = null): array
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    public function flattenArray(array $data, string $parentKey = null): array
     {
-        $flattenedArray = [];
+        $result = [];
 
-        foreach ($array as $flattenedKey => $value) {
-            $flattenedKey = null !== $parentKey ? sprintf('%s[%s]', $parentKey, $flattenedKey) : $flattenedKey;
-
+        foreach ($data as $key => $value) {
+            $key = null !== $parentKey ? sprintf('%s[%s]', $parentKey, $key) : $key;
             if (\is_array($value)) {
-                $flattenedArray = array_merge($flattenedArray, $this->flattenArray($value, $flattenedKey));
+                $result = array_merge($result, $this->flattenArray($value, $key));
             } else {
-                $flattenedArray[$flattenedKey] = $value;
+                $result[$key] = $value;
             }
         }
 
-        return $flattenedArray;
+        return $result;
     }
 
     public function fileSize(int $bytes): string
@@ -105,27 +117,10 @@ class CrudRenderExtension extends AbstractExtension
         return (int) ($bytes / (1024 ** $factor)) . @$size[$factor];
     }
 
-    // Code adapted from https://stackoverflow.com/a/48606773/2804294 (License: CC BY-SA 3.0)
-    public function applyFilterIfExists(Environment $environment, $value, string $filterName, ...$filterArguments)
-    {
-        if (null === $filter = $environment->getFilter($filterName)) {
-            return $value;
-        }
-
-        [$class, $method] = $filter->getCallable();
-        if ($class instanceof ExtensionInterface) {
-            return $filter->getCallable()($value, ...$filterArguments);
-        }
-
-        $object = $environment->getRuntime($class);
-        if ($object instanceof RuntimeExtensionInterface && method_exists($object, $method)) {
-            return $object->$method($value, ...$filterArguments);
-        }
-
-        return null;
-    }
-
-    public function representAsString($value): string
+    /**
+     * @param string|int|bool|array<mixed, mixed>|object|null $value
+     */
+    public function representAsString(null|string|int|bool|array|object $value): string
     {
         if (null === $value) {
             return '';
@@ -158,20 +153,12 @@ class CrudRenderExtension extends AbstractExtension
 
             return sprintf('%s #%s', $value::class, substr(md5(spl_object_hash($value)), 0, 7));
         }
-
-        return '';
     }
 
-    public function callFunctionIfExists(Environment $environment, string $functionName, ...$functionArguments)
-    {
-        if (null === $function = $environment->getFunction($functionName)) {
-            return '';
-        }
-
-        return $function->getCallable()(...$functionArguments);
-    }
-
-    public function pathInfo(string $path): array
+    /**
+     * @return array<string, string>|string
+     */
+    public function pathInfo(string $path): array|string
     {
         return pathinfo($path);
     }

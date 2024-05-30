@@ -135,11 +135,17 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
         $resolver->addAllowedTypes('useResourceTransformers', ['bool']);
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [];
     }
 
+    /**
+     * @return string[]
+     */
     public static function configureAdminFormThemes(): array
     {
         return [];

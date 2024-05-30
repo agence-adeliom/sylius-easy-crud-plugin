@@ -119,3 +119,6 @@ services:
 
   Adeliom\SyliusEasyCrudPlugin\Services\ResourceConfigGeneratorService:
     public: true
+    arguments:
+      $scope: ''
+      $namespaces: [ ]

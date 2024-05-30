@@ -35,7 +35,7 @@ class OembedExtension extends AbstractExtension
         ];
     }
 
-    public function getOembed(string $url)
+    public function getOembed(string $url): ?Extractor
     {
         if (!$this->embed || $url != $this->url) {
             try {
@@ -49,7 +49,7 @@ class OembedExtension extends AbstractExtension
         return $this->embed;
     }
 
-    public function getCode(string $url)
+    public function getCode(string $url): ?string
     {
         if ($this->getOembed($url) && $code = $this->getOembed($url)->code) {
             return $code->html;
@@ -58,7 +58,10 @@ class OembedExtension extends AbstractExtension
         return null;
     }
 
-    public function getDimensions($url): ?array
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getDimensions(string $url): ?array
     {
         if ($this->getOembed($url) && $code = $this->getOembed($url)->code) {
             return [

@@ -2,7 +2,9 @@
 
 use Symfony\Bundle\MakerBundle\Str;
 
-?>
+if (isset($namespace, $entity, $class_name)) {
+    ?>
+
 <?= "<?php\n" ?>
 
 declare(strict_types=1);
@@ -104,3 +106,4 @@ final class <?= $class_name ?> extends AbstractAdmin implements ServiceSubscribe
         */
     }
 }
+<?php } ?>

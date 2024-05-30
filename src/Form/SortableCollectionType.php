@@ -147,6 +147,9 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         return 'sortable_collection';
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public static function configureAdminAssets(): array
     {
         return [

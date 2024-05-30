@@ -8,63 +8,47 @@ namespace Adeliom\SyliusEasyCrudPlugin\Helper;
  * Base Enum class.
  *
  * Create an enum by implementing this class and adding class constants.
- *
- * @psalm-template T
- *
- * @psalm-immutable
- *
- * @psalm-consistent-constructor
  */
+/** @phpstan-consistent-constructor */
 abstract class Enum implements \JsonSerializable, \Stringable
 {
     /**
      * Enum value.
-     *
-     * @psalm-var T
-     *
-     * @var mixed
      */
-    protected $value;
+    protected mixed $value = null;
 
     /**
      * Enum key, the constant name.
      */
-    private string $key;
+    private string|int|null $key = null;
 
     /**
      * Store existing constants in a static cache per object.
      *
-     * @psalm-var array<class-string, array<string, mixed>>
+     * @var array<string, mixed>
      */
     protected static array $cache = [];
 
     /**
      * Cache of instances of the Enum class.
      *
-     * @psalm-var array<class-string, array<string, static>>
+     * @var array<string, mixed>
      */
     protected static array $instances = [];
 
     /**
      * Creates a new value of some type.
      *
-     * @psalm-pure
-     *
-     * @psalm-param T $value
-     *
      * @throws \UnexpectedValueException if incompatible type is given
      */
     public function __construct(mixed $value)
     {
         if ($value instanceof static) {
-            /** @psalm-var T */
             $value = $value->getValue();
         }
 
-        /* @psalm-suppress ImplicitToStringCast assertValidValueReturningKey returns always a string but psalm has currently an issue here */
         $this->key = static::assertValidValueReturningKey($value);
 
-        /* @psalm-var T */
         $this->value = $value;
     }
 
@@ -74,53 +58,34 @@ abstract class Enum implements \JsonSerializable, \Stringable
      */
     public function __wakeup()
     {
-        /* @psalm-suppress DocblockTypeContradiction key can be null when deserializing an enum without the key */
         if (null === $this->key) {
-            /*
-             * @psalm-suppress InaccessibleProperty key is not readonly as marked by psalm
-             * @psalm-suppress PossiblyFalsePropertyAssignmentValue deserializing a case that was removed
-             */
-            $this->key = static::search($this->value);
+            $search = static::search($this->value);
+            if (is_string($search)) {
+                $this->key = $search;
+            }
         }
     }
 
-    /**
-     * @return $this
-     */
-    public static function from(mixed $value)
+    public static function from(mixed $value): self
     {
         $key = static::assertValidValueReturningKey($value);
 
         return self::__callStatic($key, []);
     }
 
-    /**
-     * @psalm-pure
-     *
-     * @psalm-return T
-     *
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
     /**
      * Returns the enum key (i.e. the constant name).
-     *
-     * @psalm-pure
      */
-    public function getKey(): string
+    public function getKey(): int|string|null
     {
         return $this->key;
     }
 
-    /**
-     * @psalm-pure
-     *
-     * @psalm-suppress InvalidCast
-     */
     public function __toString(): string
     {
         return (string) $this->value;
@@ -131,10 +96,6 @@ abstract class Enum implements \JsonSerializable, \Stringable
      * Returns false if an argument is an object of different class or not an object.
      *
      * This method is final, for more information read https://github.com/myclabs/php-enum/issues/4
-     *
-     * @psalm-pure
-     *
-     * @psalm-param mixed $variable
      */
     final public function equals(mixed $variable): bool
     {
@@ -146,9 +107,7 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Returns the names (keys) of all constants in the Enum class.
      *
-     * @psalm-pure
-     *
-     * @psalm-return list<string>
+     * @return  array<mixed, int|string>
      */
     public static function keys(): array
     {
@@ -158,17 +117,12 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Returns instances of the Enum class of all Enum constants.
      *
-     * @psalm-pure
-     *
-     * @psalm-return array<string, static>
-     *
-     * @return static[] Constant name in key, Enum instance in value
+     * @return array<int, mixed>
      */
     public static function values(): array
     {
         $values = [];
 
-        /** @psalm-var T $value */
         foreach (static::toArray() as $key => $value) {
             $values[$key] = new static($value);
         }
@@ -179,22 +133,14 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Returns all possible values as an array.
      *
-     * @psalm-pure
-     *
-     * @psalm-suppress ImpureStaticProperty
-     *
-     * @psalm-return array<string, mixed>
-     *
-     * @return array Constant name in key, constant value in value
+     * @return array<int, mixed> Constant name in key, constant value in value
      */
     public static function toArray(): array
     {
         $class = static::class;
 
         if (!isset(static::$cache[$class])) {
-            /** @psalm-suppress ImpureMethodCall this reflection API usage has no side-effects here */
             $reflection = new \ReflectionClass($class);
-            /* @psalm-suppress ImpureMethodCall this reflection API usage has no side-effects here */
             static::$cache[$class] = $reflection->getConstants();
         }
 
@@ -203,12 +149,6 @@ abstract class Enum implements \JsonSerializable, \Stringable
 
     /**
      * Check if is valid enum value.
-     *
-     * @psalm-param mixed $value
-     *
-     * @psalm-pure
-     *
-     * @psalm-assert-if-true T $value
      */
     public static function isValid(mixed $value): bool
     {
@@ -217,10 +157,6 @@ abstract class Enum implements \JsonSerializable, \Stringable
 
     /**
      * Asserts valid enum value.
-     *
-     * @psalm-pure
-     *
-     * @psalm-assert T $value
      */
     public static function assertValidValue(mixed $value): void
     {
@@ -230,13 +166,9 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Asserts valid enum value.
      *
-     * @psalm-pure
-     *
-     * @psalm-assert T $value
-     *
      * @throws \UnexpectedValueException
      */
-    private static function assertValidValueReturningKey(mixed $value): string
+    protected static function assertValidValueReturningKey(mixed $value): int|string
     {
         if (false === ($key = static::search($value))) {
             throw new \UnexpectedValueException(sprintf("Value '%s' is not part of the enum ", $value) . static::class);
@@ -247,13 +179,8 @@ abstract class Enum implements \JsonSerializable, \Stringable
 
     /**
      * Check if is valid enum key.
-     *
-     *
-     * @psalm-param string $key
-     *
-     * @psalm-pure
      */
-    public static function isValidKey($key): bool
+    public static function isValidKey(string $key): bool
     {
         $array = static::toArray();
 
@@ -262,12 +189,8 @@ abstract class Enum implements \JsonSerializable, \Stringable
 
     /**
      * Return key for value.
-     *
-     * @psalm-pure
-     *
-     * @return string|true
      */
-    public static function search(mixed $value)
+    public static function search(mixed $value): false|int|string
     {
         return \array_search($value, static::toArray(), true);
     }
@@ -275,13 +198,9 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Returns a value when called statically like so: MyEnum::SOME_VALUE() given SOME_VALUE is a class constant.
      *
-     * @return $this
-     *
-     * @throws \BadMethodCallException
-     *
-     * @psalm-pure
+     * @param array<mixed> $arguments
      */
-    public static function __callStatic(string $name, array $arguments)
+    public static function __callStatic(int|string $name, array $arguments): self
     {
         $class = static::class;
         if (!isset(self::$instances[$class][$name])) {
@@ -301,15 +220,9 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Specify data which should be serialized to JSON. This method returns data that can be serialized by json_encode()
      * natively.
-     *
-     * @see http://php.net/manual/en/jsonserializable.jsonserialize.php
-     *
-     * @psalm-pure
-     *
-     * @return mixed
      */
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->getValue();
     }
