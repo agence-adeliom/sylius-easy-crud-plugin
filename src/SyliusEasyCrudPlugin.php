@@ -7,15 +7,15 @@ namespace Adeliom\SyliusEasyCrudPlugin;
 use Adeliom\SyliusEasyCrudPlugin\CompilerPass\RegisterAdminPass;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class SyliusEasyCrudPlugin extends AbstractBundle
+class SyliusEasyCrudPlugin extends Bundle
 {
     use SyliusPluginTrait;
 
     public function getPath(): string
     {
-        return __DIR__;
+        return dirname(__DIR__);
     }
 
     public function build(ContainerBuilder $container)
