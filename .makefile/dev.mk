@@ -72,7 +72,7 @@ sylius_install:
 
 install_bundle:
 	cd ${APP_DIR} && docker compose run php composer require --no-interaction ${PLUGIN_NAME}="*@dev"
-	echo "navigate to http://localhost:$(ENV)"
+	echo "navigate to http://localhost:$(DOCKER_PHP_PORT)"
 
 messenger.setup: ## Setup Messenger transports
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run php bin/console messenger:setup-transports)
