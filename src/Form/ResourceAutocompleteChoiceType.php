@@ -136,7 +136,7 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
     }
 
     /**
-     * @return array<string, string[]>
+     * @return array<string, array<int,mixed>>
      */
     public static function configureAdminAssets(): array
     {

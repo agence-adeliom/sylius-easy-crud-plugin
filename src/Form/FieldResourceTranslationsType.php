@@ -198,7 +198,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
     }
 
     /**
-     * @return array<string, string[]>
+     * @return array<string, array<int,mixed>>
      */
     public static function configureAdminAssets(): array
     {

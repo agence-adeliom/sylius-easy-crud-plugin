@@ -9,7 +9,7 @@ interface AdminFormTypeInterface
     /**
      * Declare here the assets that make your admin field working as expected
      *
-     * @return array<string, string[]>
+     * @return array<string, array<int,mixed>>
      */
     public static function configureAdminAssets(): array;
 

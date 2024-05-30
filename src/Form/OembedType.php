@@ -23,7 +23,7 @@ class OembedType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, string[]>
+     * @return array<string, array<int,mixed>>
      */
     public static function configureAdminAssets(): array
     {
