@@ -21,6 +21,9 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
+        /**
+         * @var array<string, mixed> $actionTemplates
+         */
         $actionTemplates = $container->getParameter('sylius.grid.templates.action');
         $actionTemplates['easy_crud_main_action'] = '@SyliusEasyCrudPlugin/crud/action/action.html.twig';
         $actionTemplates['easy_crud_main_sub_action'] = '@SyliusEasyCrudPlugin/crud/action/links.html.twig';
@@ -28,6 +31,9 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
         $actionTemplates['easy_crud_item_sub_action'] = '@SyliusEasyCrudPlugin/crud/action/links.html.twig';
         $container->setParameter('sylius.grid.templates.action', $actionTemplates);
 
+        /**
+         * @var array<string, mixed> $bulkActionTemplates
+         */
         $bulkActionTemplates = $container->getParameter('sylius.grid.templates.bulk_action');
         $bulkActionTemplates['easy_crud_batch_sub_action'] = '@SyliusEasyCrudPlugin/crud/action/links.html.twig';
         $container->setParameter('sylius.grid.templates.bulk_action', $bulkActionTemplates);
@@ -53,6 +59,9 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
         return '@SyliusEasyCrudPlugin/src/Migrations';
     }
 
+    /**
+     * @return string[]
+     */
     protected function getNamespacesOfMigrationsExecutedBefore(): array
     {
         return [

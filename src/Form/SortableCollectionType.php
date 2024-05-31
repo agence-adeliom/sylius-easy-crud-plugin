@@ -89,9 +89,9 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, 'sortable_collection_entry');
         }
 
-        /** @var FormInterface $prototype */
+        /** @var ?FormInterface $prototype */
         $prototype = $form->getConfig()->getAttribute('prototype');
-        if ($prototype) {
+        if (null !== $prototype) {
             if ($view->vars['prototype']->vars['multipart']) {
                 $view->vars['multipart'] = true;
             }
@@ -148,7 +148,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
     }
 
     /**
-     * @return array<string, array<int,mixed>>
+     * @return array<string, string|array<int,mixed>>
      */
     public static function configureAdminAssets(): array
     {

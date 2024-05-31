@@ -83,7 +83,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                         return $repository->$options['repositoryMethod'](...$options['repositoryArguments']);
                     }
 
-                    return $repository->findAll();
+                    return method_exists($repository, 'findAll') ? $repository->findAll() : [];
                 },
                 'repository' => function (Options $options) {
                     Assert::string($options['resource']);
@@ -104,7 +104,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, array<int,mixed>>
+     * @return array<string, string|array<int,mixed>>
      */
     public static function configureAdminAssets(): array
     {

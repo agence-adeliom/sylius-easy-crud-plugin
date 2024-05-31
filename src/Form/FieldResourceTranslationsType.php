@@ -63,7 +63,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         }
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            /** @var array $translations */
+            /** @var array<string, mixed> $translations */
             $translations = $event->getData();
 
             $parentForm = $event->getForm()->getParent();
@@ -98,7 +98,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            /** @var PersistentCollection|ArrayCollection $translations */
+            /** @var PersistentCollection<string, mixed>|ArrayCollection<string, mixed> $translations */
             $translations = $event->getData();
 
             if ($translations instanceof PersistentCollection) {
@@ -118,7 +118,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
             /** @var TranslatableInterface $translatable */
             $translatable = $parentForm->getData();
 
-            if (!empty($translations)) {
+            if ($translations->count()) {
                 foreach ($translations as $localeCode => $translation) {
                     if (null === $translation) {
                         if (isset($translationsObjectsByLocale[$localeCode])) {
@@ -131,36 +131,38 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                         continue;
                     }
 
-                    $className = get_class($translation);
-                    $objectNormalizer = new ObjectNormalizer();
-                    $data = $translationsByLocale[$localeCode] ?? [];
+                    if (is_object($translation)) {
+                        $className = get_class($translation);
+                        $objectNormalizer = new ObjectNormalizer();
+                        $data = $translationsByLocale[$localeCode] ?? [];
 
-                    $reflectionExtractor = new ReflectionExtractor();
-                    $reflectionExtractor->getProperties($className);
-                    foreach ($data as $property => $value) {
-                        $actualValue = $this->propertyAccessor->getValue($translation, $property);
-                        if (
-                            $reflectionExtractor->isWritable($className, $property) &&
-                            ($types = $reflectionExtractor->getTypes($className, $property)) &&
-                            $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
-                        ) {
-                            $objectClassName = $reflectionExtractor->getTypes($className, $property)[0]->getClassName();
-                            $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
-                                AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
-                            ]);
-                            $this->propertyAccessor->setValue($translation, $property, $objectValue);
-                        } elseif (
-                            $reflectionExtractor->isWritable($className, $property)
-                        ) {
-                            $this->propertyAccessor->setValue($translation, $property, $value);
+                        $reflectionExtractor = new ReflectionExtractor();
+                        $reflectionExtractor->getProperties($className);
+                        foreach ($data as $property => $value) {
+                            $actualValue = $this->propertyAccessor->getValue($translation, $property);
+                            if (
+                                $reflectionExtractor->isWritable($className, $property) &&
+                                ($types = $reflectionExtractor->getTypes($className, $property)) &&
+                                $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
+                            ) {
+                                $objectClassName = $reflectionExtractor->getTypes($className, $property)[0]->getClassName();
+                                $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
+                                    AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
+                                    AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
+                                ]);
+                                $this->propertyAccessor->setValue($translation, $property, $objectValue);
+                            } elseif (
+                                $reflectionExtractor->isWritable($className, $property)
+                            ) {
+                                $this->propertyAccessor->setValue($translation, $property, $value);
+                            }
                         }
-                    }
 
-                    $translation->setLocale($localeCode);
-                    $translation->setTranslatable($translatable);
-                    if (!isset($translationsObjectsByLocale[$localeCode])) {
-                        $translationsObjectsByLocale[$localeCode] = $translation;
+                        $translation->setLocale($localeCode);
+                        $translation->setTranslatable($translatable);
+                        if (!isset($translationsObjectsByLocale[$localeCode])) {
+                            $translationsObjectsByLocale[$localeCode] = $translation;
+                        }
                     }
                 }
             }
@@ -198,7 +200,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
     }
 
     /**
-     * @return array<string, array<int,mixed>>
+     * @return array<string, string|array<int,mixed>>
      */
     public static function configureAdminAssets(): array
     {

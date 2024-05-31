@@ -39,24 +39,21 @@ trait FieldTrait
         return $this;
     }
 
-    /**
-     * @param TranslatableInterface|string|false|null $label
-     */
-    public function setLabel($label): self
+    public function setLabel(TranslatableInterface|string|false|null $label): self
     {
         $this->dto->setLabel($label);
 
         return $this;
     }
 
-    public function setValue($value): self
+    public function setValue(TranslatableInterface|string|false|null $value): self
     {
         $this->dto->setValue($value);
 
         return $this;
     }
 
-    public function setFormattedValue($value): self
+    public function setFormattedValue(TranslatableInterface|string|false|null $value): self
     {
         $this->dto->setFormattedValue($value);
 
@@ -91,7 +88,7 @@ trait FieldTrait
         return $this;
     }
 
-    public function setEmptyData($emptyData = null): self
+    public function setEmptyData(?string $emptyData = null): self
     {
         $this->dto->setFormTypeOption('empty_data', $emptyData);
 
@@ -105,6 +102,9 @@ trait FieldTrait
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function setFormTypeOptions(array $options): self
     {
         $this->dto->setFormTypeOptions($options);
@@ -115,7 +115,7 @@ trait FieldTrait
     /**
      * @param string $optionName You can use "dot" notation to set nested options (e.g. 'attr.class')
      */
-    public function setFormTypeOption(string $optionName, $optionValue): self
+    public function setFormTypeOption(string $optionName, mixed $optionValue): self
     {
         $this->dto->setFormTypeOption($optionName, $optionValue);
 
@@ -125,7 +125,7 @@ trait FieldTrait
     /**
      * @param string $optionName You can use "dot" notation to set nested options (e.g. 'attr.class')
      */
-    public function setFormTypeOptionIfNotSet(string $optionName, $optionValue): self
+    public function setFormTypeOptionIfNotSet(string $optionName, mixed $optionValue): self
     {
         $this->dto->setFormTypeOptionIfNotSet($optionName, $optionValue);
 
@@ -174,6 +174,9 @@ trait FieldTrait
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function setTranslationParameters(array $parameters): self
     {
         $this->dto->setTranslationParameters($parameters);
@@ -195,6 +198,9 @@ trait FieldTrait
         return $this;
     }
 
+    /**
+     * @param string[] $formThemePaths
+     */
     public function addFormThemes(array $formThemePaths): self
     {
         $this->dto->addFormThemes($formThemePaths);
@@ -228,15 +234,15 @@ trait FieldTrait
         return $this;
     }
 
-    public function addCssFiles(Asset|string|array ...$pathsOrAssets): self
+    /**
+     * @param Asset|string ...$pathsOrAssets
+     */
+    public function addCssFiles(Asset|string ...$pathsOrAssets): self
     {
-        if (is_array($pathsOrAssets[0])) {
-            $pathsOrAssets = $pathsOrAssets[0];
-        }
         foreach ($pathsOrAssets as $pathOrAsset) {
             if (\is_string($pathOrAsset)) {
                 $this->dto->addCssAsset(new AssetDto($pathOrAsset));
-            } elseif (null !== $pathOrAsset) {
+            } else {
                 $this->dto->addCssAsset($pathOrAsset->getAsDto());
             }
         }
@@ -244,6 +250,9 @@ trait FieldTrait
         return $this;
     }
 
+    /**
+     * @param array<string, string|Asset> $assets
+     */
     public function addAssets(array $assets): self
     {
         if (isset($assets['js'])) {
@@ -259,11 +268,8 @@ trait FieldTrait
         return $this;
     }
 
-    public function addJsFiles(Asset|string|array ...$pathsOrAssets): self
+    public function addJsFiles(Asset|string ...$pathsOrAssets): self
     {
-        if (is_array($pathsOrAssets[0])) {
-            $pathsOrAssets = $pathsOrAssets[0];
-        }
         foreach ($pathsOrAssets as $pathOrAsset) {
             if (\is_string($pathOrAsset)) {
                 $this->dto->addJsAsset(new AssetDto($pathOrAsset));
@@ -367,10 +373,12 @@ trait FieldTrait
 
     public function onlyOnForms(): self
     {
-        $this->dto->setDisplayedOn(KeyValueStore::new([
-                                                          Crud::PAGE_NEW => Crud::PAGE_NEW,
-                                                          Crud::PAGE_EDIT => Crud::PAGE_EDIT,
-                                                      ]));
+        $this->dto->setDisplayedOn(
+            KeyValueStore::new([
+                                   Crud::PAGE_NEW => Crud::PAGE_NEW,
+                                   Crud::PAGE_EDIT => Crud::PAGE_EDIT,
+                               ]),
+        );
 
         return $this;
     }
@@ -427,7 +435,7 @@ trait FieldTrait
         return $this->dto;
     }
 
-    public static function create(string $propertyName, $label = null): \Sylius\Bundle\GridBundle\Builder\Field\FieldInterface
+    public static function create(string $propertyName, ?string $label = null): \Sylius\Bundle\GridBundle\Builder\Field\FieldInterface
     {
         $field = self::new($propertyName, $label);
         $syliusField = TwigField::create($propertyName, 'twig');

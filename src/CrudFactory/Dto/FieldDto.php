@@ -211,6 +211,9 @@ final class FieldDto
         return $this->formTypeOptions->get($optionName);
     }
 
+    /**
+     * @param array<string, mixed> $formTypeOptions
+     */
     public function setFormTypeOptions(array $formTypeOptions): void
     {
         foreach ($formTypeOptions as $optionName => $optionValue) {
@@ -331,6 +334,9 @@ final class FieldDto
         return $this->translationParameters;
     }
 
+    /**
+     * @param array<string, mixed> $translationParameters
+     */
     public function setTranslationParameters(array $translationParameters): void
     {
         $this->translationParameters = $translationParameters;
@@ -383,16 +389,25 @@ final class FieldDto
         $this->formThemePaths[] = $formThemePath;
     }
 
+    /**
+     * @param string[] $formThemes
+     */
     public function addFormThemes(array $formThemes): void
     {
         $this->formThemePaths = array_merge($this->formThemePaths, $formThemes);
     }
 
+    /**
+     * @return string[]
+     */
     public function getFormThemes(): array
     {
         return $this->formThemePaths;
     }
 
+    /**
+     * @param string[] $formThemePaths
+     */
     public function setFormThemes(array $formThemePaths): void
     {
         $this->formThemePaths = $formThemePaths;
@@ -408,6 +423,9 @@ final class FieldDto
         $this->assets = $assets;
     }
 
+    /**
+     * @param array<string, string|Asset> $assets
+     */
     public function addAssets(array $assets): void
     {
         if (!empty($assets['js'])) {
@@ -494,6 +512,9 @@ final class FieldDto
         return $this->customOptions->get($optionName);
     }
 
+    /**
+     * @param array<string, mixed> $customOptions
+     */
     public function setCustomOptions(array $customOptions): void
     {
         $this->customOptions = KeyValueStore::new($customOptions);
@@ -509,6 +530,9 @@ final class FieldDto
         return $this->doctrineMetadata;
     }
 
+    /**
+     * @param array<string, mixed> $metadata
+     */
     public function setDoctrineMetadata(array $metadata): void
     {
         $this->doctrineMetadata = KeyValueStore::new($metadata);

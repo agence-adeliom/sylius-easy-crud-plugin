@@ -18,15 +18,15 @@ final class ThreeStateStatusEnum extends Enum
     /**
      * @var string
      */
-    private const UNPUBLISHED = 'unpublished';
+    public const UNPUBLISHED = 'unpublished';
 
     /**
      * @var string
      */
-    private const PENDING = 'pending';
+    public const PENDING = 'pending';
 
     /**
      * @var string
      */
-    private const PUBLISHED = 'published';
+    public const PUBLISHED = 'published';
 }
