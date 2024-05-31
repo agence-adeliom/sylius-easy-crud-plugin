@@ -299,13 +299,16 @@ trait FieldTrait
         return $this;
     }
 
-    public function setCustomOption(string $optionName, $optionValue): self
+    public function setCustomOption(string $optionName, mixed $optionValue): self
     {
         $this->dto->setCustomOption($optionName, $optionValue);
 
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function setCustomOptions(array $options): self
     {
         $this->dto->setCustomOptions($options);
