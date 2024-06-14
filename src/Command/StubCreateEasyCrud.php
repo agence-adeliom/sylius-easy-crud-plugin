@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Command;
 
-final class StubMakeEasyCrud extends StubCommand
+final class StubCreateEasyCrud extends StubCommand
 {
-    protected static $defaultName = 'make:easy-crud';
+    protected static $defaultName = 'make:easy-crud:generate';
 }

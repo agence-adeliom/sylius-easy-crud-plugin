@@ -38,6 +38,20 @@ Then, into `config/bundles.php` add :
 `Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],
 ```
 
+Then, into `config/packages/_sylius.yaml` add :
+
+```yaml
+imports:
+  - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
+```
+
+Then, into `config/routes.yaml` add :
+
+```yaml
+sylius_easy_crud:
+  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
+```
+
 ## Documentation
 
 - Learn how to [generate a custom CRUD](./docs/start_using_easy_crud.md) into Sylius Admin

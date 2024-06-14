@@ -2,7 +2,6 @@
     <div class="column">
         {% include configuration.vars.templates.header_title|default('@SyliusEasyCrudPlugin/crud/show/_headerTitle.html.twig') %}
         {% include configuration.vars.templates.breadcrumb|default('@SyliusEasyCrudPlugin/crud/show/_breadcrumb.html.twig') %}
-
         {{ sylius_template_event([event_prefix ~ '.header', 'sylius.admin.update.header'], {'metadata': metadata, 'resource': resource}) }}
     </div>
     <div class="middle aligned column">

@@ -1,87 +1,48 @@
 ## Create a custom CRUD
 
-1. Create a newSymfony entity (ex: Post)
-
-- Create a new entity:
-`php bin/console make:entity`
-- Change `doctrine.yaml`: 
+#### 1. Change Sylius default `doctrine.yaml` mapping type to `attribute`
 ```yaml
 mappings:
     App:
         type: attribute
 ```
 
-2. Transform your entity as a Sylius Resource :
+#### 2. Create a new Symfony entity
 
-- Implement entity file with `ResourceInterface` :
-  ```php  
-    use Sylius\Component\Resource\Model\ResourceInterface;
-    class Post implements ResourceInterface { 
-  ```
-- Extends the created Repo with `EntityRepository` :
-```php  
-    use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository
-    class PostRepository extends EntityRepository { 
-        # and remove constructor
-  ```
-- Register your entity as described here :
-  [Sylius resource](https://docs.sylius.com/en/latest/cookbook/entities/custom-model.html#register-your-entity-as-a-sylius-resource)
-- Execute:
-`php bin/console cache:clear`
-- Execute:
-  `php bin/console doctrine:migrations:diff`
-- Execute:
-  `php bin/console doctrine:migrations:migrate`
+- You can use `php bin/console make:entity`
+And follow Sylius documentation to declare entity as a   [Sylius resource](https://docs.sylius.com/en/latest/cookbook/entities/custom-model.html#register-your-entity-as-a-sylius-resource).
+- Or, we provide the bundle command `php bin/console make:easy-crud:create-entity Post`
 
-3. Generate your easy CRUD:
-
-The following steps allows you to generate a Admin class file.
-With this Admin class you will be able to configure easily and with a method fortly inspired form the EasyAdmin Symfony Bundle :
-    - The Sylius Grid (list, filters, actions)
-    - The Sylius default edit, create and show view
-    - Create other custom view
-
-- Execute: `php bin/console make:easy-crud` and choose the "Post" entity
-- Modify config/packages/_sylius.yaml and import created `sylius_resource_post.yaml` :
-```yaml
-imports:
-  - { resource: "../resources/sylius_resource_post.yaml" } 
+This command will create 3 files :
+```bash
+$ src/Entity/Post.php
+$ src/Entity/PostTranslation.php
+$ src/Repository/PostRepository.php
 ```
-- Declare the admin route and configuration into : `config/routes/sylius_admin.yaml`
-```yaml
-app_admin_post:
-    resource: |
-        alias: app.post
-        section: admin
-        templates: "@SyliusEasyCrudPlugin\\crud"
-        #except: ['show']
-        redirect: update
-        grid: app_admin_post
-        form: 
-            type: App\Admin\PostAdmin
-            options:
-                context: $context
-        vars:
-            all:
-                subheader: app.ui.post # define a translation key for your entity subheader
-                templates:
-                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-            index:
-                icon: 'file image outline' # choose an icon that will be displayed next to the subheader
-            update:
-                redirect: 
-                    route: update
-                    parameters:
-                        context: $context
-                        id: $id
-                route:
-                    parameters:
-                        context: $context
-                        id: $id
-    type: sylius.resource
-    prefix: admin
+
+#### 3. Generate an CRUD based on your entity
+
+- Execute : `php bin/console make:easy-crud:generate Post`
+
+This command will create or modify files :
+```bash
+# This file allow you to configure your crud
+$ creation : src/Admin/PostAdmin.php
+# This optional file allow you to create custom action
+$ creation : src/Controller/PostController.php
+# A Sylius route based on your entity is added automatically
+$ modification : config/routes.yaml
+# A Sylius resource based on your entity is added automatically
+$ modification : config/packages/sylius_resources.yaml
+# A Sylius resource based on your entity is added automatically
+$ creation and configuration of a Sylius menu Listener : src/Menu/MenuListener.php
 ```
-- Execute: `php bin/console cache:clear`
+
+You can execute without entity name `php bin/console make:easy-crud:generate` and choose an existing entity.
+
+- Then, `php bin/console cache:clear`
+- Then, `php bin/console doctrine:migrations:diff`
+- Then, `php bin/console doctrine:migrations:migrate`
 
 4. Change Sylius Menu Listener to add your new custom crud
 

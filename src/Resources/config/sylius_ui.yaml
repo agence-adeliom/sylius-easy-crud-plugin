@@ -1,7 +1,0 @@
-sylius_ui:
-    events:
-        sylius.admin.update:
-            blocks:
-                sylius_easy_crud_actions:
-                    template: "@SyliusEasyCrudPlugin/crud/action/_actions.html.twig"
-                    priority: 25

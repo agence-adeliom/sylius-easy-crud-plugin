@@ -13,6 +13,7 @@ install: application platform sylius ## Install the plugin
 HELP += $(call help,reset,			Stop docker and remove project)
 reset: ## Stop docker and remove dependencies
 	${MAKE} platform_down || true
+	${MAKE} platform_clean || true
 	rm -rf ${APP_DIR}/node_modules ${APP_DIR}/package-lock.json
 	rm -rf ${APP_DIR}
 	rm -rf vendor composer.lock
@@ -20,11 +21,11 @@ reset: ## Stop docker and remove dependencies
 
 HELP += $(call help,stop,				Stop project)
 stop:
-	make platform_down
+	${MAKE} platform_down
 
 HELP += $(call help,up,				Start project)
 up:
-	make platform_up
+	${MAKE} platform_up
 
 ###
 ### TEST APPLICATION
@@ -44,10 +45,7 @@ ${APP_DIR}:
 	(symfony composer create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
 	cd ${APP_DIR} && chmod -R 777 public
 	echo "COMPOSE_PROJECT_NAME=sylius-easy-crud-plugin" >> ${APP_DIR}/.env
-	make apply_dist
-	#make override_sylius_config
-
-override_sylius_config:
+	${MAKE} apply_dist
 
 apply_dist:
 	ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST)))); \
@@ -66,12 +64,14 @@ sylius: sylius_install install_bundle messenger.setup
 
 sylius_install:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root php rm -rf public/media/image)
-	#cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root mysql mysql --execute 'UPDATE mysql.user SET host = "%" WHERE user = "root"')
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run php bin/console doctrine:database:drop --if-exists --force)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console sylius:install -s default -n)
 
 install_bundle:
-	cd ${APP_DIR} && docker compose run php composer require --no-interaction ${PLUGIN_NAME}="*@dev"
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-interaction --with-all-dependencies ${PLUGIN_NAME}="*@dev")
+	${MAKE} bundle_dependencies_install
+	${MAKE} bundle_assets_build
+	${MAKE} bundle_install_test_files
 	echo "navigate to http://localhost:$(DOCKER_PHP_PORT)"
 
 messenger.setup: ## Setup Messenger transports
@@ -86,17 +86,24 @@ platform:
 		(cd ${APP_DIR} && cp compose.override.dist.yml compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|3306:3306|${DOCKER_MYSQL_PORT}:3306|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|          - public-media:/srv/sylius/public/media:rw|          - public-media:/srv/sylius/public/media:rw\n          - ../../:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|            - ./public:/srv/sylius/public:rw,delegated|            - ./public:/srv/sylius/public:rw,delegated\n            - ../../:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|APP_DEBUG: 0|APP_DEBUG: 1|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|- "80:80"|- "$(DOCKER_PHP_PORT):80"\n        depends_on:\n            - php|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            - public-media:/srv/sylius/public/media:ro,nocopy|            - public-media:/srv/sylius/public/media:ro,nocopy\n            - ../../:/srv/sylius/lib/sylius-easy-crud-plugin:rw|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\SyliusEasyCrudPlugin\\\SyliusEasyCrudPlugin::class => ['all' => true],\n];|g" config/bundles.php); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            "App\\": "src/",|            "App\\": "src/",\n            "Adeliom\\SyliusEasyCrudPlugin\\": "lib/sylius-easy-crud-plugin/src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\SyliusEasyCrudPlugin\\\\": "lib/sylius-easy-crud-plugin/src/",\n            "App\\\\": "src/"|g' composer.json); \
+		(cd ${APP_DIR} && sed -i'' -e 's|type: annotation|type: attribute|g' config/packages/doctrine.yaml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|- { resource: "../parameters.yaml" }|- { resource: "../parameters.yaml" }\n    - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }|g' config/packages/_sylius.yaml); \
+		(cd ${APP_DIR} && echo -e 'sylius_easy_crud:\n  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"' config/routes.yaml); \
+		(cd ${APP_DIR} && rm -rf config/packages/doctrine.yaml-e); \
+		(cd ${APP_DIR} && rm -rf config/packages/_sylius.yaml-e); \
 		(cd ${APP_DIR} && rm -rf compose.override.yml-e); \
 		(cd ${APP_DIR} && rm -rf config/bundles.php-e); \
 		(cd ${APP_DIR} && rm -rf composer.json-e); \
 	fi
 
-	make platform_up
+	${MAKE} platform_up
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config github-oauth.github.com ${GITHUB_TOKEN})
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config minimum-stability dev)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config extra.symfony.allow-contrib true)
@@ -108,8 +115,8 @@ platform:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress --dev symfony/maker-bundle)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer dump-autoload)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
-	make platform_up
-	make platform_assets
+	${MAKE} platform_up
+	${MAKE} platform_assets
 
 platform_assets:
 	rm -rf ${APP_DIR}/node_modules
@@ -140,6 +147,28 @@ HELP += $(call help,node-watch,			Run assets build as watch)
 node-watch:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs "npm run watch")
 
+HELP += $(call help,bundle_dependencies_install,			Install bundles assets npm dependencies)
+bundle_dependencies_install:
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs "npm install --prefix ./lib/sylius-easy-crud-plugin")
+	cd ${APP_DIR}/lib/sylius-easy-crud-plugin && (ENV=$(ENV) docker compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
+	${MAKE} symfony_assets_install
 
+HELP += $(call help,symfony_assets_install,			Install bundles assets npm dependencies)
+symfony_assets_install:
+	cd ${APP_DIR}/lib/sylius-easy-crud-plugin && (ENV=$(ENV) docker compose run --rm php bin/console assets:install --symlink)
 
+HELP += $(call help,bundle_assets_watch,			Build bundles assets in watch mode)
+bundle_assets_watch:
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs "npm run watch --prefix ./lib/sylius-easy-crud-plugin")
 
+HELP += $(call help,bundle_assets_build,			Build bundles assets in watch mode)
+bundle_assets_build:
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs "npm run build --prefix ./lib/sylius-easy-crud-plugin")
+
+HELP += $(call help,bundle_install_test_files,			Build bundles assets in watch mode)
+bundle_install_test_files:
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:easy-crud:create-entity Post)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:easy-crud:generate Post)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console cache:clear)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:diff --allow-empty-diff -n)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:mig -n)

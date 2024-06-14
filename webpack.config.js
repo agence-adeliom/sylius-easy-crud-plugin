@@ -1,7 +1,7 @@
 var Encore = require('@symfony/webpack-encore');
 
 Encore
-  .setOutputPath('./src/Resources/public/')
+  .setOutputPath('./public/')
   .setPublicPath('/bundles/syliuseasycrudplugin/')
   .setManifestKeyPrefix('')
 

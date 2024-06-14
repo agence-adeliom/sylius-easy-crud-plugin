@@ -4,7 +4,7 @@
     {% set row_attr = row_attr|merge({
         class: row_attr.class|default('') ~ ' form-group'
     }) %}
-    <div class="">
+    <div class="field">
         <div {% with {attr: row_attr|merge({
             'data-row-id': id
         })} %}{{ block('attributes') }}{% endwith %}>

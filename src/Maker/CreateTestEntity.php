@@ -1,0 +1,116 @@
+<?php
+
+/*
+ * This file is part of the Sylius package.
+ *
+ * (c) Paweł Jędrzejewski
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace Adeliom\SyliusEasyCrudPlugin\Maker;
+
+use Adeliom\SyliusEasyCrudPlugin\Services\CrudMakerService;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\MakerBundle\ConsoleStyle;
+use Symfony\Bundle\MakerBundle\DependencyBuilder;
+use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
+use Symfony\Bundle\MakerBundle\Generator;
+use Symfony\Bundle\MakerBundle\InputConfiguration;
+use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
+final class CreateTestEntity extends AbstractMaker
+{
+    public function __construct(
+        protected ManagerRegistry $managerRegistry,
+        protected ParameterBagInterface $parameterBag,
+    ) {
+    }
+
+    public static function getCommandName(): string
+    {
+        return 'make:easy-crud:create-entity';
+    }
+
+    public static function getCommandDescription(): string
+    {
+        return 'Creates simple entity, entityTranslation and repository';
+    }
+
+    public function configureCommand(Command $command, InputConfiguration $inputConfig): void
+    {
+        $command
+            ->setDescription(self::getCommandDescription())
+            ->addArgument('className', InputArgument::REQUIRED, 'Ex : Post')
+        ;
+
+        $inputConfig->setArgumentAsNonInteractive('className');
+    }
+
+    public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
+    {
+        $class = 'App\Entity\\' . $input->getArgument('className');
+
+        if (!\class_exists($class)) {
+            $namespace = \trim($generator->getRootNamespace(), '\\');
+
+            [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
+
+            try {
+                $resourceConfigGenerator = new CrudMakerService(
+                    $this->parameterBag->get('kernel.project_dir'),
+                    $generator,
+                    $namespace,
+                    $entity,
+                    $repository,
+                    $entityTranslation,
+                );
+
+                $resourceConfigGenerator->generateEntity($class);
+                $resourceConfigGenerator->generateEntityTranslation($class);
+                $resourceConfigGenerator->generateRepository($class);
+
+                $io->comment('Now run bin/console make:easy-crud:generate to create a sylius east crud based on an entity');
+
+                $this->writeSuccessMessage($io);
+            } catch (\Exception $exception) {
+                $io->error($exception->getMessage());
+            }
+        } else {
+            $io->info(\sprintf('Entity "%s" already exists.', $input->getArgument('className')));
+        }
+    }
+
+    protected function getEntity(string $class, Generator $generator)
+    {
+        $entity = null;
+        $entityTranslation = null;
+        $repository = null;
+        if (\class_exists($class)) {
+            $entity = new \ReflectionClass($class);
+
+            $repository = new \ReflectionClass($this->managerRegistry->getRepository($entity->getName()));
+            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
+                // not using a custom repository
+            }
+
+            if (method_exists($entity, 'createTranslation')) {
+                $entityTranslation = new \ReflectionClass(get_class($entity->createTranslation()));
+            }
+        }
+
+        return [$entity, $entityTranslation, $repository];
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies)
+    {
+        // TODO: Implement configureDependencies() method.
+    }
+}

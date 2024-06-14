@@ -24,7 +24,7 @@ test.ecs.fix:
 
 HELP += $(call help,test.yaml,			Lint the symfony Yaml files)
 test.yaml: ## Lint the symfony Yaml files
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php bin/console lint:yaml --parse-tags ${PLUGIN_DIR}/src/Resources)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php bin/console lint:yaml --parse-tags ${PLUGIN_DIR}/templates)
 
 HELP += $(call help,test.schema,			Validate MySQL Schema)
 test.schema: ## Validate MySQL Schema
@@ -33,5 +33,5 @@ test.schema: ## Validate MySQL Schema
 
 HELP += $(call help,test.twig,			Validate Twig templates)
 test.twig: ## Validate Twig templates
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php bin/console lint:twig --no-debug ${PLUGIN_DIR}/src/Resources/views)
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php vendor/bin/twigcs ${PLUGIN_DIR}/src/Resources/views --severity error --display blocking)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php bin/console lint:twig --no-debug ${PLUGIN_DIR}/templates)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php vendor/bin/twigcs ${PLUGIN_DIR}/templates --severity error --display blocking)

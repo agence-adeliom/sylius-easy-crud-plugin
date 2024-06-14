@@ -12,8 +12,8 @@ services:
   Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\SortableCollectionConfigurator:
     public: true
 
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\AssociationConfigurator:
-    public: true
+  #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\AssociationConfigurator:
+  #    public: true
 
   Adeliom\SyliusEasyCrudPlugin\Form\ChoiceMaskType:
     public: true
@@ -29,12 +29,13 @@ services:
       - "@sylius.translation_locale_provider.admin"
     public: true
 
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\PositionSortableConfigurator:
-    public: true
+  #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\PositionSortableConfigurator:
+  #    public: true
 
   Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension:
     public: true
     tags: [ twig.extension ]
+
   adeliom.sylius.twig.oembed_extension:
     alias: Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension
     public: true
@@ -44,6 +45,7 @@ services:
     arguments:
       - "@property_accessor"
     tags: [ twig.extension ]
+
   adeliom.sylius.twig.resource_property_extension:
     alias: Adeliom\SyliusEasyCrudPlugin\Twig\ResourcePropertyAccessorExtension
     public: true
@@ -71,6 +73,7 @@ services:
     arguments:
       - "@sylius.translation_locale_provider"
       - "@property_accessor"
+
   Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType:
     alias: adeliom.sylius.form.type.field_resource_translations
 
@@ -104,8 +107,17 @@ services:
   Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
     alias: adeliom.sylius.crud.admin.factory
 
-  Adeliom\SyliusEasyCrudPlugin\Maker\MakeEasyCrud:
+  Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
     tags: [ 'maker.command' ]
+    arguments:
+      - "@doctrine"
+      - "@parameter_bag"
+
+  Adeliom\SyliusEasyCrudPlugin\Maker\CreateTestEntity:
+    tags: [ 'maker.command' ]
+    arguments:
+      - "@doctrine"
+      - "@parameter_bag"
 
   Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage:
     arguments:
@@ -116,9 +128,3 @@ services:
   Adeliom\SyliusEasyCrudPlugin\Form\ImageType:
     arguments:
       - "@sylius.image_uploader"
-
-  Adeliom\SyliusEasyCrudPlugin\Services\ResourceConfigGeneratorService:
-    public: true
-    arguments:
-      $scope: ''
-      $namespaces: [ ]

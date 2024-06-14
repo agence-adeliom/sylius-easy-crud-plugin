@@ -52,7 +52,7 @@ final class EnumConfigurator implements FieldConfiguratorInterface
         $choicesEnum = $enum::toArray();
         $choices = [];
         foreach ($choicesEnum as $v) {
-            $choices[sprintf('syliuseasycrudplugin.enum.%s.%s', $field->getProperty(), $v)] = $v;
+            $choices[sprintf('sylius_easy_crud_plugin.enum.%s.%s', $field->getProperty(), $v)] = $v;
         }
 
         return $choices;

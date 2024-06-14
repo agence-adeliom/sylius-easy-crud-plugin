@@ -1,0 +1,13 @@
+services:
+
+  Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
+    tags: [ 'maker.command' ]
+    arguments:
+      - "@doctrine"
+      - "@parameter_bag"
+
+  Adeliom\SyliusEasyCrudPlugin\Maker\CreateTestEntity:
+    tags: [ 'maker.command' ]
+    arguments:
+      - "@doctrine"
+      - "@parameter_bag"

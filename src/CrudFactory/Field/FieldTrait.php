@@ -234,9 +234,6 @@ trait FieldTrait
         return $this;
     }
 
-    /**
-     * @param Asset|string ...$pathsOrAssets
-     */
     public function addCssFiles(Asset|string ...$pathsOrAssets): self
     {
         foreach ($pathsOrAssets as $pathOrAsset) {

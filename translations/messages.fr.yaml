@@ -1,0 +1,18 @@
+sylius_easy_crud_plugin:
+  enum:
+    state:
+      unpublished: Non publié
+      pending: En attente de publication
+      published: Publié
+    publishState:
+      unpublished: Non publié
+      pending: En attente de publication
+      published: Publié
+
+  admin:
+    ui:
+      default:
+        create: Créer une nouvelle entité
+        subheader: Gestion de l'entité
+        index: Liste des entités
+        update: Mettre à jour l'entité
