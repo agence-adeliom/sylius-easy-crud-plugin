@@ -185,9 +185,13 @@ final class FieldDto
         $this->formatValueCallable = $callable;
     }
 
-    public function getLabel(): TranslatableInterface|string|false|null
+    public function getLabel(): ?string
     {
-        return $this->label;
+        if (is_string($this->label)) {
+            return $this->label;
+        }
+
+        return null;
     }
 
     public function setLabel(TranslatableInterface|string|false|null $label): void

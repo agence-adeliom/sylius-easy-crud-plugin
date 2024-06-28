@@ -105,10 +105,13 @@ final class Actions
         return $this;
     }
 
+    /**
+     * @param string[] $orderedActionNames
+     */
     public function reorder(string $pageName, array $orderedActionNames): self
     {
         $newActionOrder = [];
-        $currentActions = $this->dto->getActions();
+        $currentActions = $this->dto->getAllActions();
         foreach ($orderedActionNames as $actionName) {
             if (!\array_key_exists($actionName, $currentActions[$pageName])) {
                 throw new \InvalidArgumentException(sprintf('The "%s" action does not exist in the "%s" page, so you cannot set its order.', $actionName, $pageName));
@@ -139,7 +142,7 @@ final class Actions
     }
 
     /**
-     * @param array $permissions Syntax: ['actionName' => 'actionPermission', ...]
+     * @param string[] $permissions Syntax: ['actionName' => 'actionPermission', ...]
      */
     public function setPermissions(array $permissions): self
     {
@@ -189,13 +192,12 @@ final class Actions
 
         if (Action::EDIT === $actionName) {
             $action = UpdateAction::create([]);
-            if ($action) {
-                return Action::new(
-                    Action::EDIT,
-                    $this->metadata->getApplicationName() . '.ui.edit_.' . $this->metadata->getName(),
-                    null,
-                )->setSyliusAction($action);
-            }
+
+            return Action::new(
+                Action::EDIT,
+                $this->metadata->getApplicationName() . '.ui.edit_.' . $this->metadata->getName(),
+                null,
+            )->setSyliusAction($action);
         }
 
         if (Action::DETAIL === $actionName) {

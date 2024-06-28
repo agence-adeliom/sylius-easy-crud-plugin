@@ -25,6 +25,7 @@ class ActionDto
 
     private ?string $htmlElement = null;
 
+    /** @var string[] */
     private array $htmlAttributes = [];
 
     private ?string $linkUrl = null;
@@ -33,17 +34,21 @@ class ActionDto
 
     private ?string $controllerMethodName = null;
 
+    /** @var array<string, mixed>|null */
     private ?array $controllerMethodContext = null;
 
     private ?string $routeName = null;
 
+    /** @var array<string>|callable */
     private $routeParameters = [];
 
     /* @var callable|string|null */
-    private $url;
+    private mixed $url;
 
+    /** @var array<string, mixed> */
     private array $translationParameters = [];
 
+    /** @var callable|null */
     private $displayCallable;
 
     /** @var array<Action> */
@@ -100,7 +105,7 @@ class ActionDto
         return '';
     }
 
-    public function setLabel(string|false|null $label): void
+    public function setLabel(string|null $label): void
     {
         $this->label = $label;
     }
@@ -135,16 +140,25 @@ class ActionDto
         $this->htmlElement = $htmlElement;
     }
 
+    /**
+     * @return string[]
+     */
     public function getHtmlAttributes(): array
     {
         return $this->htmlAttributes;
     }
 
+    /**
+     * @param string[] $htmlAttributes
+     */
     public function addHtmlAttributes(array $htmlAttributes): void
     {
         $this->htmlAttributes = array_merge($this->htmlAttributes, $htmlAttributes);
     }
 
+    /**
+     * @param string[] $htmlAttributes
+     */
     public function setHtmlAttributes(array $htmlAttributes): void
     {
         $this->htmlAttributes = $htmlAttributes;
@@ -185,11 +199,17 @@ class ActionDto
         $this->controllerMethodName = $controllerMethodName;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getControllerMethodContext(): array
     {
         return $this->controllerMethodContext ?? [];
     }
 
+    /**
+     * @param array<string, mixed>|null $controllerMethodContext
+     */
     public function setControllerMethodContext(?array $controllerMethodContext = null): void
     {
         $this->controllerMethodContext = $controllerMethodContext;
@@ -206,66 +226,42 @@ class ActionDto
     }
 
     /**
-     * @return array|callable
+     * @return array<string>|callable
      */
-    public function getRouteParameters()/* : array|callable */
+    public function getRouteParameters(): array|callable
     {
         return $this->routeParameters;
     }
 
     /**
-     * @param array|callable $routeParameters
+     * @param array<string>|callable $routeParameters
      */
-    public function setRouteParameters($routeParameters): void
+    public function setRouteParameters(array|callable $routeParameters): void
     {
-        if (!\is_array($routeParameters) && !\is_callable($routeParameters)) {
-            trigger_deprecation(
-                'agence-adeliom/sylius-easy-crud-bundle',
-                '4.0.5',
-                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
-                '$routeParameters',
-                __METHOD__,
-                '"array" or "callable"',
-                \gettype($routeParameters),
-            );
-        }
-
         $this->routeParameters = $routeParameters;
     }
 
-    /**
-     * @return string|callable|null
-     */
-    public function getUrl()
+    public function getUrl(): string|callable|null
     {
         return $this->url;
     }
 
-    /**
-     * @param string|callable $url
-     */
-    public function setUrl($url): void
+    public function setUrl(string|callable $url): void
     {
-        if (!\is_string($url) && !\is_callable($url)) {
-            trigger_deprecation(
-                'agence-adeliom/sylius-easy-crud-bundle',
-                '4.0.5',
-                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
-                '$url',
-                __METHOD__,
-                '"string" or "callable"',
-                \gettype($url),
-            );
-        }
-
         $this->url = $url;
     }
 
+    /**
+     * @return array<string, mixed> $translationParameters
+     */
     public function getTranslationParameters(): array
     {
         return $this->translationParameters;
     }
 
+    /**
+     * @param array<string, mixed> $translationParameters
+     */
     public function setTranslationParameters(array $translationParameters): void
     {
         $this->translationParameters = $translationParameters;

@@ -110,6 +110,9 @@ final class Asset
         return $this;
     }
 
+    /**
+     * @param string[] $attrNamesAndValues
+     */
     public function htmlAttrs(array $attrNamesAndValues): self
     {
         foreach ($attrNamesAndValues as $attrName => $attrValue) {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Knp\Menu\FactoryInterface;
-use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfigurationFactory;
@@ -21,16 +21,21 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class CrudAdminFactory
 {
+    /** @var string[] */
     public array $formThemes = [];
 
+    /** @var AssetDto[] */
     public array $cssAssets = [];
 
+    /** @var AssetDto[] */
     public array $jsAssets = [];
 
+    /** @var AssetDto[] */
     public array $webpackEncoreAssets = [];
 
     protected ?MenuItem $menu = null;
 
+    /** @var array<array<string, mixed>> */
     public array $columns = [];
 
     protected ?Metadata $metadata = null;
@@ -49,10 +54,10 @@ class CrudAdminFactory
         $this->initMenu();
     }
 
-    public function initContext($model): void
+    public function initContext(string $model): void
     {
         try {
-            /** @var array $resources */
+            /** @var array<mixed> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
         } catch (InvalidArgumentException $exception) {
             return;
@@ -105,7 +110,7 @@ class CrudAdminFactory
         return $this->menu;
     }
 
-    public function getMenuFactory(): MenuFactory
+    public function getMenuFactory(): FactoryInterface
     {
         return $this->menuFactory;
     }
@@ -137,6 +142,9 @@ class CrudAdminFactory
         }
     }
 
+    /**
+     * @return array{MenuItem, array<string, mixed>}
+     */
     public function addTab(string $name, ?string $label = null, ?string $template = null): array
     {
         $menuItem = new MenuItem($name, $this->getMenuFactory());
@@ -154,6 +162,9 @@ class CrudAdminFactory
         return [$menuItem, $column];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function addColumn(MenuItem $menuItem, ?FieldDto $fieldDto): array
     {
         $column = $this->newColumn(
@@ -168,10 +179,13 @@ class CrudAdminFactory
         return $column;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function newColumn(
         MenuItem $menuItem,
-        string $name = null,
-        string $label = null,
+        ?string $name = null,
+        ?string $label = null,
         ?ColumnSizeEnum $size = ColumnSizeEnum::WIDE_16_OF_16,
         ?bool $newLine = true,
     ): array {
@@ -181,10 +195,13 @@ class CrudAdminFactory
             'size' => $size,
             'label' => $label ?? null,
             'newLine' => $newLine,
-            'menuItem' => null !== $menuItem ? $menuItem->getName() : null,
+            'menuItem' => $menuItem->getName(),
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getViewVars(): array
     {
         $vars = [];

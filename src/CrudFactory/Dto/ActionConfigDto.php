@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\ActionCollection;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 
@@ -14,11 +13,11 @@ use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
  */
 final class ActionConfigDto
 {
-    private ?string $pageName = null;
+    private string $pageName = '';
 
     private ?string $routePrefix = null;
 
-    /** @var array<string,array<string,ActionDto>> */
+    /** @var array<string,array<ActionDto>> */
     private array $actions = [
         Crud::PAGE_DETAIL => [],
         Crud::PAGE_EDIT => [],
@@ -45,7 +44,7 @@ final class ActionConfigDto
         }
     }
 
-    public function setPageName(?string $pageName): void
+    public function setPageName(string $pageName): void
     {
         $this->pageName = $pageName;
     }
@@ -65,6 +64,9 @@ final class ActionConfigDto
         $this->actionPermissions[$actionName] = $permission;
     }
 
+    /**
+     * @param string[] $permissions
+     */
     public function setActionPermissions(array $permissions): void
     {
         $this->actionPermissions = $permissions;
@@ -95,6 +97,9 @@ final class ActionConfigDto
         unset($this->actions[$pageName][$actionName]);
     }
 
+    /**
+     * @param string[] $orderedActionNames
+     */
     public function reorderActions(string $pageName, array $orderedActionNames): void
     {
         $orderedActions = [];
@@ -105,6 +110,9 @@ final class ActionConfigDto
         $this->actions[$pageName] = $orderedActions;
     }
 
+    /**
+     * @param string[] $actionNames
+     */
     public function disableActions(array $actionNames): void
     {
         foreach ($actionNames as $actionName) {
@@ -114,30 +122,50 @@ final class ActionConfigDto
         }
     }
 
-    public function getActions(): ActionCollection|array
+    /**
+     * @return array<ActionDto>
+     */
+    public function getActions(): array
     {
-        return null === $this->pageName ? $this->actions : ActionCollection::new($this->actions[$this->pageName]);
+        return $this->actions[$this->pageName] ?? [];
     }
 
     /**
-     * @param ActionDto[] $newActions
+     * @return array<string, array<ActionDto>>
      */
-    public function setActions(string $pageName, array $newActions): void
+    public function getAllActions(): array
     {
-        $this->actions[$pageName] = $newActions;
+        return $this->actions;
     }
 
+    /**
+     * @param ActionDto[] $actions
+     */
+    public function setPageActions(string $pageName, array $actions): void
+    {
+        $this->actions[$pageName] = $actions;
+    }
+
+    /**
+     * @return string[]
+     */
     public function getDisabledActions(): array
     {
         return $this->disabledActions;
     }
 
+    /**
+     * @return string[]
+     */
     public function getActionPermissions(): array
     {
         return $this->actionPermissions;
     }
 
-    public function getActionsByType(string $type): array
+    /**
+     * @return array<ActionInterface>
+     */
+    public function getGridActionsByType(string $type): array
     {
         $actions = $this->getActions();
 
@@ -145,7 +173,7 @@ final class ActionConfigDto
             array_filter(
                 $this->convertAsGridActions(
                     array_filter(
-                        $actions->getIterator()->getArrayCopy(),
+                        $actions,
                         static function (ActionDto $action) use ($type) {
                             if ($type === Action::TYPE_SUB_ITEM) {
                                 return $action->hasType(Action::TYPE_ITEM) && count($action->getSubActions());
@@ -158,19 +186,21 @@ final class ActionConfigDto
                         },
                     ),
                 ),
-                static function (?ActionInterface $action) use ($type) {
+                static function (?ActionInterface $action) {
                     return null !== $action;
                 },
             );
     }
 
+    /**
+     * @param array<ActionDto> $actionsDto
+     *
+     * @return array<?ActionInterface>
+     */
     public function convertAsGridActions(array $actionsDto): array
     {
         $gridActions = [];
         foreach ($actionsDto as $actionDto) {
-            /**
-             * @var ActionDto $actionDto
-             */
             $gridActions[] = $actionDto->convertToGridAction();
         }
 

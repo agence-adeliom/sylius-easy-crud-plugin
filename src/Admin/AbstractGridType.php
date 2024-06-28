@@ -51,10 +51,10 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
         $actionsDto = $actions->getAsDto($pageName);
 
         $pageActions = [
-            'main' => $actionsDto->getActionsByType(Action::TYPE_GLOBAL),
-            'bulk' => $actionsDto->getActionsByType(Action::TYPE_BATCH),
-            'item' => $actionsDto->getActionsByType(Action::TYPE_ITEM),
-            'subitem' => $actionsDto->getActionsByType(Action::TYPE_SUB_ITEM),
+            'main' => $actionsDto->getGridActionsByType(Action::TYPE_GLOBAL),
+            'bulk' => $actionsDto->getGridActionsByType(Action::TYPE_BATCH),
+            'item' => $actionsDto->getGridActionsByType(Action::TYPE_ITEM),
+            'subitem' => $actionsDto->getGridActionsByType(Action::TYPE_SUB_ITEM),
         ];
 
         return $pageActions;
