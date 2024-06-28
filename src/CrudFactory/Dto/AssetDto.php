@@ -28,6 +28,7 @@ final class AssetDto
 
     private string $webpackEntrypointName = '_default';
 
+    /** @var array<string, string> */
     private array $htmlAttributes = [];
 
     private KeyValueStore $loadedOn;
@@ -126,6 +127,9 @@ final class AssetDto
         $this->htmlAttributes[$attrName] = $attrValue;
     }
 
+    /**
+     * @return string[]
+     */
     public function getHtmlAttributes(): array
     {
         return $this->htmlAttributes;

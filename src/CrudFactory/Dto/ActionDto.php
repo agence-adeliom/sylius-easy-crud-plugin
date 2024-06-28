@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
-use Adeliom\SyliusEasyCrudPlugin\Config\EntityDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Sylius\Bundle\GridBundle\Builder\Action\Action as SyliusAction;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
@@ -19,7 +17,7 @@ class ActionDto
 
     private ?string $name = null;
 
-    private TranslatableInterface|string|null $label = null;
+    private string|null $label = null;
 
     private ?string $icon = null;
 
@@ -48,6 +46,7 @@ class ActionDto
 
     private $displayCallable;
 
+    /** @var array<Action> */
     private array $subActions = [];
 
     private ?ActionInterface $syliusAction = null;
@@ -92,12 +91,16 @@ class ActionDto
         $this->name = $name;
     }
 
-    public function getLabel(): TranslatableInterface|string|false|null
+    public function getLabel(): string
     {
-        return $this->label;
+        if (is_string($this->label)) {
+            return $this->label;
+        }
+
+        return '';
     }
 
-    public function setLabel(TranslatableInterface|string|false|null $label): void
+    public function setLabel(string|false|null $label): void
     {
         $this->label = $label;
     }
@@ -270,6 +273,10 @@ class ActionDto
 
     public function shouldBeDisplayedFor(EntityDto $entityDto): bool
     {
+        if (null === $entityDto->getInstance()) {
+            return false;
+        }
+
         return null === $this->displayCallable || (bool) \call_user_func($this->displayCallable, $entityDto->getInstance());
     }
 
@@ -293,15 +300,15 @@ class ActionDto
         }
 
         if ($this->isGlobalAction()) {
-            $this->createAsGlobalAction();
+            $action->createAsGlobalAction();
         } elseif ($this->isBatchAction()) {
-            $this->createAsBatchAction();
+            $action->createAsBatchAction();
         }
 
         if ('a' === $this->htmlElement) {
-            $this->displayAsLink();
+            $action->displayAsLink();
         } else {
-            $this->displayAsButton();
+            $action->displayAsButton();
         }
 
         if (null !== $this->controllerMethodName) {
@@ -313,21 +320,27 @@ class ActionDto
         }
 
         if (null !== $this->routeName) {
-            $this->linkToRoute($this->routeName, $this->routeParameters);
+            $action->linkToRoute($this->routeName, $this->routeParameters);
         }
 
         if (null !== $this->displayCallable) {
-            $this->displayIf($this->displayCallable);
+            $action->displayIf($this->displayCallable);
         }
 
         return $action;
     }
 
+    /**
+     * @return array<Action>
+     */
     public function getSubActions(): array
     {
         return $this->subActions;
     }
 
+    /**
+     * @param array<Action> $subActions
+     */
     public function setSubActions(array $subActions): void
     {
         $this->subActions = $subActions;
@@ -384,7 +397,6 @@ class ActionDto
 
             $subItems = [];
             foreach ($this->getSubActions() as $subAction) {
-                /** @var ActionDto $subActionDto */
                 $subActionDto = $subAction->getAsDto();
                 $route = $actionRoute($subActionDto);
                 $subItems[] = array_merge(

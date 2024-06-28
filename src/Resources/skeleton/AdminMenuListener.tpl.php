@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 if (isset($class_name, $route)) {
-?>
+    ?>
 <?= "<?php\n" ?>
 
 namespace App\Menu;

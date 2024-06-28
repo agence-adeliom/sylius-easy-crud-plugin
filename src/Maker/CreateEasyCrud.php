@@ -82,9 +82,11 @@ final class CreateEasyCrud extends AbstractMaker
 
         [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
 
+        $projectDir = $this->parameterBag->get('kernel.project_dir');
+
         try {
             $resourceConfigGenerator = new CrudMakerService(
-                $this->parameterBag->get('kernel.project_dir'),
+                is_string($projectDir) ? $projectDir : '',
                 $generator,
                 $namespace,
                 $entity,
@@ -130,12 +132,18 @@ final class CreateEasyCrud extends AbstractMaker
         // No dependencies needed
     }
 
-    protected function getEntity(string $class, Generator $generator)
+    /**
+     * @return array<int, mixed>
+     */
+    protected function getEntity(string $class, Generator $generator): array
     {
         $entity = null;
         $entityTranslation = null;
         $repository = null;
-        $classTranslation = $class.'Translation';
+        /**
+         * @var class-string<object> $classTranslation
+         */
+        $classTranslation = $class . 'Translation';
         if (\class_exists($class)) {
             $entity = new \ReflectionClass($class);
 
@@ -144,7 +152,9 @@ final class CreateEasyCrud extends AbstractMaker
                 // not using a custom repository
             }
 
-            $entityTranslation = new \ReflectionClass($classTranslation);
+            if (is_string($classTranslation)) {
+                $entityTranslation = new \ReflectionClass($classTranslation);
+            }
         }
 
         return [$entity, $entityTranslation, $repository];

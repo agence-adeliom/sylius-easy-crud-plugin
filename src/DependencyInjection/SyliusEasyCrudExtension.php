@@ -43,7 +43,6 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension
 
         $container->registerForAutoconfiguration(AdminInterface::class)
             ->addTag('sylius_easy_crud');
-
     }
 
     public function getAlias(): string

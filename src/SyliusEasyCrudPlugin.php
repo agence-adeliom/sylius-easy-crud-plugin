@@ -21,6 +21,7 @@ class SyliusEasyCrudPlugin extends AbstractBundle
 
         $container->addCompilerPass(new RegisterAdminPass());
     }
+
     public function getContainerExtension(): ?ExtensionInterface
     {
         return new SyliusEasyCrudExtension();

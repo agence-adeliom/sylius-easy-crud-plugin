@@ -31,7 +31,7 @@ final class FieldCollection implements CollectionInterface
         $clonedFields = [];
         foreach ($this->fields as $fieldDto) {
             $clonedFieldDto = clone $fieldDto;
-            $clonedFields[$clonedFieldDto->getUniqueId()] = $clonedFieldDto;
+            $clonedFields[$clonedFieldDto->getUniqueIdAsString()] = $clonedFieldDto;
         }
 
         $this->fields = $clonedFields;
@@ -68,17 +68,17 @@ final class FieldCollection implements CollectionInterface
 
     public function set(FieldDto $newOrUpdatedField): void
     {
-        $this->fields[$newOrUpdatedField->getUniqueId()] = $newOrUpdatedField;
+        $this->fields[$newOrUpdatedField->getUniqueIdAsString()] = $newOrUpdatedField;
     }
 
     public function unset(FieldDto $removedField): void
     {
-        unset($this->fields[$removedField->getUniqueId()]);
+        unset($this->fields[$removedField->getUniqueIdAsString()]);
     }
 
     public function prepend(FieldDto $newField): void
     {
-        $this->fields = array_merge([$newField->getUniqueId() => $newField], $this->fields);
+        $this->fields = array_merge([$newField->getUniqueIdAsString() => $newField], $this->fields);
     }
 
     public function first(): ?FieldDto
@@ -158,7 +158,7 @@ final class FieldCollection implements CollectionInterface
                 $configurator->configure($dto); //, $entityDto, $context
             }
 
-            $dtos[$dto->getUniqueId()] = $dto;
+            $dtos[$dto->getUniqueIdAsString()] = $dto;
         }
 
         return $dtos;

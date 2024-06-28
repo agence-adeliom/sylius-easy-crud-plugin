@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
 use Mockery\Exception;
+use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
@@ -17,10 +19,17 @@ class CrudMakerService
     public const YAML_ROUTES_FILE = 'config/routes.yaml';
 
     public const YAML_RESOURCE_FILE = 'config/packages/sylius_resource.yaml';
+
     public const YAML_SERVICES_FILE = 'config/services.yaml';
 
+    /** @var array<string, mixed> */
     protected array $namespaces;
 
+    /**
+     * @param \ReflectionClass<ResourceInterface>|null $entity
+     * @param \ReflectionClass<RepositoryInterface<ResourceInterface>>|null $repository
+     * @param \ReflectionClass<ResourceInterface>|null $entityTranslation
+     */
     public function __construct(
         protected string $projectDir,
         protected Generator $generator,
@@ -103,26 +112,26 @@ class CrudMakerService
                 'App\Menu\AdminMenuListener',
                 __DIR__ . '/../Resources/skeleton/AdminMenuListener.tpl.php',
                 [
-                    'route' => $this->namespace. '_admin_'. mb_strtolower(Str::asSnakeCase($className)),
+                    'route' => $this->namespace . '_admin_' . mb_strtolower(Str::asSnakeCase($className)),
                 ],
             );
             $this->generator->writeChanges();
 
             $yaml = [];
             $yaml['app.listener.admin.menu_builder'] = [
-                "class" => 'App\Menu\AdminMenuListener',
-                "tags" => [
+                'class' => 'App\Menu\AdminMenuListener',
+                'tags' => [
                     0 => [
                         'name' => 'kernel.event_listener',
                         'event' => 'sylius.menu.admin.main',
                         'method' => 'addAdminMenuItems',
-                    ]
+                    ],
                 ],
             ];
             $content = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
             file_put_contents(
                 self::YAML_SERVICES_FILE,
-                "    " . str_replace("\n","\n    ",$content),
+                '    ' . str_replace("\n", "\n    ", $content),
                 \FILE_APPEND,
             );
         }

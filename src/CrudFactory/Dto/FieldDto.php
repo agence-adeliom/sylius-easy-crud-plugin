@@ -24,9 +24,10 @@ final class FieldDto
 
     private mixed $formattedValue = null;
 
+    /** @var callable|null */
     private $formatValueCallable;
 
-    private $label;
+    private TranslatableInterface|string|false|null $label;
 
     private ?string $formType = null;
 
@@ -42,7 +43,7 @@ final class FieldDto
 
     private ?string $textAlign = null;
 
-    private $help;
+    private TranslatableInterface|string|null $help;
 
     private string $cssClass = '';
 
@@ -53,6 +54,7 @@ final class FieldDto
     // same as $columns but used when the user doesn't define columns explicitly
     private string $defaultColumns = '';
 
+    /** @var array<string, mixed> */
     private array $translationParameters = [];
 
     private ?string $templateName = 'crud/field/text';
@@ -63,6 +65,7 @@ final class FieldDto
 
     private ?string $showTemplatePath = null;
 
+    /** @var array<int, string> */
     private array $formThemePaths = [];
 
     private AssetsDto $assets;
@@ -72,7 +75,7 @@ final class FieldDto
     private KeyValueStore $doctrineMetadata;
 
     /** @internal */
-    private $uniqueId;
+    private Ulid $uniqueId;
 
     private KeyValueStore $displayedOn;
 
@@ -101,12 +104,17 @@ final class FieldDto
         $this->displayedOn = clone $this->displayedOn;
     }
 
-    public function getUniqueId(): string
+    public function getUniqueId(): Ulid
+    {
+        return $this->uniqueId;
+    }
+
+    public function getUniqueIdAsString(): string
     {
         return $this->uniqueId->toRfc4122();
     }
 
-    public function setUniqueId(string $uniqueId): void
+    public function setUniqueId(Ulid $uniqueId): void
     {
         $this->uniqueId = $uniqueId;
     }
@@ -177,15 +185,12 @@ final class FieldDto
         $this->formatValueCallable = $callable;
     }
 
-    /**
-     * @return TranslatableInterface|string|false|null
-     */
-    public function getLabel()
+    public function getLabel(): TranslatableInterface|string|false|null
     {
         return $this->label;
     }
 
-    public function setLabel($label): void
+    public function setLabel(TranslatableInterface|string|false|null $label): void
     {
         $this->label = $label;
         $this->setFormTypeOption('label', $label);
@@ -201,12 +206,15 @@ final class FieldDto
         $this->formType = $formTypeFqcn;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFormTypeOptions(): array
     {
         return $this->formTypeOptions->all();
     }
 
-    public function getFormTypeOption(string $optionName)
+    public function getFormTypeOption(string $optionName): mixed
     {
         return $this->formTypeOptions->get($optionName);
     }
@@ -329,6 +337,9 @@ final class FieldDto
         $this->defaultColumns = $columnCssClasses;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getTranslationParameters(): array
     {
         return $this->translationParameters;
@@ -424,11 +435,11 @@ final class FieldDto
     }
 
     /**
-     * @param array<string, string|Asset> $assets
+     * @param array<string, array<string, string|Asset>> $assets
      */
     public function addAssets(array $assets): void
     {
-        if (!empty($assets['js'])) {
+        if (is_array($assets['js'])) {
             foreach ($assets['js'] as $asset) {
                 $found = false;
                 foreach ($this->assets->getJsAssets() as $assetDto) {
@@ -452,7 +463,7 @@ final class FieldDto
             }
         }
 
-        if (!empty($assets['css'])) {
+        if (is_array($assets['css'])) {
             foreach ($assets['css'] as $asset) {
                 $found = false;
                 foreach ($this->assets->getCssAssets() as $assetDto) {

@@ -20,10 +20,10 @@ final class AssetsDto
     /** @var AssetDto[] */
     private array $jsAssets = [];
 
-    /** @var AssetDto[] */
+    /** @var string[] */
     private array $headContents = [];
 
-    /** @var AssetDto[] */
+    /** @var string[] */
     private array $bodyContents = [];
 
     public function __construct()
@@ -104,11 +104,17 @@ final class AssetsDto
         return $this->jsAssets;
     }
 
+    /**
+     * @return string[]
+     */
     public function getHeadContents(): array
     {
         return $this->headContents;
     }
 
+    /**
+     * @return string[]
+     */
     public function getBodyContents(): array
     {
         return $this->bodyContents;

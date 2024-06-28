@@ -17,7 +17,6 @@ use Adeliom\SyliusEasyCrudPlugin\Services\CrudMakerService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
-use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
@@ -63,9 +62,11 @@ final class CreateTestEntity extends AbstractMaker
 
             [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
 
+            $projectDir = $this->parameterBag->get('kernel.project_dir');
+
             try {
                 $resourceConfigGenerator = new CrudMakerService(
-                    $this->parameterBag->get('kernel.project_dir'),
+                    is_string($projectDir) ? $projectDir : '',
                     $generator,
                     $namespace,
                     $entity,
@@ -88,7 +89,10 @@ final class CreateTestEntity extends AbstractMaker
         }
     }
 
-    protected function getEntity(string $class, Generator $generator)
+    /**
+     * @return array<int, mixed>
+     */
+    protected function getEntity(string $class, Generator $generator): array
     {
         $entity = null;
         $entityTranslation = null;
@@ -102,15 +106,17 @@ final class CreateTestEntity extends AbstractMaker
             }
 
             if (method_exists($entity, 'createTranslation')) {
-                $entityTranslation = new \ReflectionClass(get_class($entity->createTranslation()));
+                $object = get_class($entity->createTranslation());
+                if (is_string($object)) {
+                    $entityTranslation = new \ReflectionClass($object);
+                }
             }
         }
 
         return [$entity, $entityTranslation, $repository];
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies)
+    public function configureDependencies(DependencyBuilder $dependencies): void
     {
-        // TODO: Implement configureDependencies() method.
     }
 }
