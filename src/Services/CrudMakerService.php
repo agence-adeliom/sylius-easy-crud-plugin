@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
-use Mockery\Exception;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -177,7 +176,7 @@ class CrudMakerService
             );
 
             return self::YAML_ROUTES_FILE;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $e->getCode() . ' : ' . $e->getMessage();
         }
     }
@@ -200,7 +199,7 @@ class CrudMakerService
             file_put_contents($filePath, $yamlGenerator->getContents());
 
             return self::YAML_RESOURCE_FILE;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $e->getCode() . ' : ' . $e->getMessage();
         }
     }

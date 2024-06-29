@@ -101,7 +101,6 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
      */
     protected function processDetailAndUpdateActions(string $pageName): array
     {
-        dump($pageName);
         $pageActions = $this->processActions($pageName);
         $mainActions = MainActionGroup::create(...$pageActions[Action::TYPE_GLOBAL]);
         $itemActions = ItemActionGroup::create(...$pageActions[Action::TYPE_ITEM]);
@@ -170,7 +169,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     protected function processGridDefaultSort(
         ?GridBuilderInterface $gridBuilder = null,
     ): void {
-        if ($this instanceof AbstractAdmin) {
+        if ($this instanceof AbstractAdmin && !is_null($gridBuilder)) {
             foreach ($this->configureDefaultSort() as $name => $direction) {
                 $gridBuilder->addOrderBy($name, $direction);
             }

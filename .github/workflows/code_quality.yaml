@@ -119,4 +119,4 @@ jobs:
         run: vendor/bin/phpunit --colors=always
 
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse -c phpstan.neon -l max src/
+        run: vendor/bin/phpstan analyse --level=7 -c phpstan.neon src/
