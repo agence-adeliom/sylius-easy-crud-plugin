@@ -199,10 +199,6 @@ class Action
 
     public function getAsDto(): ActionDto
     {
-        if ('' === $this->dto->getLabel() && null === $this->dto->getIcon()) {
-            throw new \InvalidArgumentException(sprintf('The label and icon of an action cannot be null at the same time. Either set the label, the icon or both for the "%s" action.', $this->dto->getName()));
-        }
-
         return $this->dto;
     }
 

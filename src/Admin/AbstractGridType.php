@@ -43,8 +43,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
                     $grid->orderBy($this::getDefaultSortColumn(), $this::getDefaultSortOrder());
                 }
             }
-            if (is_array(class_implements($resourceClass)) && in_array(TranslatableInterface::class, class_implements
-                ($resourceClass))) {
+            if (is_array(class_implements($resourceClass)) && in_array(TranslatableInterface::class, class_implements($resourceClass))) {
                 if (method_exists($this, 'getRepositoryMethod')) {
                     $grid->setDriverOption('repository', $this::getRepositoryMethod());
                 }
@@ -85,8 +84,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     /**
      * @param array<string, mixed> $data
      */
-    protected function transformActionsAsGridDefinition(string $name, array $data):
-    \Sylius\Component\Grid\Definition\Action
+    protected function transformActionsAsGridDefinition(string $name, array $data): \Sylius\Component\Grid\Definition\Action
     {
         $action = \Sylius\Component\Grid\Definition\Action::fromNameAndType($name, $data['type']);
         $action->setOptions($data['options'] ?? []);
@@ -103,6 +101,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
      */
     protected function processDetailAndUpdateActions(string $pageName): array
     {
+        dump($pageName);
         $pageActions = $this->processActions($pageName);
         $mainActions = MainActionGroup::create(...$pageActions[Action::TYPE_GLOBAL]);
         $itemActions = ItemActionGroup::create(...$pageActions[Action::TYPE_ITEM]);
@@ -148,6 +147,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
                     SubItemActionGroup::create(...$pageActions[Action::TYPE_SUB_ITEM]),
                 );
         }
+
         return $pageActions;
     }
 

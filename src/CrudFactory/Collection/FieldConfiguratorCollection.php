@@ -15,7 +15,8 @@ class FieldConfiguratorCollection
      * @param iterable<FieldConfiguratorInterface> $handlers
      */
     public function __construct(protected iterable $handlers)
-    {}
+    {
+    }
 
     /**
      * @return iterable<FieldConfiguratorInterface>

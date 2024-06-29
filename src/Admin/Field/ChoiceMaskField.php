@@ -40,7 +40,7 @@ final class ChoiceMaskField implements FieldInterface
     /**
      * @var string
      */
-    public const OPTION_ESCAPE_HTML_CONTENTS = "escapeHtml";
+    public const OPTION_ESCAPE_HTML_CONTENTS = 'escapeHtml';
 
     /**
      * @var string[]

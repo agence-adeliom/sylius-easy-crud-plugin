@@ -199,7 +199,7 @@ abstract class AbstractFormType extends AbstractGridType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
-        $actions = $this->processDetailAndUpdateActions(Crud::PAGE_EDIT);
+        $actions = $this->processDetailAndUpdateActions($form->getConfig()->getOption('page_name'));
 
         $view->vars = array_merge(
             $view->vars,
@@ -274,11 +274,11 @@ abstract class AbstractFormType extends AbstractGridType
         $actions = $this->processDetailAndUpdateActions(Crud::PAGE_DETAIL);
 
         return array_merge(
+            $this->crudAdminFactory->getViewVars(),
             [
                 'fields' => $fields,
                 'actionsGroups' => $actions,
             ],
-            $this->crudAdminFactory->getViewVars(),
         );
     }
 
@@ -309,8 +309,8 @@ abstract class AbstractFormType extends AbstractGridType
                     $field->setOption('template', $fieldDto->getGridTemplatePath());
 
                     $field->addOptions([
-                                           'vars' => ['field' => $fieldDto],
-                                       ]);
+                       'vars' => ['field' => $fieldDto],
+                    ]);
 
                     $gridBuilder->addField(
                         $field,

@@ -81,9 +81,13 @@ final class EnumField implements FieldInterface
     /**
      * Given enum must follow the same format used in Symfony Forms:.
      */
-    public function setEnum(string $enumFcqn): self
+    public function setEnum(Enum|string $enumFcqn): self
     {
-        if (!class_exists($enumFcqn) || !is_a($enumFcqn, Enum::class, true)) {
+        if (is_string($enumFcqn) && !class_exists($enumFcqn)) {
+            throw new InvalidConfigurationException(sprintf('Enum class must be a valid class extending %s. "%s" given.', Enum::class, $enumFcqn));
+        }
+
+        if (!is_a($enumFcqn, Enum::class, true)) {
             throw new InvalidConfigurationException(sprintf('Enum class must be a valid class extending %s. "%s" given.', Enum::class, $enumFcqn));
         }
 

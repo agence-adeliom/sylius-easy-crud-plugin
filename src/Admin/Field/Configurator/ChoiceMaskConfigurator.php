@@ -51,7 +51,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         // the value of this form option must be a string to properly propagate it as an HTML attribute value
         $field->setFormTypeOption(
             'attr.data-ea-autocomplete-render-items-as-html',
-            ($field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true')
+            ($field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true'),
         );
 
         $fieldValue = $field->getValue();

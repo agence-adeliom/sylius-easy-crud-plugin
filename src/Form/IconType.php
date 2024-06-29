@@ -72,7 +72,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
     {
         return [
             'css' => [
-                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css'
+                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
             ],
         ];
     }

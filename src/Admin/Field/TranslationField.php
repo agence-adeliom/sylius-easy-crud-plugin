@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
 use Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType;
@@ -14,9 +13,7 @@ final class TranslationField implements FieldInterface
 {
     use FieldTrait;
 
-    /**
-     * @var array<FieldInterface>|null
-     */
+    /** @var array<FieldInterface>|null */
     protected ?array $fields = null;
 
     public static function new(string $propertyName, ?string $label = null): self

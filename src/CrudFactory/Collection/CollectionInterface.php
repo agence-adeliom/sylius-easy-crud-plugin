@@ -10,6 +10,7 @@ use IteratorAggregate;
 
 /**
  * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
+ *
  * @extends ArrayAccess<int, mixed>
  * @extends IteratorAggregate<int, mixed>
  */

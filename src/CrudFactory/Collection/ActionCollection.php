@@ -17,7 +17,8 @@ final class ActionCollection implements CollectionInterface
      * @param ActionDto[] $actions
      */
     private function __construct(private array $actions)
-    {}
+    {
+    }
 
     public function __clone()
     {

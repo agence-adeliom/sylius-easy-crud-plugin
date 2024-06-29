@@ -8,7 +8,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Doctrine\ORM\Mapping\Entity;
-use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
 use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
@@ -57,7 +56,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
             ->addGlobalAction(Crud::PAGE_EDIT, Action::INDEX)
             ->addGlobalAction(Crud::PAGE_EDIT, Action::DELETE)
 
-            ->addItemAction(Crud::PAGE_DETAIL, Action::EDIT)
+            ->addGlobalAction(Crud::PAGE_DETAIL, Action::EDIT)
             ->addGlobalAction(Crud::PAGE_DETAIL, Action::INDEX)
 
         ;
@@ -76,6 +75,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 
     /**
      * configure sylius grid addOrderBy(string $name, string $direction = 'asc')
+     *
      * @return array<string, string>
      */
     public function configureDefaultSort(): array

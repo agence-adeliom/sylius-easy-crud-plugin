@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use FOS\RestBundle\View\View;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -88,7 +89,13 @@ class SyliusCrudResourceController extends ResourceController
 
         $formFactory = $this->container->get('form.factory');
         $form = $formFactory
-            ->create($this->metadata->getParameters()['classes']['form']);
+            ->create(
+                $this->metadata->getParameters()['classes']['form'],
+                null,
+                [
+                    'page_name' => Crud::PAGE_DETAIL,
+                ],
+            );
         $formType = $form->getConfig()->getType()->getInnerType();
         $formType->resetBuild();
 
@@ -97,6 +104,8 @@ class SyliusCrudResourceController extends ResourceController
         }
 
         if ($configuration->isHtmlRequest()) {
+            $formView = $form->createView();
+
             return $this->render(
                 $configuration->getTemplate(ResourceActions::SHOW . '.html'),
                 array_merge(
@@ -105,7 +114,7 @@ class SyliusCrudResourceController extends ResourceController
                         'configuration' => $configuration,
                         'metadata' => $this->metadata,
                         'resource' => $resource,
-                        'form' => $form->createView(),
+                        'form' => $formView,
                         $this->metadata->getName() => $resource,
                     ],
                 ),

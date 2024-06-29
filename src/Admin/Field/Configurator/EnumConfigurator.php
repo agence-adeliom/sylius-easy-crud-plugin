@@ -47,9 +47,13 @@ final class EnumConfigurator implements FieldConfiguratorInterface
     /**
      * @return array<string, mixed>
      */
-    private function getChoices(?Enum $enum, FieldDto $field): array
+    private function getChoices(Enum|string|null $enum, FieldDto $field): array
     {
         if (null === $enum) {
+            return [];
+        }
+
+        if (is_string($enum) && !class_exists($enum)) {
             return [];
         }
 
