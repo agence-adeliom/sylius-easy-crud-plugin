@@ -9,9 +9,9 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config;
  */
 class Crud
 {
-    public const PAGE_DETAIL = 'detail';
+    public const PAGE_DETAIL = 'show';
 
-    public const PAGE_EDIT = 'edit';
+    public const PAGE_EDIT = 'update';
 
     public const PAGE_INDEX = 'index';
 

@@ -330,6 +330,10 @@ abstract class AbstractFormType extends AbstractGridType
         parent::processGridFilters(
             $gridBuilder,
         );
+
+        $gridBuilder->setDriverOption('css_assets', $this->crudAdminFactory->cssAssets);
+        $gridBuilder->setDriverOption('js_assets', $this->crudAdminFactory->jsAssets);
+        $gridBuilder->setDriverOption('webpack_encore_assets', $this->crudAdminFactory->webpackEncoreAssets);
     }
 
     /**

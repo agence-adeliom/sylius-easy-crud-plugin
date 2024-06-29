@@ -169,7 +169,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     protected function processGridDefaultSort(
         ?GridBuilderInterface $gridBuilder = null,
     ): void {
-        if ($this instanceof AbstractAdmin && !is_null($gridBuilder)) {
+        if ($this instanceof AbstractAdmin && null !== $gridBuilder) {
             foreach ($this->configureDefaultSort() as $name => $direction) {
                 $gridBuilder->addOrderBy($name, $direction);
             }
