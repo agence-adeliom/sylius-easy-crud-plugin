@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "encore dev",
     "watch": "encore dev --watch",
-    "build": "encore production"
+    "build": "encore production",
+    "lint": "eslint -c .eslintrc.cjs ./assets/js",
+    "lint-style": "stylelint --fix --no-cache \"./assets/**/*.css\""
   },
   "devDependencies": {
     "@symfony/webpack-encore": "^2.0",
@@ -17,7 +19,10 @@
     "process": "^0.11.10",
     "resolve-url-loader": "^4.0.0",
     "sass": "^1.35.1",
-    "sass-loader": "^12.1.0"
+    "sass-loader": "^12.1.0",
+    "eslint": "^8.56.0",
+    "stylelint": "^16.3.0",
+    "stylelint-config-standard": "^36.0.0"
   },
   "dependencies": {
     "@popperjs/core": "^2.9.3",

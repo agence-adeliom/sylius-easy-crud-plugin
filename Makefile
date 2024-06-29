@@ -30,7 +30,7 @@ DOCKER_MYSQL_PORT ?= 63501
 ### Commands to test the code quality
 ### ¯¯¯¯¯¯¯¯¯¯¯
 
--include .makefile/ci.mk
+-include .makefile/qa.mk
 
 
 
