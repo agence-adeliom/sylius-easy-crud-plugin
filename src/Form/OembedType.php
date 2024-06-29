@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormTypeInterface;
 
@@ -23,7 +24,7 @@ class OembedType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, string|array<int,mixed>>
+     * @return array<string, array<int,string|Asset>>
      */
     public static function configureAdminAssets(): array
     {

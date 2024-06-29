@@ -12,7 +12,7 @@ final class FormTypeField implements FieldInterface
 {
     use FieldTrait;
 
-    public static function new(string $propertyName, ?string $label = null, $formType = TextType::class): self
+    public static function new(string $propertyName, ?string $label = null, string $formType = TextType::class): self
     {
         return (new self())
             ->setProperty($propertyName)

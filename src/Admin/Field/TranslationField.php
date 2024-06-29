@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
 use Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType;
@@ -13,9 +14,12 @@ final class TranslationField implements FieldInterface
 {
     use FieldTrait;
 
-    protected ?iterable $fields = null;
+    /**
+     * @var array<FieldInterface>|null
+     */
+    protected ?array $fields = null;
 
-    public static function new(string $propertyName, ?string $label = null, $fieldsConfig = []): self
+    public static function new(string $propertyName, ?string $label = null): self
     {
         return (new self())
             ->setProperty($propertyName)
@@ -39,9 +43,12 @@ final class TranslationField implements FieldInterface
         return $this;
     }
 
+    /**
+     * @param string[] $locales
+     */
     public function restrictToLocales(array $locales): self
     {
-        if (is_array($locales) && count($locales) > 0) {
+        if (count($locales) > 0) {
             $this->setFormTypeOption('entries', $locales);
         }
 

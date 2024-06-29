@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -65,12 +66,14 @@ class IconType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, string|array<int,mixed>>
+     * @return array<string, array<int,string|Asset>>
      */
     public static function configureAdminAssets(): array
     {
         return [
-            'css' => 'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
+            'css' => [
+                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css'
+            ],
         ];
     }
 

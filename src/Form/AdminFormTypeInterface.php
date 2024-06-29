@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
+
 interface AdminFormTypeInterface
 {
     /**
      * Declare here the assets that make your admin field working as expected
      *
-     * @return array<string, string|array<int,mixed>>
+     * @return array<string, array<int,string|Asset>>
      */
     public static function configureAdminAssets(): array;
 

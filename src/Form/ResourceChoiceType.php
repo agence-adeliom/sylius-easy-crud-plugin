@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Sylius\Bundle\ResourceBundle\Form\DataTransformer\CollectionToStringTransformer;
 use Sylius\Bundle\ResourceBundle\Form\DataTransformer\RecursiveTransformer;
 use Sylius\Bundle\ResourceBundle\Form\DataTransformer\ResourceToIdentifierTransformer;
@@ -104,7 +105,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, string|array<int,mixed>>
+     * @return array<string, array<int,string|Asset>>
      */
     public static function configureAdminAssets(): array
     {

@@ -7,6 +7,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
+use ArrayIterator;
 
 /**
  * Initial class from EasyAdmin
@@ -121,11 +122,11 @@ final class FieldCollection implements CollectionInterface
     }
 
     /**
-     * @return \ArrayIterator<FieldDto>
+     * @return ArrayIterator<int,FieldDto>
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->fields);
+        return new ArrayIterator($this->fields);
     }
 
     /**

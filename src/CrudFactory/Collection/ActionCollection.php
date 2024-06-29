@@ -6,6 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\CollectionInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\ActionDto;
+use ArrayIterator;
 
 /**
  * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
@@ -16,8 +17,7 @@ final class ActionCollection implements CollectionInterface
      * @param ActionDto[] $actions
      */
     private function __construct(private array $actions)
-    {
-    }
+    {}
 
     public function __clone()
     {
@@ -73,11 +73,11 @@ final class ActionCollection implements CollectionInterface
     }
 
     /**
-     * @return \ArrayIterator<ActionDto>
+     * @return ArrayIterator<int, ActionDto>
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->actions);
+        return new ArrayIterator($this->actions);
     }
 
     public function getItemActions(): self

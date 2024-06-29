@@ -49,7 +49,7 @@ class Action
         return $this->dto->getName();
     }
 
-    public static function new(string $name, $label = null, ?string $icon = null): self
+    public static function new(string $name, ?string $label = null, ?string $icon = null): self
     {
         $dto = new ActionDto();
         $dto->setType(self::TYPE_ITEM);
@@ -77,7 +77,7 @@ class Action
         return $this;
     }
 
-    public function setLabel($label): self
+    public function setLabel(?string $label): self
     {
         $this->dto->setLabel($label ?? self::humanizeString($this->dto->getName()));
 
@@ -129,6 +129,9 @@ class Action
         return $this;
     }
 
+    /**
+     * @param string[] $attributes
+     */
     public function setHtmlAttributes(array $attributes): self
     {
         $this->dto->setHtmlAttributes($attributes);
@@ -143,6 +146,9 @@ class Action
         return $this;
     }
 
+    /**
+     * @param array<string, mixed>|null $methodContext
+     */
     public function linkToControllerMethod(
         string $methodName,
         ?array $methodContext = null,
@@ -154,7 +160,7 @@ class Action
     }
 
     /**
-     * @param array|callable $routeParameters The callable has the signature: function ($entity): array
+     * @param array<string>|callable $routeParameters The callable has the signature: function ($entity): array
      *
      * Route parameters can be defined as a callable with the signature: function ($entityInstance): array
      * Example: ->linkToRoute('invoice_send', fn (Invoice $entity) => ['uuid' => $entity->getId()]);
@@ -167,28 +173,16 @@ class Action
         return $this;
     }
 
-    /**
-     * @param string|callable $url
-     */
-    public function linkToUrl($url): self
+    public function linkToUrl(string|callable $url): self
     {
-        if (!\is_string($url) && !\is_callable($url)) {
-            trigger_deprecation(
-                'agence-adeliom/sylius-easy-crud-bundle',
-                '4.0.5',
-                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
-                '$url',
-                __METHOD__,
-                '"string" or "callable"',
-                \gettype($url),
-            );
-        }
-
         $this->dto->setUrl($url);
 
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function setTranslationParameters(array $parameters): self
     {
         $this->dto->setTranslationParameters($parameters);
@@ -205,7 +199,7 @@ class Action
 
     public function getAsDto(): ActionDto
     {
-        if (null === $this->dto->getLabel() && null === $this->dto->getIcon()) {
+        if ('' === $this->dto->getLabel() && null === $this->dto->getIcon()) {
             throw new \InvalidArgumentException(sprintf('The label and icon of an action cannot be null at the same time. Either set the label, the icon or both for the "%s" action.', $this->dto->getName()));
         }
 

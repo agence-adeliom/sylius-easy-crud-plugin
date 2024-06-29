@@ -217,30 +217,20 @@ trait FieldTrait
         return $this;
     }
 
-    public function addWebpackEncoreEntries(Asset|string ...$entryNamesOrAssets): self
+    /**
+     * @param array<int, Asset|string> $assets
+     */
+    public function addWebpackEncoreEntries(array $assets): self
     {
         if (!class_exists('Symfony\\WebpackEncoreBundle\\Twig\\EntryFilesTwigExtension')) {
             throw new \RuntimeException('You are trying to add Webpack Encore entries in a field but Webpack Encore is not installed in your project. Try running "composer require symfony/webpack-encore-bundle"');
         }
 
-        foreach ($entryNamesOrAssets as $entryNameOrAsset) {
-            if (\is_string($entryNameOrAsset)) {
-                $this->dto->addWebpackEncoreAsset(new AssetDto($entryNameOrAsset));
-            } else {
-                $this->dto->addWebpackEncoreAsset($entryNameOrAsset->getAsDto());
-            }
-        }
-
-        return $this;
-    }
-
-    public function addCssFiles(Asset|string ...$pathsOrAssets): self
-    {
-        foreach ($pathsOrAssets as $pathOrAsset) {
-            if (\is_string($pathOrAsset)) {
-                $this->dto->addCssAsset(new AssetDto($pathOrAsset));
-            } else {
-                $this->dto->addCssAsset($pathOrAsset->getAsDto());
+        foreach ($assets as $asset) {
+            if (is_string($asset)) {
+                $this->dto->addWebpackEncoreAsset(new AssetDto($asset));
+            } elseif ($asset instanceof Asset) {
+                $this->dto->addWebpackEncoreAsset($asset->getAsDto());
             }
         }
 
@@ -248,7 +238,23 @@ trait FieldTrait
     }
 
     /**
-     * @param array<string, string|Asset> $assets
+     * @param array<int, Asset|string> $assets
+     */
+    public function addCssFiles(array $assets): self
+    {
+        foreach ($assets as $asset) {
+            if (\is_string($asset)) {
+                $this->dto->addCssAsset(new AssetDto($asset));
+            } else {
+                $this->dto->addCssAsset($asset->getAsDto());
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, array<int, Asset|string>> $assets
      */
     public function addAssets(array $assets): self
     {
@@ -265,13 +271,16 @@ trait FieldTrait
         return $this;
     }
 
-    public function addJsFiles(Asset|string ...$pathsOrAssets): self
+    /**
+     * @param array<int, Asset|string> $assets
+     */
+    public function addJsFiles(array $assets): self
     {
-        foreach ($pathsOrAssets as $pathOrAsset) {
-            if (\is_string($pathOrAsset)) {
-                $this->dto->addJsAsset(new AssetDto($pathOrAsset));
-            } elseif (null !== $pathOrAsset) {
-                $this->dto->addJsAsset($pathOrAsset->getAsDto());
+        foreach ($assets as $asset) {
+            if (\is_string($asset)) {
+                $this->dto->addJsAsset(new AssetDto($asset));
+            } elseif ($asset instanceof Asset) {
+                $this->dto->addJsAsset($asset->getAsDto());
             }
         }
 

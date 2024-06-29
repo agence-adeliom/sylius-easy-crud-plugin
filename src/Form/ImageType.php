@@ -43,7 +43,7 @@ class ImageType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, string|array<int,mixed>>
+     * @return array<string, array<int,string|Asset>>
      */
     public static function configureAdminAssets(): array
     {

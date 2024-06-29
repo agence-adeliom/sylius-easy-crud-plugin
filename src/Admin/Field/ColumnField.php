@@ -13,7 +13,7 @@ final class ColumnField implements FieldInterface
 {
     use FieldTrait;
 
-    public static function new(?string $label = null, $fieldsConfig = []): self
+    public static function new(string $propertyName, ?string $label = null): self
     {
         return (new self())
             ->setProperty('_' . rand(0, 1000))

@@ -51,6 +51,9 @@ final class ResourceAutocompleteChoiceField implements FieldInterface
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function setRemoteRoute(string $path, array $parameters = []): self
     {
         $this->setFormTypeOption('remote_route', [
@@ -61,6 +64,9 @@ final class ResourceAutocompleteChoiceField implements FieldInterface
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function setLoadEditRoute(string $path, array $parameters = []): self
     {
         $this->setFormTypeOption('load_edit_route', [
@@ -78,6 +84,9 @@ final class ResourceAutocompleteChoiceField implements FieldInterface
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $arguments
+     */
     public function setRepositoryArguments(array $arguments): self
     {
         $this->setFormTypeOption('repositoryArguments', $arguments);

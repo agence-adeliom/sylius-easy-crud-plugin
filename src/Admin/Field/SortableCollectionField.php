@@ -74,7 +74,7 @@ final class SortableCollectionField implements FieldInterface
             ->setCustomOption(self::OPTION_RENDER_EXPANDED, false);
     }
 
-    public function setEntryType($type): self
+    public function setEntryType(string $type): self
     {
         $this->setCustomOption(self::OPTION_ENTRY_TYPE, $type);
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Sylius\Component\Resource\Model\TranslatableInterface;
@@ -200,7 +201,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
     }
 
     /**
-     * @return array<string, string|array<int,mixed>>
+     * @return array<string, array<int,string|Asset>>
      */
     public static function configureAdminAssets(): array
     {

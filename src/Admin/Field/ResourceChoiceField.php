@@ -58,6 +58,9 @@ final class ResourceChoiceField implements FieldInterface
         return $this;
     }
 
+    /**
+     * @param array<string, mixed>|null $arguments
+     */
     public function setRepositoryArguments(?array $arguments = null): self
     {
         $this->setFormTypeOption('repositoryArguments', $arguments);

@@ -39,10 +39,14 @@ final class RequestConfigurationFactory implements RequestConfigurationFactoryIn
      */
     private $configurationClass;
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $defaultParameters;
 
     /**
      * @psalm-param class-string<RequestConfiguration> $configurationClass
+     * @param array<string, mixed> $defaultParameters
      */
     public function __construct(ParametersParserInterface $parametersParser, string $configurationClass, array $defaultParameters = [])
     {
@@ -67,6 +71,7 @@ final class RequestConfigurationFactory implements RequestConfigurationFactoryIn
 
     /**
      * @throws \InvalidArgumentException
+     * @return array<string, mixed>
      */
     private function parseApiParameters(Request $request): array
     {

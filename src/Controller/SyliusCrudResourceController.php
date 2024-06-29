@@ -54,7 +54,7 @@ class SyliusCrudResourceController extends ResourceController
             $resources = $this->resourcesCollectionProvider->get($configuration, $this->repository);
 
             if (!(method_exists($this, $method))) {
-                throw new HttpException('403', 'Method ' . $method . ' not exists in file ' . $controller);
+                throw new HttpException(Response::HTTP_FORBIDDEN, 'Method ' . $method . ' not exists in file ' . $controller);
             }
 
             return $this->$method(
@@ -124,16 +124,19 @@ class SyliusCrudResourceController extends ResourceController
         // set metadata for resource that need an autocomplete search
         $resourceName = $request->query->get('resourceName');
         $repositoryMethod = $request->query->get('repositoryMethod');
-        $repositoryArguments = json_decode(
-            $request->query->get('repositoryArguments'),
-            true,
-        );
+        $repositoryArguments = [];
+        if (is_string($request->query->get('repositoryArguments'))) {
+            $repositoryArguments = json_decode(
+                $request->query->get('repositoryArguments'),
+                true,
+            );
+        }
 
         try {
-            /** @var array $resources */
-            $resources = $this->container->getParameter('sylius.resources');
+            /** @var array<mixed> $resources */
+            $resources = $this->getParameter('sylius.resources');
         } catch (InvalidArgumentException $exception) {
-            throw new HttpException('403', $exception);
+            throw new HttpException(Response::HTTP_FORBIDDEN, $exception->getMessage());
         }
 
         foreach ($resources as $alias => $configuration) {
@@ -179,6 +182,9 @@ class SyliusCrudResourceController extends ResourceController
         return $this->createRestView($configuration, $exportableDatas, null, $request->get('groups'));
     }
 
+    /**
+     * @param string[]|null $groups
+     */
     protected function createRestView(RequestConfiguration $configuration, $data, int $statusCode = null, ?array $groups = []): Response
     {
         if (empty($groups)) {

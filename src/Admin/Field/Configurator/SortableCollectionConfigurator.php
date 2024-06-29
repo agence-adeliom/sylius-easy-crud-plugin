@@ -67,7 +67,7 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
         $field->setFormattedValue($this->formatCollection($field));
     }
 
-    private function formatCollection(FieldDto $field)
+    private function formatCollection(FieldDto $field): int|string
     {
         $doctrineMetadata = $field->getDoctrineMetadata();
         if ('array' !== $doctrineMetadata->get('type') && !$field->getValue() instanceof PersistentCollection) {
@@ -83,9 +83,11 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
             $collectionItemsAsText[] = (string) $item;
         }
 
-        $isDetailAction = false;
+        // TODO
+        //$isDetailAction = false;
+        $length = 32; //$isDetailAction ? 512 : 32;
 
-        return u(', ')->join($collectionItemsAsText)->truncate($isDetailAction ? 512 : 32, '…')->toString();
+        return u(', ')->join($collectionItemsAsText)->truncate($length, '…')->toString();
     }
 
     private function countNumElements($collection): int

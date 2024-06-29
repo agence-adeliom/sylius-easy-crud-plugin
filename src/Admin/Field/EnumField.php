@@ -102,20 +102,8 @@ final class EnumField implements FieldInterface
      *
      * Possible badge types: 'success', 'warning', 'danger', 'info', 'primary', 'secondary', 'light', 'dark'
      */
-    public function renderAsBadges($badgeSelector = true): self
+    public function renderAsBadges(?bool $badgeSelector = true): self
     {
-        if (!\is_bool($badgeSelector) && !\is_array($badgeSelector) && !\is_callable($badgeSelector)) {
-            throw new \InvalidArgumentException(sprintf('The argument of the "%s" method must be a boolean, an array or a closure ("%s" given).', __METHOD__, \gettype($badgeSelector)));
-        }
-
-        if (\is_array($badgeSelector)) {
-            foreach ($badgeSelector as $fieldValue => $badgeType) {
-                if (!\in_array($badgeType, self::VALID_BADGE_TYPES, true)) {
-                    throw new \InvalidArgumentException(sprintf('The values of the array passed to the "%s" method must be one of the following valid badge types: "%s" ("%s" given).', __METHOD__, implode(', ', self::VALID_BADGE_TYPES), $badgeType));
-                }
-            }
-        }
-
         $this->setCustomOption(self::OPTION_RENDER_AS_BADGES, $badgeSelector);
 
         return $this;
