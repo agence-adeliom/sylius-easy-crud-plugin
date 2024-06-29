@@ -48,7 +48,7 @@ jobs:
           composer config extra.symfony.require "${{ matrix.symfony }}"
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "${{ matrix.node }}"
 
