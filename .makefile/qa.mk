@@ -39,3 +39,9 @@ test.twig: ## Validate Twig templates
 HELP += $(call help,test.eslint,			Validate Twig templates)
 test.eslint: ## Validate eslint
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm -i nodejs "npm --prefix ${PLUGIN_DIR} run lint")
+
+
+HELP += $(call help,test.phpunit,			Run phpunit)
+test.phpunit: ## Validate eslint
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec php vendor/bin/phpunit --colors=always)
+
