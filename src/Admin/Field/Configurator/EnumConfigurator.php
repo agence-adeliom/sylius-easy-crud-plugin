@@ -7,6 +7,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
+use Adeliom\SyliusEasyCrudPlugin\Helper\Enum;
 use Sylius\Component\Resource\Model\ResourceInterface;
 
 /**
@@ -43,7 +44,10 @@ final class EnumConfigurator implements FieldConfiguratorInterface
         $field->setFormTypeOption('attr.data-ea-autocomplete-render-items-as-html', $field->getCustomOption(EnumField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true');
     }
 
-    private function getChoices($enum, FieldDto $field): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getChoices(?Enum $enum, FieldDto $field): array
     {
         if (null === $enum) {
             return [];

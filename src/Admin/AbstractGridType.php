@@ -6,6 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
+use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\BulkActionGroup;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\ItemActionGroup;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\MainActionGroup;
@@ -19,6 +20,9 @@ use Sylius\Component\Resource\Model\TranslatableInterface;
 
 abstract class AbstractGridType extends AbstractResourceType implements ResourceAwareGridInterface
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         $gridBuilder = $this->createGridBuilder();
@@ -32,35 +36,57 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     {
         $resourceClass = $this->getResourceClass();
         $grid = GridBuilder::create($this::getName(), $resourceClass);
-        if ('' !== $this::getDefaultSortColumn()) {
-            $grid->orderBy($this::getDefaultSortColumn(), $this::getDefaultSortOrder());
-        }
 
-        if (in_array(TranslatableInterface::class, class_implements($resourceClass))) {
-            $grid->setDriverOption('repository', $this::getRepositoryMethod());
+        if ($this instanceof AbstractAdmin) {
+            if (method_exists($this, 'getDefaultSortColumn')) {
+                if ('' !== $this::getDefaultSortColumn()) {
+                    $grid->orderBy($this::getDefaultSortColumn(), $this::getDefaultSortOrder());
+                }
+            }
+            if (is_array(class_implements($resourceClass)) && in_array(TranslatableInterface::class, class_implements
+                ($resourceClass))) {
+                if (method_exists($this, 'getRepositoryMethod')) {
+                    $grid->setDriverOption('repository', $this::getRepositoryMethod());
+                }
+            }
         }
 
         return $grid;
     }
 
+    /**
+     * @return array<string, array<ActionInterface>>
+     */
     protected function processActions(string $pageName): array
     {
-        $actions = $this->configureActions(
-            $pageName,
-        );
-        $actionsDto = $actions->getAsDto($pageName);
-
         $pageActions = [
-            'main' => $actionsDto->getGridActionsByType(Action::TYPE_GLOBAL),
-            'bulk' => $actionsDto->getGridActionsByType(Action::TYPE_BATCH),
-            'item' => $actionsDto->getGridActionsByType(Action::TYPE_ITEM),
-            'subitem' => $actionsDto->getGridActionsByType(Action::TYPE_SUB_ITEM),
+            'main' => [],
+            'bulk' => [],
+            'item' => [],
+            'subitem' => [],
         ];
+        if ($this instanceof AbstractAdmin) {
+            $actions = $this->configureActions(
+                $pageName,
+            );
+            $actionsDto = $actions->getAsDto($pageName);
+
+            $pageActions = [
+                'main' => $actionsDto->getGridActionsByType(Action::TYPE_GLOBAL),
+                'bulk' => $actionsDto->getGridActionsByType(Action::TYPE_BATCH),
+                'item' => $actionsDto->getGridActionsByType(Action::TYPE_ITEM),
+                'subitem' => $actionsDto->getGridActionsByType(Action::TYPE_SUB_ITEM),
+            ];
+        }
 
         return $pageActions;
     }
 
-    protected function transformActionsAsGridDefinition($name, $data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    protected function transformActionsAsGridDefinition(string $name, array $data):
+    \Sylius\Component\Grid\Definition\Action
     {
         $action = \Sylius\Component\Grid\Definition\Action::fromNameAndType($name, $data['type']);
         $action->setOptions($data['options'] ?? []);
@@ -72,6 +98,9 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
         return $action;
     }
 
+    /**
+     * @return array<string, array<int, \Sylius\Component\Grid\Definition\Action>>
+     */
     protected function processDetailAndUpdateActions(string $pageName): array
     {
         $pageActions = $this->processActions($pageName);
@@ -96,9 +125,12 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
         return $actions;
     }
 
+    /**
+     * @return array<string, array<ActionInterface>>
+     */
     protected function processGridActions(
         ?GridBuilderInterface $gridBuilder = null,
-    ) {
+    ): array {
         $pageActions = $this->processActions(Crud::PAGE_INDEX);
 
         if ($gridBuilder instanceof GridBuilderInterface) {
@@ -115,32 +147,33 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
                 ->addActionGroup(
                     SubItemActionGroup::create(...$pageActions[Action::TYPE_SUB_ITEM]),
                 );
-        } else {
-            return $pageActions;
         }
+        return $pageActions;
     }
 
     protected function processGridFilters(
         ?GridBuilderInterface $gridBuilder = null,
-    ) {
-        $filters = $this->configureFilters();
+    ): void {
+        if ($this instanceof AbstractAdmin) {
+            $filters = $this->configureFilters();
 
-        if ($gridBuilder instanceof GridBuilderInterface) {
-            foreach ($filters as $filter) {
-                if ($filter instanceof FilterInterface) {
-                    $gridBuilder->addFilter($filter);
+            if ($gridBuilder instanceof GridBuilderInterface) {
+                foreach ($filters as $filter) {
+                    if ($filter instanceof FilterInterface) {
+                        $gridBuilder->addFilter($filter);
+                    }
                 }
             }
-        } else {
-            return $filters;
         }
     }
 
     protected function processGridDefaultSort(
         ?GridBuilderInterface $gridBuilder = null,
     ): void {
-        foreach ($this->configureDefaultSort() as $name => $direction) {
-            $gridBuilder->addOrderBy($name, $direction);
+        if ($this instanceof AbstractAdmin) {
+            foreach ($this->configureDefaultSort() as $name => $direction) {
+                $gridBuilder->addOrderBy($name, $direction);
+            }
         }
     }
 }

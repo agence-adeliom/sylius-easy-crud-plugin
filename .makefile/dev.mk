@@ -101,6 +101,7 @@ platform:
 		(cd ${APP_DIR} && rm -rf compose.override.yml-e); \
 		(cd ${APP_DIR} && rm -rf config/bundles.php-e); \
 		(cd ${APP_DIR} && rm -rf composer.json-e); \
+		(cp phpstan.neon ${APP_DIR}/phpstan.neon); \
 	fi
 
 	${MAKE} platform_up

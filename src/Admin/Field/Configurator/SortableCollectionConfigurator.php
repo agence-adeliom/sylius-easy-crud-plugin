@@ -90,7 +90,7 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
         return u(', ')->join($collectionItemsAsText)->truncate($length, '…')->toString();
     }
 
-    private function countNumElements($collection): int
+    private function countNumElements(mixed $collection): int
     {
         if (null === $collection) {
             return 0;

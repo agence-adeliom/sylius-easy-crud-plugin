@@ -5,13 +5,21 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
+use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
 
 interface AdminInterface
 {
+    /**
+     * @return iterable<FieldInterface>
+     */
     public function configureFields(string $pageName, ?string $context = null): iterable;
 
     public function configureActions(string $pageName): Actions;
 
+    /**
+     * @return iterable<FilterInterface>
+     */
     public function configureFilters(): iterable;
 
     public static function getEntityFqcn(): string;

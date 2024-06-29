@@ -40,7 +40,7 @@ final class ChoiceMaskField implements FieldInterface
     /**
      * @var string
      */
-    public const OPTION_ESCAPE_HTML_CONTENTS = 'escapeHtml';
+    public const OPTION_ESCAPE_HTML_CONTENTS = "escapeHtml";
 
     /**
      * @var string[]
@@ -58,9 +58,9 @@ final class ChoiceMaskField implements FieldInterface
     public const WIDGET_NATIVE = 'native';
 
     /**
-     * @var bool
+     * @var string
      */
-    public const OPTION_IS_TRANSLATION = false;
+    public const OPTION_IS_TRANSLATION = 'is_translation';
 
     /**
      * @param string|false|null $label
@@ -96,7 +96,7 @@ final class ChoiceMaskField implements FieldInterface
      * ->setChoices(fn (?MyEntity $foo) => $foo->someField()->getChoices())
      * ->setChoices(fn (?MyEntity $foo, FieldDto $field) => ...)
      */
-    public function setChoices($choiceGenerator): self
+    public function setChoices(mixed $choiceGenerator): self
     {
         if (!\is_array($choiceGenerator) && !\is_callable($choiceGenerator)) {
             throw new \InvalidArgumentException(sprintf('The argument of the "%s" method must be an array or a closure ("%s" given).', __METHOD__, \gettype($choiceGenerator)));
@@ -117,7 +117,7 @@ final class ChoiceMaskField implements FieldInterface
      * ->setMap(fn (?MyEntity $foo) => $foo->someField()->getChoices())
      * ->setMap(fn (?MyEntity $foo, FieldDto $field) => ...)
      */
-    public function setMap($mapGenerator): self
+    public function setMap(mixed $mapGenerator): self
     {
         if (!\is_array($mapGenerator) && !\is_callable($mapGenerator)) {
             throw new \InvalidArgumentException(sprintf('The argument of the "%s" method must be an array or a closure ("%s" given).', __METHOD__, \gettype($mapGenerator)));

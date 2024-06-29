@@ -18,6 +18,7 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\IconField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use <?= $entity->getName() ?>;
@@ -47,6 +48,9 @@ final class <?= $class_name ?> extends AbstractAdmin implements ServiceSubscribe
         return '';
     }
 
+    /**
+     * @return iterable<FieldInterface>
+     */
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
         yield TabField::new('tab1', 'Tab 1');

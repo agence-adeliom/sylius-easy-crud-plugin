@@ -10,21 +10,12 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Sylius\Component\Resource\Model\ResourceInterface;
 use function Symfony\Component\String\u;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * * Inspired by EasyAdmin Symfony Bundle
  */
 final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
 {
-    public function __construct(
-        /**
-         * @readonly
-         */
-        private TranslatorInterface $translator,
-    ) {
-    }
-
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool
     {
         return ChoiceMaskField::class === $field->getFieldFqcn();
@@ -60,9 +51,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         // the value of this form option must be a string to properly propagate it as an HTML attribute value
         $field->setFormTypeOption(
             'attr.data-ea-autocomplete-render-items-as-html',
-            $field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ?
-                'false' :
-                'true',
+            ($field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true')
         );
 
         $fieldValue = $field->getValue();
@@ -89,7 +78,10 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         $field->setFormattedValue(implode($isRenderedAsBadge ? '' : ', ', $selectedChoices));
     }
 
-    private function getChoices($choiceGenerator): array
+    /**
+     * @return array<int, mixed>
+     */
+    private function getChoices(mixed $choiceGenerator): array
     {
         if (null === $choiceGenerator) {
             return [];
@@ -103,7 +95,10 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         //return $choiceGenerator($entity->getInstance(), $field);
     }
 
-    private function getMap($mapGenerator): array
+    /**
+     * @return array<int, mixed>
+     */
+    private function getMap(mixed $mapGenerator): array
     {
         if (null === $mapGenerator) {
             return [];
@@ -117,7 +112,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         //return $mapGenerator($entity->getInstance(), $field);
     }
 
-    private function getBadgeCssClass($badgeSelector, $value, FieldDto $field): string
+    private function getBadgeCssClass(mixed $badgeSelector, mixed $value, FieldDto $field): string
     {
         $commonBadgeCssClass = 'badge';
 

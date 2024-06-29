@@ -8,6 +8,8 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Doctrine\ORM\Mapping\Entity;
+use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
+use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 {
@@ -21,7 +23,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
     abstract public static function getDefaultSortColumn(): string;
 
     /**
-     * @return array{method: string|array, arguments: array}
+     * @return array<string, mixed>
      */
     public static function getRepositoryMethod(): array
     {
@@ -63,11 +65,19 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
         return $actions;
     }
 
+    /**
+     * @return iterable<FilterInterface>
+     */
     public function configureFilters(): iterable
     {
-        yield null;
+        //yield BooleanFilter::create('enabled');
+        return [];
     }
 
+    /**
+     * configure sylius grid addOrderBy(string $name, string $direction = 'asc')
+     * @return array<string, string>
+     */
     public function configureDefaultSort(): array
     {
         return [];
@@ -78,11 +88,13 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     public function configureRepository(): string
     {
-        $reflectionClass = new \ReflectionClass(self::getResourceClass());
-        foreach ($reflectionClass->getAttributes() as $attribute) {
-            if ($attribute->getName() === Entity::class) {
-                if ($attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0] ?? null) {
-                    return $attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0];
+        if (class_exists(self::getResourceClass())) {
+            $reflectionClass = new \ReflectionClass(self::getResourceClass());
+            foreach ($reflectionClass->getAttributes() as $attribute) {
+                if ($attribute->getName() === Entity::class) {
+                    if ($attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0] ?? null) {
+                        return $attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0];
+                    }
                 }
             }
         }

@@ -18,7 +18,7 @@ final class FieldCollection implements CollectionInterface
     private array $fields;
 
     /**
-     * @param FieldInterface[]|string[] $fields
+     * @param FieldInterface[] $fields
      */
     private function __construct(
         iterable $fields,
@@ -39,7 +39,7 @@ final class FieldCollection implements CollectionInterface
     }
 
     /**
-     * @param FieldInterface[]|string[] $fields
+     * @param FieldInterface[] $fields
      */
     public static function new(iterable $fields, FieldConfiguratorCollection $fieldConfiguratorCollection): self
     {

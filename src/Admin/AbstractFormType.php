@@ -12,6 +12,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
@@ -49,7 +50,7 @@ abstract class AbstractFormType extends AbstractGridType
         protected LocaleProviderInterface $localeProvider,
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
-        private Security $security,
+        protected Security $security,
     ) {
         parent::__construct(
             $dataClass,
@@ -131,9 +132,9 @@ abstract class AbstractFormType extends AbstractGridType
                             $fieldDto->getCustomOption('fieldsDto'),
                             $this->crudAdminFactory->getFieldConfiguratorCollection(),
                         );
-                        $formFieldOptions['data_translation_class'] = call_user_func(
-                            $options['data_class'] . '::getTranslationClass',
-                        );
+                        if (method_exists($options['data_class'], 'getTranslationClass')) {
+                            $formFieldOptions['data_translation_class'] = $options['data_class']::getTranslationClass();
+                        }
                         $subFields = [];
                         foreach ($subFieldsDto as $subFieldDto) {
                             $formSubFieldOptions = $subFieldDto->getFormTypeOptions();
@@ -162,9 +163,10 @@ abstract class AbstractFormType extends AbstractGridType
                             ];
                         }
                         $formFieldOptions['fields'] = $subFields;
-                        $formFieldOptions['data_translation_class'] = call_user_func(
-                            $options['data_class'] . '::getTranslationClass',
-                        );
+
+                        if (method_exists($options['data_class'], 'getTranslationClass')) {
+                            $formFieldOptions['data_translation_class'] = $options['data_class']::getTranslationClass();
+                        }
                     }
 
                     $formField = $builder
@@ -213,6 +215,9 @@ abstract class AbstractFormType extends AbstractGridType
         $this->crudAdminFactory->initMenu();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function buildDetail(ResourceInterface $resource): array
     {
         $fields = FieldCollection::new(
@@ -294,24 +299,23 @@ abstract class AbstractFormType extends AbstractGridType
             ) {
                 $this->crudAdminFactory->manageFieldAssets($fieldDto);
 
-                $field = call_user_func(
-                    $fieldDto->getFieldFqcn() . '::create',
-                    $fieldDto->getProperty(),
-                );
+                if (method_exists($fieldDto->getFieldFqcn(), 'create')) {
+                    $field = $fieldDto->getFieldFqcn()::create($fieldDto->getProperty());
 
-                $field->setLabel($fieldDto->getLabel());
-                $field->setSortable($fieldDto->isSortable() ?? true, $fieldDto->getSortablePath());
+                    $field->setLabel($fieldDto->getLabel());
+                    $field->setSortable($fieldDto->isSortable() ?? true, $fieldDto->getSortablePath());
 
-                // TODO: needed to allow override, but check that there is no conflict
-                $field->setOption('template', $fieldDto->getGridTemplatePath());
+                    // TODO: needed to allow override, but check that there is no conflict
+                    $field->setOption('template', $fieldDto->getGridTemplatePath());
 
-                $field->addOptions([
-                    'vars' => ['field' => $fieldDto],
-                ]);
+                    $field->addOptions([
+                                           'vars' => ['field' => $fieldDto],
+                                       ]);
 
-                $gridBuilder->addField(
-                    $field,
-                );
+                    $gridBuilder->addField(
+                        $field,
+                    );
+                }
             }
         }
 
@@ -328,6 +332,9 @@ abstract class AbstractFormType extends AbstractGridType
         );
     }
 
+    /**
+     * @return iterable<FieldInterface>
+     */
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
         yield TabField::new('default', 'default');
