@@ -2,7 +2,7 @@
   "entrypoints": {
     "form-type-collection-sortable": {
       "js": [
-        "/bundles/syliuseasycrudplugin/form-type-collection-sortable.d8112d5f.js"
+        "/bundles/syliuseasycrudplugin/form-type-collection-sortable.beddc93a.js"
       ]
     },
     "field-code-editor": {
@@ -10,12 +10,12 @@
         "/bundles/syliuseasycrudplugin/field-code-editor.7006e473.css"
       ],
       "js": [
-        "/bundles/syliuseasycrudplugin/field-code-editor.5dc83b55.js"
+        "/bundles/syliuseasycrudplugin/field-code-editor.2d0691e1.js"
       ]
     },
     "field-slug": {
       "js": [
-        "/bundles/syliuseasycrudplugin/field-slug.07d3f91d.js"
+        "/bundles/syliuseasycrudplugin/field-slug.9deaa5d0.js"
       ]
     },
     "field-image": {
@@ -25,7 +25,7 @@
     },
     "form-nested-accordion": {
       "js": [
-        "/bundles/syliuseasycrudplugin/form-nested-accordion.9b2b9c80.js"
+        "/bundles/syliuseasycrudplugin/form-nested-accordion.a9e56e8e.js"
       ]
     },
     "text-editor": {
@@ -33,7 +33,7 @@
         "/bundles/syliuseasycrudplugin/text-editor.1830acff.css"
       ],
       "js": [
-        "/bundles/syliuseasycrudplugin/text-editor.aede172f.js"
+        "/bundles/syliuseasycrudplugin/text-editor.23f8ba4f.js"
       ]
     }
   }

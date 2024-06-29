@@ -1,4 +1,4 @@
-require('../css/field-code-editor.css');
+import '../css/field-code-editor.css';
 
 import CodeMirror from 'codemirror';
 

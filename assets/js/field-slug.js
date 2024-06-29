@@ -47,7 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let timeout;
 
-    nameInput.addEventListener('input', (event) => {
+    nameInput.addEventListener('input', () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         updateSlug();

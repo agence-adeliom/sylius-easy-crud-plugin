@@ -43,7 +43,7 @@ const SortableCollectionProperty = {
       collection.sortable = Sortable.create(sortableWrapper, {
         handle: `[drag-handler="${collection.dataset.formTypeId}"]`,
         direction: 'vertical',
-        onEnd(evt) {
+        onEnd() {
           SortableCollectionProperty.updateCollectionItemCssClasses(collection);
         },
       });
@@ -93,7 +93,7 @@ const SortableCollectionProperty = {
   },
 };
 
-const sortableCollectionHandler = function (event) {
+const sortableCollectionHandler = function () {
   document.querySelectorAll('.field-sortable_collection-add-button:not(.processed)')
     .forEach((addButton) => {
       const collection = addButton.closest('[data-sylius-collection-field]');

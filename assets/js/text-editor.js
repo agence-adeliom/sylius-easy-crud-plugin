@@ -1,4 +1,4 @@
-require('../css/form-type-text-editor.css');
+import '../css/form-type-text-editor.css';
 
 import DirtyForm from "dirty-form";
 import Trix from 'trix/dist/trix';
@@ -113,7 +113,7 @@ class TextEditorField {
         });
       }
     });
-  };
+  }
 
   #getLocalizedErrorMessage() {
     // copied from https://github.com/chromium/chromium/search?p=1&q=2507943997699731163

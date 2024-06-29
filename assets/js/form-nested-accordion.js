@@ -1,3 +1,5 @@
+/* global $ */
+
 window.addEventListener('DOMContentLoaded', () => {
   const initAccordion = function(target) {
     if (target
@@ -39,9 +41,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // init after default sylius script
   // look at $('.ui.accordion').accordion(); in admin-entry.js
   setTimeout(() => {
-    $('[data-form-collection="item"]')
-      .each(function () {
-        initAccordion($(this));
+    document.querySelectorAll('[data-form-collection="item"]')
+      .forEach(function (selector) {
+        initAccordion($(selector));
       });
   },1);
 });
