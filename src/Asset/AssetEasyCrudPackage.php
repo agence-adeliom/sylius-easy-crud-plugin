@@ -29,7 +29,7 @@ final class AssetEasyCrudPackage implements PackageInterface
     {
         $this->package = new PathPackage(
             '/bundles/syliuseasycrudplugin',
-            new JsonManifestVersionStrategy(__DIR__ . '/public/manifest.json'),
+            new JsonManifestVersionStrategy(__DIR__ . '/../../public/manifest.json'),
             new RequestStackContext($requestStack),
         );
     }

@@ -43,7 +43,7 @@ class ActionDto
     private $routeParameters = [];
 
     /* @var callable|string|null */
-    private mixed $url;
+    private mixed $url = null;
 
     /** @var array<string, mixed> */
     private array $translationParameters = [];
