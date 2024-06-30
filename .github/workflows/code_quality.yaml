@@ -109,6 +109,9 @@ jobs:
       - name: Check assets
         run: npm run lint
 
+      - name: Build assets
+        run: npm run build
+
       - name: Check twig
         run: vendor/bin/twigcs templates/ --severity error --display blocking --reporter githubAction
 

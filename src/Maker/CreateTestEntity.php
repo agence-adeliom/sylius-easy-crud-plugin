@@ -78,7 +78,7 @@ final class CreateTestEntity extends AbstractMaker
                 $resourceConfigGenerator->generateEntityTranslation($class);
                 $resourceConfigGenerator->generateRepository($class);
 
-                $io->comment('Now run bin/console make:easy-crud:generate to create a sylius east crud based on an entity');
+                $io->comment('Now run bin/console make:easy-crud:generate to create a sylius easy crud based on an entity');
 
                 $this->writeSuccessMessage($io);
             } catch (\Exception $exception) {
