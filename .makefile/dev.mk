@@ -60,15 +60,14 @@ apply_dist:
 ###
 ### SYLIUS
 ### ¯¯¯¯¯¯¯¯
-sylius: sylius_install install_bundle messenger.setup
+sylius: sylius_install configure_bundle messenger.setup
 
 sylius_install:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose exec -it -u root php rm -rf public/media/image)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run php bin/console doctrine:database:drop --if-exists --force)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console sylius:install -s default -n)
 
-install_bundle:
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-interaction --with-all-dependencies ${PLUGIN_NAME}="*@dev")
+configure_bundle:
 	${MAKE} bundle_dependencies_install
 	${MAKE} bundle_assets_build
 	${MAKE} bundle_install_test_files
@@ -112,10 +111,9 @@ platform:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config repositories.adeliom '{"type":"vcs","url":"$(PLUGIN_URL)"}')
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer config extra.symfony.require "~${SYMFONY_VERSION}")
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress sylius/sylius="~${SYLIUS_VERSION}")
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress --dev friendsoftwig/twigcs)
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-install --no-scripts --no-progress --dev symfony/maker-bundle)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer dump-autoload)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer install --no-interaction --no-scripts --prefer-dist)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-interaction --with-all-dependencies --no-scripts ${PLUGIN_NAME}="*@dev")
 	${MAKE} platform_up
 	${MAKE} platform_assets
 

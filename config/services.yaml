@@ -68,6 +68,7 @@ services:
     public: true
 
   adeliom.sylius.form.type.field_resource_translations:
+    public: true
     class: Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType
     tags: [ 'form.type' ]
     arguments:
@@ -75,26 +76,32 @@ services:
       - "@property_accessor"
 
   Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType:
+    public: true
     alias: adeliom.sylius.form.type.field_resource_translations
 
   adeliom.sylius.form.type.resource_autocomplete_choice:
+    public: true
     class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceAutocompleteChoiceType
     tags: [ 'form.type' ]
     arguments:
       - "@sylius.registry.resource_repository"
   Adeliom\SyliusEasyCrudPlugin\Form\ResourceAutocompleteChoiceType:
+    public: true
     alias: adeliom.sylius.form.type.resource_autocomplete_choice
 
   adeliom.sylius.form.type.resource_choice:
+    public: true
     class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType
     tags: [ 'form.type' ]
     arguments:
       - "@sylius.registry.resource_repository"
   Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType:
+    public: true
     alias: adeliom.sylius.form.type.resource_choice
 
   adeliom.sylius.crud.admin.factory:
     class: Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory
+    public: true
     arguments:
       - "@form.type_guesser.doctrine"
       - "@adeliom.sylius.field.configurator.collection"
@@ -105,6 +112,7 @@ services:
       - "@parameter_bag"
 
   Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
+    public: true
     alias: adeliom.sylius.crud.admin.factory
 
   Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
