@@ -46,7 +46,7 @@
       "symfony/yaml": "^6.4 || ^v7.0",
       "symfony/maker-bundle": "^1.60",
       "symfony/web-profiler-bundle": "^6.4 || ^v7.0",
-      "vimeo/psalm": "5.23.1"
+      "vimeo/psalm": "5.25.0"
     },
     "autoload": {
       "psr-4": {
