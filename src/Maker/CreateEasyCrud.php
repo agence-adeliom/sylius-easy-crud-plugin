@@ -152,7 +152,7 @@ final class CreateEasyCrud extends AbstractMaker
                 // not using a custom repository
             }
 
-            if (is_string($classTranslation)) {
+            if (\class_exists($classTranslation)) {
                 $entityTranslation = new \ReflectionClass($classTranslation);
             }
         }
