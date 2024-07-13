@@ -153,7 +153,7 @@ final class IntlFormatter
             throw new RuntimeError('Unable to format the given number.');
         }
 
-        return $ret;
+        return (string) $ret;
     }
 
     /**
