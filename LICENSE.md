@@ -1,6 +1,8 @@
+Crud concept inspired and partially copied from https://github.com/EasyCorp/EasyAdminBundle (c) Javier Eguiluz - MIT License.
+
 MIT License
 
-Copyright (c) 2021 Adeliom
+Copyright (c) 2024 Adeliom
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

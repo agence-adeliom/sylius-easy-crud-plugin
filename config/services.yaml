@@ -29,6 +29,14 @@ services:
       - "@sylius.translation_locale_provider.admin"
     public: true
 
+  sylius.easycrud.intlformatter:
+    class: Adeliom\SyliusEasyCrudPlugin\Intl\IntlFormatter
+
+  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\DateTimeConfigurator:
+    arguments:
+      - "@sylius.easycrud.intlformatter"
+    public: true
+
   #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\PositionSortableConfigurator:
   #    public: true
 

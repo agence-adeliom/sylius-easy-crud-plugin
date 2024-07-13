@@ -12,4 +12,6 @@ interface FieldConfiguratorInterface
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool;
 
     public function configure(FieldDto $field, ?ResourceInterface $resource = null): void;
+
+    public function formatValue(FieldDto $field, mixed $value): mixed;
 }

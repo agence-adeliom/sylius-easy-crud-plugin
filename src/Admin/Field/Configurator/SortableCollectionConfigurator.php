@@ -63,21 +63,19 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
 
             $field->setCustomOption(SortableCollectionField::OPTION_ENTRY_IS_COMPLEX, $isComplexEntry);
         }
-
-        $field->setFormattedValue($this->formatCollection($field));
     }
 
-    private function formatCollection(FieldDto $field): int|string
+    private function formatCollection(FieldDto $field, mixed $value): int|string
     {
         $doctrineMetadata = $field->getDoctrineMetadata();
-        if ('array' !== $doctrineMetadata->get('type') && !$field->getValue() instanceof PersistentCollection) {
-            return $this->countNumElements($field->getValue());
+        if ('array' !== $doctrineMetadata->get('type') && !$value instanceof PersistentCollection) {
+            return $this->countNumElements($value);
         }
 
         $collectionItemsAsText = [];
-        foreach ($field->getValue() ?? [] as $item) {
+        foreach ($value ?? [] as $item) {
             if (!\is_string($item) && !(\is_object($item) && method_exists($item, '__toString'))) {
-                return $this->countNumElements($field->getValue());
+                return $this->countNumElements($value);
             }
 
             $collectionItemsAsText[] = (string) $item;
@@ -105,5 +103,10 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
         }
 
         return 0;
+    }
+
+    public function formatValue(FieldDto $field, mixed $value): mixed
+    {
+        return $this->formatCollection($field, $value);
     }
 }

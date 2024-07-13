@@ -1,0 +1,4 @@
+{% if data is defined %}
+    {% set field = options.vars.field %}
+    <time datetime="{{ data|date('c') }}" title="{{ data|date('r') }}">{{ field.configurator.formatValue(field, data)|default(data|date('r')) }}</time>
+{% endif %}

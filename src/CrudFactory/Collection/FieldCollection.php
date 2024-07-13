@@ -157,6 +157,7 @@ final class FieldCollection implements CollectionInterface
                 }
 
                 $configurator->configure($dto); //, $entityDto, $context
+                $dto->setConfigurator($configurator);
             }
 
             $dtos[$dto->getUniqueIdAsString()] = $dto;
