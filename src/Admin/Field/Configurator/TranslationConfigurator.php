@@ -27,4 +27,9 @@ final class TranslationConfigurator implements FieldConfiguratorInterface
         $field->setCustomOption('definedLocalesCodes', $this->localeProvider->getDefinedLocalesCodes());
         $field->setCustomOption('defaultLocaleCode', $this->localeProvider->getDefaultLocaleCode());
     }
+
+    public function formatValue(FieldDto $field, mixed $value): mixed
+    {
+        return $value;
+    }
 }

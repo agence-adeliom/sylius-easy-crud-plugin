@@ -19,4 +19,9 @@ final class CodeEditorConfigurator implements FieldConfiguratorInterface
     public function configure(FieldDto $field, ?ResourceInterface $resource = null, ?string $pageName = null): void
     {
     }
+
+    public function formatValue(FieldDto $field, mixed $value): mixed
+    {
+        return $value;
+    }
 }

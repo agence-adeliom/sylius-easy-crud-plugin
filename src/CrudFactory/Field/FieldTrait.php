@@ -53,20 +53,6 @@ trait FieldTrait
         return $this;
     }
 
-    public function setFormattedValue(TranslatableInterface|string|false|null $value): self
-    {
-        $this->dto->setFormattedValue($value);
-
-        return $this;
-    }
-
-    public function formatValue(?callable $callable): self
-    {
-        $this->dto->setFormatValueCallable($callable);
-
-        return $this;
-    }
-
     public function setVirtual(?bool $isVirtual = true): self
     {
         $this->dto->setVirtual($isVirtual);
