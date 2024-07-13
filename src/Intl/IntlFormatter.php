@@ -113,18 +113,15 @@ final class IntlFormatter
         'monetary_grouping_separator' => \NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL,
     ];
 
-    /**
-     * @var array<IntlDateFormatter> $dateFormatters
-     */
+    /** @var array<IntlDateFormatter> */
     private array $dateFormatters = [];
 
-    /**
-     * @var array<NumberFormatter> $numberFormatters
-     */
+    /** @var array<NumberFormatter> */
     private array $numberFormatters = [];
 
     /**
      * @param string[] $attrs
+     *
      * @throws RuntimeError
      */
     public function formatCurrency(float $amount, string $currency, array $attrs = [], ?string $locale = null): string
@@ -141,6 +138,7 @@ final class IntlFormatter
 
     /**
      * @param string[] $attrs
+     *
      * @throws RuntimeError
      */
     public function formatNumber(int|float $number, array $attrs = [], string $style = 'decimal', string $type = 'default', ?string $locale = null): string
@@ -190,7 +188,7 @@ final class IntlFormatter
     }
 
     private function createDateFormatter(?string $locale, ?string $dateFormat, ?string $timeFormat, string $pattern =
-    '', ?DateTimeZone                            $timezone = null, string $calendarName = 'gregorian'): \IntlDateFormatter
+    '', ?DateTimeZone $timezone = null, string $calendarName = 'gregorian'): \IntlDateFormatter
     {
         if (null !== $dateFormat && !isset(self::DATE_FORMATS[$dateFormat])) {
             throw new RuntimeError(sprintf('The date format "%s" does not exist, known formats are: "%s".', $dateFormat, implode('", "', array_keys(self::DATE_FORMATS))));
@@ -220,6 +218,7 @@ final class IntlFormatter
 
     /**
      * @param string[] $attrs
+     *
      * @throws RuntimeError
      */
     private function createNumberFormatter(?string $locale, string $style, array $attrs = []): \NumberFormatter
@@ -266,7 +265,7 @@ final class IntlFormatter
                 }
 
                 $value = self::NUMBER_ROUNDING_ATTRIBUTES[$value];
-            } else if ('padding_position' === $name) {
+            } elseif ('padding_position' === $name) {
                 if (!isset(self::NUMBER_PADDING_ATTRIBUTES[$value])) {
                     throw new RuntimeError(sprintf('The number formatter padding position "%s" does not exist, known positions are: "%s".', $value, implode('", "', array_keys(self::NUMBER_PADDING_ATTRIBUTES))));
                 }
@@ -293,8 +292,7 @@ final class IntlFormatter
     /**
      * @throws \Exception
      */
-    private function convertDate(null|DateTimeImmutable|DateTimeInterface $date, DateTimeZone|string|false|null $timezone = null):
-    ?\DateTimeInterface
+    private function convertDate(null|DateTimeImmutable|DateTimeInterface $date, DateTimeZone|string|false|null $timezone = null): ?\DateTimeInterface
     {
         if (null === $date) {
             return null;
@@ -302,7 +300,7 @@ final class IntlFormatter
 
         if (null === $timezone) {
             $timezone = new DateTimeZone(date_default_timezone_get());
-        } else if (!$timezone instanceof DateTimeZone && is_string($timezone)) {
+        } elseif (!$timezone instanceof DateTimeZone && is_string($timezone)) {
             $timezone = new DateTimeZone($timezone);
         }
 

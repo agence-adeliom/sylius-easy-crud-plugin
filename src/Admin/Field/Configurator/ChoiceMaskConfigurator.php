@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Sylius\Component\Resource\Model\ResourceInterface;
@@ -53,8 +52,6 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
             'attr.data-ea-autocomplete-render-items-as-html',
             ($field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true'),
         );
-
-
     }
 
     /**
