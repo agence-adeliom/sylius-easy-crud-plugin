@@ -12,6 +12,7 @@ on:
     paths-ignore:
       - "*.md"
 
+
 jobs:
   tests:
     runs-on: ubuntu-20.04
