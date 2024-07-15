@@ -2,11 +2,13 @@ name: Code Quality
 
 on:
   push:
-    branches: [ "0.x", "1.x", "2.x" ]
+    branches-ignore:
+      - "dependabot/**"
     paths-ignore:
       - README.md
   pull_request:
-    branches: [ "0.x", "1.x", "2.x" ]
+    branches-ignore:
+      - "dependabot/**"
     paths-ignore:
       - "*.md"
 
