@@ -12,6 +12,7 @@ on:
     paths-ignore:
       - "*.md"
 
+
 permissions:
   contents: read
   pull-requests: write
