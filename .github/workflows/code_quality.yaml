@@ -1,15 +1,14 @@
 name: Code Quality
 
 on:
-    push:
-        branches-ignore:
-          - "dependabot/**"
-        paths-ignore:
-            - README.md
-    pull_request:
-        branches: [ 0.x ]
-        paths-ignore:
-          - "*.md"
+  push:
+    branches: [ 0.x, 1.x, 2.x ]
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches: [ 0.x, 1.x, 2.x ]
+    paths-ignore:
+      - "*.md"
 
 jobs:
   tests:
@@ -22,13 +21,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ["8.2", "8.3"]
-        symfony: ["^6.4"]
-        node: ["20.x"]
-        
+        php: [ "8.2", "8.3" ]
+        symfony: [ "^6.4" ]
+        node: [ "20.x" ]
+    
     env:
       APP_ENV: test_cached
-       
+    
     steps:
       - uses: actions/checkout@v4
 
