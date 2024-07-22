@@ -80,7 +80,11 @@ final class CreateEasyCrud extends AbstractMaker
 
         $namespace = \trim($generator->getRootNamespace(), '\\');
 
-        [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
+        [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
+            $class,
+            $generator,
+            $this->managerRegistry,
+        );
 
         $projectDir = $this->parameterBag->get('kernel.project_dir');
 
@@ -130,34 +134,6 @@ final class CreateEasyCrud extends AbstractMaker
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
         // No dependencies needed
-    }
-
-    /**
-     * @return array<int, mixed>
-     */
-    protected function getEntity(string $class, Generator $generator): array
-    {
-        $entity = null;
-        $entityTranslation = null;
-        $repository = null;
-        /**
-         * @var class-string<object> $classTranslation
-         */
-        $classTranslation = $class . 'Translation';
-        if (\class_exists($class)) {
-            $entity = new \ReflectionClass($class);
-
-            $repository = new \ReflectionClass($this->managerRegistry->getRepository($entity->getName()));
-            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
-                // not using a custom repository
-            }
-
-            if (\class_exists($classTranslation)) {
-                $entityTranslation = new \ReflectionClass($classTranslation);
-            }
-        }
-
-        return [$entity, $entityTranslation, $repository];
     }
 
     /**
