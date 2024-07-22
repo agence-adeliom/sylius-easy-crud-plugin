@@ -94,6 +94,16 @@ final class ResourceAutocompleteChoiceField implements FieldInterface
         return $this;
     }
 
+    /**
+     * @param array<string> $groups
+     */
+    public function setSerializationGroups(array $groups): self
+    {
+        $this->setFormTypeOption('serializationGroups', $groups);
+
+        return $this;
+    }
+
     public function setRemoteCriteriaName(string $criteriaName): self
     {
         $this->setFormTypeOption('remote_criteria_name', $criteriaName);

@@ -141,6 +141,13 @@ class SyliusCrudResourceController extends ResourceController
             );
         }
 
+        $serializationGroups = [];
+        if (is_string($request->query->get('serializationGroups'))) {
+            $serializationGroups = json_decode(
+                $request->query->get('serializationGroups')
+            );
+        }
+
         try {
             /** @var array<mixed> $resources */
             $resources = $this->getParameter('sylius.resources');
@@ -163,7 +170,7 @@ class SyliusCrudResourceController extends ResourceController
 
         $request->attributes->set('_format', 'json');
         $request->attributes->set('_sylius', [
-            'serialization_groups' => [
+            'serialization_groups' => $serializationGroups ?? [
                 'Autocomplete',
             ],
             'permission' => true,
