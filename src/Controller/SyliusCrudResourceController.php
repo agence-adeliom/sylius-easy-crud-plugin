@@ -7,14 +7,10 @@ namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use FOS\RestBundle\View\View;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
 use Sylius\Bundle\ResourceBundle\Grid\View\ResourceGridView;
-use Sylius\Component\Resource\Metadata\Metadata;
 use Sylius\Component\Resource\ResourceActions;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -23,7 +19,7 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 class SyliusCrudResourceController extends ResourceController
 {
     use ResourceAutocompleteTrait;
-    
+
     public function indexAction(Request $request): Response
     {
         /**
