@@ -22,6 +22,8 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class SyliusCrudResourceController extends ResourceController
 {
+    use ResourceAutocompleteTrait;
+    
     public function indexAction(Request $request): Response
     {
         /**
@@ -122,65 +124,6 @@ class SyliusCrudResourceController extends ResourceController
         }
 
         return $this->createRestView($configuration, $resource);
-    }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function autocompleteAction(Request $request): Response
-    {
-        // set metadata for resource that need an autocomplete search
-        $resourceName = $request->query->get('resourceName');
-        $repositoryMethod = $request->query->get('repositoryMethod');
-        $repositoryArguments = [];
-        if (is_string($request->query->get('repositoryArguments'))) {
-            $repositoryArguments = json_decode(
-                $request->query->get('repositoryArguments'),
-                true,
-            );
-        }
-
-        $serializationGroups = [];
-        if (is_string($request->query->get('serializationGroups'))) {
-            $serializationGroups = json_decode(
-                $request->query->get('serializationGroups')
-            );
-        }
-
-        try {
-            /** @var array<mixed> $resources */
-            $resources = $this->getParameter('sylius.resources');
-        } catch (InvalidArgumentException $exception) {
-            throw new HttpException(Response::HTTP_FORBIDDEN, $exception->getMessage());
-        }
-
-        foreach ($resources as $alias => $configuration) {
-            if ($resourceName === $alias) {
-                $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
-                $syliusRepositoryService = str_replace('sylius.', 'sylius.repository.', $alias);
-                if ($this->container->has($syliusRepositoryService)) {
-                    $this->repository = $this->container->get($syliusRepositoryService);
-                } else {
-                    $this->repository = $this->container->get('doctrine')
-                        ->getRepository($configuration['classes']['model']);
-                }
-            }
-        }
-
-        $request->attributes->set('_format', 'json');
-        $request->attributes->set('_sylius', [
-            'serialization_groups' => $serializationGroups ?? [
-                'Autocomplete',
-            ],
-            'permission' => true,
-            'repository' => [
-                'method' => $repositoryMethod,
-                'arguments' => $repositoryArguments,
-            ],
-        ]);
-
-        return $this->indexAction($request);
     }
 
     public function exportGridResourcesTestGroupAction(

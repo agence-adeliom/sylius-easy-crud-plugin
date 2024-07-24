@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait ResourceAutocompleteTrait
 {
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -55,6 +56,7 @@ trait ResourceAutocompleteTrait
         $request->attributes->set('_sylius', [
             'serialization_groups' => [
                 'Autocomplete',
+                'Default'
             ],
             'permission' => true,
             'repository' => [
