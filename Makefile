@@ -8,8 +8,8 @@ SHELL=/bin/bash
 ### VERSIONS
 ### ¯¯¯
 
-SYLIUS_VERSION=1.13.0
-SYMFONY_VERSION=6.4
+SYLIUS_VERSION=2.0.0
+SYMFONY_VERSION=7.1
 PLUGIN_NAME=agence-adeliom/sylius-easy-crud-plugin
 PLUGIN_VERSION="*@dev"
 PLUGIN_DIR=lib/sylius-easy-crud-plugin

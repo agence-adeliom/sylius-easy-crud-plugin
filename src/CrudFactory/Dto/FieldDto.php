@@ -340,7 +340,7 @@ final class FieldDto
 
     public function getGridTemplatePath(): ?string
     {
-        // '@SyliusUi/Grid/Field/rawLabel.html.twig'
+        // '@SyliusUi/grid/field/rawLabel.html.twig'
         return $this->gridTemplatePath ?? '@SyliusEasyCrudPlugin/field/default/grid.html.twig';
     }
 
@@ -351,7 +351,7 @@ final class FieldDto
 
     public function getShowTemplatePath(): ?string
     {
-        // '@SyliusUi/Grid/Field/rawLabel.html.twig'
+        // '@SyliusUi/grid/field/rawLabel.html.twig'
         return $this->showTemplatePath ?? '@SyliusEasyCrudPlugin/field/default/show.html.twig';
     }
 
