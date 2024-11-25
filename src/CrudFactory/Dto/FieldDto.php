@@ -7,6 +7,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use function Symfony\Component\String\u;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -21,11 +22,6 @@ final class FieldDto
     private ?string $propertyName = null;
 
     private mixed $value = null;
-
-    private mixed $formattedValue = null;
-
-    /** @var callable|null */
-    private $formatValueCallable;
 
     private TranslatableInterface|string|false|null $label;
 
@@ -78,6 +74,8 @@ final class FieldDto
     private Ulid $uniqueId;
 
     private KeyValueStore $displayedOn;
+
+    private ?FieldConfiguratorInterface $configurator = null;
 
     public function __construct()
     {
@@ -146,43 +144,6 @@ final class FieldDto
     public function setProperty(string $propertyName): void
     {
         $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the original unmodified value stored in the entity field.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    public function setValue(mixed $value): void
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * Returns the value to be displayed for the field (it could be the
-     * same as the value stored in the field or not).
-     */
-    public function getFormattedValue(): mixed
-    {
-        return $this->formattedValue;
-    }
-
-    public function setFormattedValue(mixed $formattedValue): void
-    {
-        $this->formattedValue = $formattedValue;
-    }
-
-    public function getFormatValueCallable(): ?callable
-    {
-        return $this->formatValueCallable;
-    }
-
-    public function setFormatValueCallable(?callable $callable): void
-    {
-        $this->formatValueCallable = $callable;
     }
 
     public function getLabel(): ?string
@@ -566,5 +527,25 @@ final class FieldDto
     public function isDisplayedOn(string $pageName): bool
     {
         return $this->displayedOn->has($pageName);
+    }
+
+    public function getConfigurator(): ?FieldConfiguratorInterface
+    {
+        return $this->configurator;
+    }
+
+    public function setConfigurator(?FieldConfiguratorInterface $configurator): void
+    {
+        $this->configurator = $configurator;
+    }
+
+    public function getValue(): mixed
+    {
+        return $this->value;
+    }
+
+    public function setValue(mixed $value): void
+    {
+        $this->value = $value;
     }
 }

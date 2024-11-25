@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Sylius\Component\Resource\Model\ResourceInterface;
@@ -53,29 +52,6 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
             'attr.data-ea-autocomplete-render-items-as-html',
             ($field->getCustomOption(ChoiceMaskField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true'),
         );
-
-        $fieldValue = $field->getValue();
-        $isIndexOrDetail = $pageName === Crud::PAGE_INDEX;
-        if (null === $fieldValue || !$isIndexOrDetail) {
-            return;
-        }
-
-        $badgeSelector = $field->getCustomOption(ChoiceMaskField::OPTION_RENDER_AS_BADGES);
-        $isRenderedAsBadge = null !== $badgeSelector && false !== $badgeSelector;
-
-        $selectedChoices = [];
-        $flippedChoices = array_flip($choices);
-        // $value is a scalar for single selections and an array for multiple selections
-        foreach (array_values((array) $fieldValue) as $selectedValue) {
-            if (null !== $selectedChoice = $flippedChoices[$selectedValue] ?? null) {
-                $choiceValue = $selectedChoice;
-                $selectedChoices[] = $isRenderedAsBadge
-                    ? sprintf('<span class="%s">%s</span>', $this->getBadgeCssClass($badgeSelector, $selectedValue, $field), $choiceValue)
-                    : $choiceValue;
-            }
-        }
-
-        $field->setFormattedValue(implode($isRenderedAsBadge ? '' : ', ', $selectedChoices));
     }
 
     /**
@@ -92,7 +68,6 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         }
 
         return [];
-        //return $choiceGenerator($entity->getInstance(), $field);
     }
 
     /**
@@ -130,5 +105,30 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         $badgeTypeCssClass = empty($badgeType) ? '' : u($badgeType)->ensureStart('badge-')->toString();
 
         return $commonBadgeCssClass . ' ' . $badgeTypeCssClass;
+    }
+
+    public function formatValue(FieldDto $field, mixed $value): mixed
+    {
+        $fieldValue = $value;
+        if (null === $fieldValue) {
+            return '';
+        }
+
+        $badgeSelector = $field->getCustomOption(ChoiceMaskField::OPTION_RENDER_AS_BADGES);
+        $isRenderedAsBadge = null !== $badgeSelector && false !== $badgeSelector;
+
+        $selectedChoices = [];
+        $flippedChoices = array_flip($field->getFormTypeOption('choices'));
+        // $value is a scalar for single selections and an array for multiple selections
+        foreach (array_values((array) $fieldValue) as $selectedValue) {
+            if (null !== $selectedChoice = $flippedChoices[$selectedValue] ?? null) {
+                $choiceValue = $selectedChoice;
+                $selectedChoices[] = $isRenderedAsBadge
+                    ? sprintf('<span class="%s">%s</span>', $this->getBadgeCssClass($badgeSelector, $selectedValue, $field), $choiceValue)
+                    : $choiceValue;
+            }
+        }
+
+        return implode($isRenderedAsBadge ? '' : ', ', $selectedChoices);
     }
 }

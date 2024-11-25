@@ -83,6 +83,9 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
                     'repositoryArguments' => json_encode(
                         $options['repositoryArguments'],
                     ),
+                    'serializationGroups' => json_encode(
+                        $options['serializationGroups'],
+                    ),
                 ],
                 $parameters,
             ),
@@ -99,6 +102,9 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
                              $options['choice_value'] => "\${$options['choice_value']}",
                          ],
                     ]),
+                    'serializationGroups' => json_encode(
+                        $options['serializationGroups'],
+                    ),
                 ],
                 $parameters,
             ),
@@ -122,6 +128,7 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
             'locale' => "expr:service('sylius.context.locale').getLocaleCode()",
             'limit' => 10,
         ]);
+        $resolver->setDefault('serializationGroups', ['Autocomplete']);
         $resolver->setDefault('choice_value', 'id');
         $resolver->setDefault('choice_name', 'name');
         $resolver->setDefault('resource', 'sylius.product');
@@ -133,6 +140,7 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
         $resolver->addAllowedTypes('remote_criteria_name', ['string']);
         $resolver->addAllowedTypes('repositoryMethod', ['string']);
         $resolver->addAllowedTypes('repositoryArguments', ['array']);
+        $resolver->addAllowedTypes('serializationGroups', ['array']);
         $resolver->addAllowedTypes('useResourceTransformers', ['bool']);
     }
 

@@ -65,4 +65,9 @@ final class EnumConfigurator implements FieldConfiguratorInterface
 
         return $choices;
     }
+
+    public function formatValue(FieldDto $field, mixed $value): mixed
+    {
+        return $value;
+    }
 }
