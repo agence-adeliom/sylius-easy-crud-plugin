@@ -147,6 +147,9 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                                 $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
                             ) {
                                 $objectClassName = $reflectionExtractor->getTypes($className, $property)[0]->getClassName();
+                                if (method_exists($actualValue, 'normalizeFormData')) {
+                                    $value = $actualValue::normalizeFormData($value);
+                                }
                                 $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
                                     AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
                                     AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
