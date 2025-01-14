@@ -26,7 +26,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   if (document.querySelector("[data-form-collection=\"item\"]")) {
-    const observer = new MutationObserver(function() {
+    const observer = new MutationObserver(function(event) {
       setTimeout(function() {
         initAccordion($(event.target));
       },1);
