@@ -13,7 +13,7 @@ use Sylius\Component\Resource\Model\AbstractTranslation;
 use Sylius\Component\Resource\Model\ResourceInterface;
 
 #[ORM\Entity]
-#[ORM\Table(name: '<?= strtolower($class_name) ?>')]
+#[ORM\Table(name: '<?= strtolower(str_replace('translation', '_translation', $class_name)) ?>')]
 class <?= $class_name ?>Translation extends AbstractTranslation implements ResourceInterface
 {
     #[ORM\Id]
