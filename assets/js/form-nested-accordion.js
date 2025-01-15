@@ -1,4 +1,9 @@
 /* global $ */
+$(document).ready(() => {
+  setTimeout(() => {
+    $('.ui.accordion').accordion('destroy');
+  },1);
+});
 
 window.addEventListener('DOMContentLoaded', () => {
   const initAccordion = function(target) {
@@ -25,17 +30,21 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  if (document.querySelector("[data-form-collection=\"item\"]")) {
-    const observer = new MutationObserver(function(event) {
-      setTimeout(function() {
-        initAccordion($(event.target));
-      },1);
-    });
+  const collectionFirstItems = document.querySelectorAll("[data-form-collection=\"item\"]:first-child");
+  if (collectionFirstItems.length > 0) {
+    collectionFirstItems.forEach(function (item) {
+      const observer = new MutationObserver(function(event) {
+        setTimeout(function() {
+          initAccordion($(event.target));
+        },1);
+      });
 
-    observer.observe(document.querySelector("[data-form-collection=\"item\"]"), {
-      subtree: true,
-      childList: true,
-    });
+      observer.observe(item.closest('.collection-list'), {
+        subtree: true,
+        childList: true,
+      });
+
+    })
   }
 
   // init after default sylius script
