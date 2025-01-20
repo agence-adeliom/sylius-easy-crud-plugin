@@ -214,13 +214,6 @@ class CrudMakerService
     public function generateResource(bool $returnContent = false, ?string $entityName = null, ?string $entityTranslationName = null): string
     {
         try {
-            $filePath = $this->projectDir . '/' . self::YAML_RESOURCE_FILE;
-            $filesystem = new Filesystem();
-            if (!$filesystem->exists($filePath)) {
-                $filesystem->touch($filePath);
-                $filesystem->appendToFile($filePath, "sylius_resource:\n  resources:");
-            }
-
             $entityName = $entityName ?? $this->namespaces['entity'] ?? $this->entity->getName();
             if (true === $returnContent) {
                 $yamlGenerator = new YamlSourceManipulator("sylius_resource:\n  resources:");
@@ -230,12 +223,14 @@ class CrudMakerService
 
                 return $yamlGenerator->getContents();
             }
-            $fileContent = file_get_contents($filePath);
-            if (!@preg_match('/sylius_resource/', $fileContent)) {
-                $yamlGenerator = new YamlSourceManipulator("sylius_resource:\n  resources:");
-            } else {
-                $yamlGenerator = new YamlSourceManipulator(file_get_contents($filePath) ?: '');
+
+            $filePath = $this->projectDir . '/' . self::YAML_RESOURCE_FILE;
+            $filesystem = new Filesystem();
+            if (!$filesystem->exists($filePath)) {
+                $filesystem->touch($filePath);
+                $filesystem->appendToFile($filePath, "sylius_resource:\n  resources:");
             }
+            $yamlGenerator = new YamlSourceManipulator(file_get_contents($filePath) ?: '');
             $yaml = $yamlGenerator->getData();
             $this->appendResourceConfig($yaml, $entityName, $entityTranslationName);
             $yamlGenerator->setData($yaml);
