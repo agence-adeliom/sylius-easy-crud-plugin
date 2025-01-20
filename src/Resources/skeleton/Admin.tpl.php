@@ -1,18 +1,16 @@
 <?php declare(strict_types=1);
 
 use Symfony\Bundle\MakerBundle\Str;
-use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 if (
-    isset($entity, $classNameDetail) &&
-     $classNameDetail instanceof ClassNameDetails
+    isset($entity, $entityShortName, $namespace)
 ) {
     ?>
 <?= "<?php\n" ?>
 
 declare(strict_types=1);
 
-namespace App\Admin;
+namespace <?= $namespace ?>;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
@@ -30,7 +28,7 @@ use <?= $entity ?>;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin implements ServiceSubscriberInterface,
+final class <?= $entityShortName ?>Admin extends AbstractAdmin implements ServiceSubscriberInterface,
 AdminInterface
 {
 
@@ -41,12 +39,12 @@ AdminInterface
 
     public static function getName(): string
     {
-        return 'admin_<?= Str::asSnakeCase(($classNameDetail->getShortName())) ?>';
+        return 'admin_<?= Str::asSnakeCase(($entityShortName)) ?>';
     }
 
     public static function getEntityFqcn(): string
     {
-        return <?= Str::asClassName($classNameDetail->getShortName()) ?>::class;
+        return <?= Str::asClassName($entityShortName) ?>::class;
     }
 
     public static function getDefaultSortColumn(): string

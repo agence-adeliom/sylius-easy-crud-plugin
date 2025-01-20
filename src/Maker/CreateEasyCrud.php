@@ -28,7 +28,7 @@ final class CreateEasyCrud extends AbstractMaker
 
     public static function getCommandName(): string
     {
-        return 'make:easy-crud:generate';
+        return 'make:easy-crud:create-crud';
     }
 
     public static function getCommandDescription(): string
@@ -60,21 +60,31 @@ final class CreateEasyCrud extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $entryClassName = Str::asClassName($input->getArgument('entity'));
-        $entryClassNameDetail = $generator->createClassNameDetails(
-            $entryClassName,
-            'Entity\\',
-        );
-        $entryClassNameTranslationDetail = $generator->createClassNameDetails(
-            $entryClassName,
-            'Entity\\',
-            'Translation',
-        );
+        $entryClassName = $input->getArgument('entity');
+        $entryTranslationClassName = $entryClassName . 'Translation';
+
+        if (!class_exists($entryClassName)) {
+            $entryClassNameDetail = $generator->createClassNameDetails(
+                $entryClassName,
+                'Entity\\',
+            );
+            $entryClassName = $entryClassNameDetail->getFullName();
+        }
+        if (!class_exists($entryTranslationClassName)) {
+            $entryTranslationClassNameDetail = $generator->createClassNameDetails(
+                $entryClassName,
+                'Entity\\',
+                'Translation',
+            );
+            $entryTranslationClassName = $entryTranslationClassNameDetail->getFullName();
+        }
+
+        $entryShortClassName = Str::getShortClassName($entryClassName);
 
         $namespace = \trim($generator->getRootNamespace(), '\\');
 
         [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
-            $entryClassNameDetail->getFullName(),
+            $entryClassName,
             $generator,
             $this->managerRegistry,
         );
@@ -91,37 +101,19 @@ final class CreateEasyCrud extends AbstractMaker
                 $entityTranslation,
             );
 
-            $resourceConfigGenerator->generateEntity(
-                className: $entryClassNameDetail->getFullName(),
-                variables: [
-                               'classNameDetail' => $entryClassNameDetail,
-                           ],
-            );
-
-            $resourceConfigGenerator->generateEntityTranslation(
-                className: $entryClassNameDetail->getFullName(),
-                variables: [
-                               'classNameDetail' => $entryClassNameTranslationDetail,
-                           ],
-            );
-
-            $resourceConfigGenerator->generateRepository(
-                className: $entryClassNameDetail->getFullName(),
-                variables: [
-                               'classNameDetail' => $entryClassNameDetail,
-                           ],
-            );
-
             $resourceConfigGenerator->generateAdmin(
-                className: $entryClassNameDetail->getFullName(),
+                className: $entryClassName,
                 variables: [
-                               'classNameDetail' => $entryClassNameDetail,
-                           ],
+                   'entityShortName' => $entryShortClassName,
+                   'namespace' => str_replace('Entity', 'Admin', $entryClassName),
+                ],
             );
 
-            $resourceConfigGenerator->generateMenuListener($entryClassNameDetail->getFullName());
+            $resourceConfigGenerator->generateMenuListener($entryClassName);
 
-            $route = $resourceConfigGenerator->generateRoute();
+            $route = $resourceConfigGenerator->generateRoute(
+                entityName: $entryClassName,
+            );
 
             $io->comment(sprintf(
                 '%s: %s',
@@ -130,8 +122,8 @@ final class CreateEasyCrud extends AbstractMaker
             ));
 
             $resource = $resourceConfigGenerator->generateResource(
-                entityName: $entryClassNameDetail->getFullName(),
-                entityTranslationName: $entryClassNameTranslationDetail->getFullName(),
+                entityName: $entryClassName,
+                entityTranslationName: $entryTranslationClassName,
             );
 
             $io->comment(sprintf(

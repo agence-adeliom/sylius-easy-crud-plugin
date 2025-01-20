@@ -136,19 +136,19 @@ class CrudMakerService
             $this->generator->writeChanges();
 
             $yaml['app.listener.admin.menu_builder'] = [
-                'class' => 'App\Menu\AdminMenuListener',
-                'tags' => [
-                    0 => [
-                        'name' => 'kernel.event_listener',
-                        'event' => 'sylius.menu.admin.main',
-                        'method' => 'addAdminMenuItems',
-                    ],
-                ],
-            ];
+                     'class' => 'App\Menu\AdminMenuListener',
+                     'tags' => [
+                         0 => [
+                             'name' => 'kernel.event_listener',
+                             'event' => 'sylius.menu.admin.main',
+                             'method' => 'addAdminMenuItems',
+                         ],
+                     ],
+                 ];
             $content = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
             file_put_contents(
                 self::YAML_SERVICES_FILE,
-                "\n\t\t" . str_replace("\n", "\n    ", $content),
+                "\n\t" . str_replace("\n", "\n\t\t", $content),
                 \FILE_APPEND,
             );
         }
@@ -178,7 +178,7 @@ class CrudMakerService
             str_replace('Entity', $templateName, $className) . $templateName,
             (is_string($templatePath) && file_exists($templatePath)) ? $templatePath : __DIR__ . '/../Resources/skeleton/' . $templateName . '.tpl.php',
             array_merge([
-                            'entity' => $this->entity ?? $this->namespaces['entity'],
+                            'entity' => $this->entity ? ($this->entity->getName() ?? $this->namespaces['entity']) : $this->namespaces['entity'],
                             'repository' => $this->repository,
                         ], $variables),
         );
@@ -193,7 +193,7 @@ class CrudMakerService
         try {
             $yaml = [];
             if (null === $entityName) {
-                $entityName = $this->namespaces['entity'] ?? $this->entity->getShortName();
+                $entityName = $this->namespaces['entity']->getShortName() ?? $this->entity->getShortName();
             }
             $this->appendRoutingConfig($yaml, $entityName);
             if (true === $returnContent) {

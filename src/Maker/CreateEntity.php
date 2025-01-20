@@ -25,7 +25,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-final class CreateTestEntity extends AbstractMaker
+final class CreateEntity extends AbstractMaker
 {
     public function __construct(
         protected ManagerRegistry $managerRegistry,
@@ -78,7 +78,7 @@ final class CreateTestEntity extends AbstractMaker
                 $resourceConfigGenerator->generateEntityTranslation($class);
                 $resourceConfigGenerator->generateRepository($class);
 
-                $io->comment('Now run bin/console make:easy-crud:generate to create a sylius easy crud based on an entity');
+                $io->comment('Now run bin/console make:easy-crud:create-crud to create a sylius easy crud based on an entity');
 
                 $this->writeSuccessMessage($io);
             } catch (\Exception $exception) {
