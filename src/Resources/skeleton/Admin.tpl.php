@@ -39,7 +39,7 @@ AdminInterface
 
     public static function getName(): string
     {
-        return 'admin_<?= Str::asSnakeCase(($entityShortName)) ?>';
+        return 'admin_app_entity_<?= Str::asSnakeCase(($entityShortName)) ?>';
     }
 
     public static function getEntityFqcn(): string

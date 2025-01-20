@@ -136,19 +136,19 @@ class CrudMakerService
             $this->generator->writeChanges();
 
             $yaml['app.listener.admin.menu_builder'] = [
-                     'class' => 'App\Menu\AdminMenuListener',
-                     'tags' => [
-                         0 => [
-                             'name' => 'kernel.event_listener',
-                             'event' => 'sylius.menu.admin.main',
-                             'method' => 'addAdminMenuItems',
-                         ],
+                 'class' => 'App\Menu\AdminMenuListener',
+                 'tags' => [
+                     0 => [
+                         'name' => 'kernel.event_listener',
+                         'event' => 'sylius.menu.admin.main',
+                         'method' => 'addAdminMenuItems',
                      ],
-                 ];
+                 ],
+             ];
             $content = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
             file_put_contents(
                 self::YAML_SERVICES_FILE,
-                "\n\t" . str_replace("\n", "\n\t\t", $content),
+                "\n    " . str_replace("\n", "\n    ", $content),
                 \FILE_APPEND,
             );
         }
