@@ -27,7 +27,7 @@ class CrudMakerService
 
     /**
      * @param \ReflectionClass<ResourceInterface>|null $entity
-     * @param \ReflectionClass<RepositoryInterface<ResourceInterface>>|null $repository
+     * @param \ReflectionClass<RepositoryInterface>|null $repository
      * @param \ReflectionClass<ResourceInterface>|null $entityTranslation
      */
     public function __construct(
@@ -135,7 +135,6 @@ class CrudMakerService
             );
             $this->generator->writeChanges();
 
-            $yaml = [];
             $yaml['app.listener.admin.menu_builder'] = [
                 'class' => 'App\Menu\AdminMenuListener',
                 'tags' => [
@@ -149,7 +148,7 @@ class CrudMakerService
             $content = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
             file_put_contents(
                 self::YAML_SERVICES_FILE,
-                '    ' . str_replace("\n", "\n    ", $content),
+                "\n\t\t" . str_replace("\n", "\n    ", $content),
                 \FILE_APPEND,
             );
         }
@@ -176,10 +175,10 @@ class CrudMakerService
             $suffix,
         );
         $this->generator->generateClass(
-            $file->getFullName(),
+            str_replace('Entity', $templateName, $className) . $templateName,
             (is_string($templatePath) && file_exists($templatePath)) ? $templatePath : __DIR__ . '/../Resources/skeleton/' . $templateName . '.tpl.php',
             array_merge([
-                            'entity' => $this->entity,
+                            'entity' => $this->entity ?? $this->namespaces['entity'],
                             'repository' => $this->repository,
                         ], $variables),
         );
@@ -189,12 +188,17 @@ class CrudMakerService
         return $file;
     }
 
-    public function generateRoute(): string
+    public function generateRoute(bool $returnContent = false, ?string $entityName = null): string
     {
         try {
             $yaml = [];
-            $entityName = $this->entity->getName();
+            if (null === $entityName) {
+                $entityName = $this->namespaces['entity'] ?? $this->entity->getShortName();
+            }
             $this->appendRoutingConfig($yaml, $entityName);
+            if (true === $returnContent) {
+                return Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+            }
             file_put_contents(
                 self::YAML_ROUTES_FILE,
                 Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK),
@@ -207,7 +211,7 @@ class CrudMakerService
         }
     }
 
-    public function generateResource(): string
+    public function generateResource(bool $returnContent = false, ?string $entityName = null, ?string $entityTranslationName = null): string
     {
         try {
             $filePath = $this->projectDir . '/' . self::YAML_RESOURCE_FILE;
@@ -217,10 +221,18 @@ class CrudMakerService
                 $filesystem->appendToFile($filePath, "sylius_resource:\n  resources:");
             }
 
-            $entityName = $this->entity->getName();
+            $entityName = $entityName ?? $this->namespaces['entity'] ?? $this->entity->getName();
+            if (true === $returnContent) {
+                $yamlGenerator = new YamlSourceManipulator("sylius_resource:\n  resources:");
+                $yaml = $yamlGenerator->getData();
+                $this->appendResourceConfig($yaml, $entityName, $entityTranslationName);
+                $yamlGenerator->setData($yaml);
+
+                return $yamlGenerator->getContents();
+            }
             $yamlGenerator = new YamlSourceManipulator(file_get_contents($filePath) ?: '');
             $yaml = $yamlGenerator->getData();
-            $this->appendResourceConfig($yaml, $entityName);
+            $this->appendResourceConfig($yaml, $entityName, $entityTranslationName);
             $yamlGenerator->setData($yaml);
             file_put_contents($filePath, $yamlGenerator->getContents());
 
@@ -248,7 +260,7 @@ class CrudMakerService
             . "redirect: update\n"
             . 'grid: admin_' . mb_strtolower(Str::asSnakeCase($entityName)) . "\n"
             . "form:\n"
-            . '    type: ' . ($this->namespaces['admin'] ?? 'NoAdmin') . "\n"
+            . '    type: ' . str_replace('Entity', 'Admin', $entityName) . "Admin\n"
             . "    options:\n"
             . "        context: \$context\n"
             . "vars:\n"
@@ -285,7 +297,7 @@ class CrudMakerService
     /**
      * @param array<string, mixed> $data
      */
-    private function appendResourceConfig(array &$data, string $entityName): void
+    private function appendResourceConfig(array &$data, string $entityName, ?string $entityTranslationName = null): void
     {
         $alias = mb_strtolower($this->namespace . '.' . Str::asSnakeCase($entityName));
         if (!isset($data['sylius_resource'])) {
@@ -295,30 +307,25 @@ class CrudMakerService
             $data['sylius_resource']['resources'] = [];
         }
         $data['sylius_resource']['resources'][] = YamlSourceManipulator::EMPTY_LINE_PLACEHOLDER_VALUE;
+
+        $controller = str_replace('Entity', 'Controller', $entityName) . 'Controller';
+
         $data['sylius_resource']['resources'][$alias] =
             [
                 'driver' => 'doctrine/orm',
                 'classes' => [
                     'model' => $entityName,
-                    'controller' => 'Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController',
-                    'form' => $this->namespaces['admin'],
+                    'repository' => str_replace('Entity', 'Repository', $entityName) . 'Repository',
+                    'controller' => class_exists($controller) ? $controller : 'Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController',
+                    'form' => str_replace('Entity', 'Admin', $entityName) . 'Admin',
                 ],
             ];
-        if (isset($this->namespaces['admin'])) {
-            $data['sylius_resource']['resources'][$alias]['classes']['form'] = $this->namespaces['admin'];
-        }
-        if (isset($this->namespaces['controller'])) {
-            $data['sylius_resource']['resources'][$alias]['classes']['controller'] = $this->namespaces['controller'];
-        }
-        if (null !== $this->repository) {
-            $data['sylius_resource']['resources'][$alias]['classes']['repository'] = $this->repository->getName();
-        }
-        if (null !== $this->entityTranslation) {
+        if (null !== $entityTranslationName) {
             $data['sylius_resource']['resources'][$alias]['translation'] = [
                 'classes' => [
-                    'model' => $this->entityTranslation->getName(),
-                    'controller' => $this->namespaces['controller'] ?? 'Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController',
-                    'form' => $this->namespaces['admin'],
+                    'model' => $entityTranslationName,
+                    'controller' => 'Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController',
+                    'form' => str_replace('Entity', 'Admin', $entityName) . 'Admin',
                 ],
             ];
         }

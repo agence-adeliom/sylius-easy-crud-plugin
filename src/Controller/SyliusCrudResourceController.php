@@ -150,6 +150,10 @@ class SyliusCrudResourceController extends ResourceController
             throw new \LogicException('You can not use the "non-html" request if FriendsOfSymfony Rest Bundle is not available. Try running "composer require friendsofsymfony/rest-bundle".');
         }
 
+        if (!class_exists(View::class)) {
+            throw new \LogicException('You can not use the "non-html" request if FriendsOfSymfony Rest Bundle is not available. Try running "composer require friendsofsymfony/rest-bundle".');
+        }
+
         $view = View::create($data, $statusCode);
         $context = $view->getContext()->setGroups($groups);
         $view->setContext($context);

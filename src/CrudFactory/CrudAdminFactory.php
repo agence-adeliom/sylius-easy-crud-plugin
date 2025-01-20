@@ -12,7 +12,7 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuItem;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfigurationFactory;
-use Sylius\Component\Resource\Metadata\Metadata;
+use Sylius\Resource\Metadata\Metadata;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

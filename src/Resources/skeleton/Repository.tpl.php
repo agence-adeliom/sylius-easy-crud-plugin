@@ -17,7 +17,7 @@ use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
  * @method <?= $entity_name ?>[]    findAll()
  * @method <?= $entity_name ?>[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class <?= $class_name ?>Repository extends EntityRepository implements TranslationRepositoryInterface
+class <?= $class_name ?> extends EntityRepository implements TranslationRepositoryInterface
 {
     use TranslationRepositoryTrait;
 }

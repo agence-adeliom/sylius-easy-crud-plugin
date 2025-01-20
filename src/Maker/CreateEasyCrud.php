@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the Sylius package.
- *
- * (c) Paweł Jędrzejewski
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Maker;
@@ -21,6 +12,7 @@ use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,20 +60,21 @@ final class CreateEasyCrud extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $class = $input->getArgument('entity');
-
-        if (!\class_exists($class)) {
-            $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
-        }
-
-        if (!\class_exists($class)) {
-            //throw new RuntimeCommandException(\sprintf('Entity "%s" not found.', $input->getArgument('entity')));
-        }
+        $entryClassName = Str::asClassName($input->getArgument('entity'));
+        $entryClassNameDetail = $generator->createClassNameDetails(
+            $entryClassName,
+            'Entity\\',
+        );
+        $entryClassNameTranslationDetail = $generator->createClassNameDetails(
+            $entryClassName,
+            'Entity\\',
+            'Translation',
+        );
 
         $namespace = \trim($generator->getRootNamespace(), '\\');
 
         [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
-            $class,
+            $entryClassNameDetail->getFullName(),
             $generator,
             $this->managerRegistry,
         );
@@ -98,11 +91,35 @@ final class CreateEasyCrud extends AbstractMaker
                 $entityTranslation,
             );
 
-            $resourceConfigGenerator->generateMenuListener($class);
+            $resourceConfigGenerator->generateEntity(
+                className: $entryClassNameDetail->getFullName(),
+                variables: [
+                               'classNameDetail' => $entryClassNameDetail,
+                           ],
+            );
 
-            $resourceConfigGenerator->generateAdmin();
+            $resourceConfigGenerator->generateEntityTranslation(
+                className: $entryClassNameDetail->getFullName(),
+                variables: [
+                               'classNameDetail' => $entryClassNameTranslationDetail,
+                           ],
+            );
 
-            $resourceConfigGenerator->generateController();
+            $resourceConfigGenerator->generateRepository(
+                className: $entryClassNameDetail->getFullName(),
+                variables: [
+                               'classNameDetail' => $entryClassNameDetail,
+                           ],
+            );
+
+            $resourceConfigGenerator->generateAdmin(
+                className: $entryClassNameDetail->getFullName(),
+                variables: [
+                               'classNameDetail' => $entryClassNameDetail,
+                           ],
+            );
+
+            $resourceConfigGenerator->generateMenuListener($entryClassNameDetail->getFullName());
 
             $route = $resourceConfigGenerator->generateRoute();
 
@@ -112,7 +129,10 @@ final class CreateEasyCrud extends AbstractMaker
                 $route,
             ));
 
-            $resource = $resourceConfigGenerator->generateResource();
+            $resource = $resourceConfigGenerator->generateResource(
+                entityName: $entryClassNameDetail->getFullName(),
+                entityTranslationName: $entryClassNameTranslationDetail->getFullName(),
+            );
 
             $io->comment(sprintf(
                 '%s: %s',
