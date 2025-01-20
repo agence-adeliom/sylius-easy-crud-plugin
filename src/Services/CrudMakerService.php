@@ -230,7 +230,12 @@ class CrudMakerService
 
                 return $yamlGenerator->getContents();
             }
-            $yamlGenerator = new YamlSourceManipulator(file_get_contents($filePath) ?: '');
+            $fileContent = file_get_contents($filePath);
+            if (!@preg_match('/sylius_resource/', $fileContent)) {
+                $yamlGenerator = new YamlSourceManipulator("sylius_resource:\n  resources:");
+            } else {
+                $yamlGenerator = new YamlSourceManipulator(file_get_contents($filePath) ?: '');
+            }
             $yaml = $yamlGenerator->getData();
             $this->appendResourceConfig($yaml, $entityName, $entityTranslationName);
             $yamlGenerator->setData($yaml);
