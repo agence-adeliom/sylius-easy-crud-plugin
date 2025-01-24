@@ -142,6 +142,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                         foreach ($data as $property => $value) {
                             $actualValue = $this->propertyAccessor->getValue($translation, $property);
                             if (
+                                !is_array($actualValue) &&
                                 $reflectionExtractor->isWritable($className, $property) &&
                                 ($types = $reflectionExtractor->getTypes($className, $property)) &&
                                 $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
