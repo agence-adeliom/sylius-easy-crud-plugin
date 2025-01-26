@@ -48,8 +48,8 @@ class CrudAdminFactory
         protected FactoryInterface $menuFactory,
         protected PropertyAccessor $propertyAccessor,
         protected RequestConfigurationFactory $requestConfigurationFactory,
-        protected RequestStack $requestStack,
-        protected ParameterBagInterface $parameterBag,
+        public RequestStack $requestStack,
+        public ParameterBagInterface $parameterBag,
     ) {
         $this->initMenu();
     }
