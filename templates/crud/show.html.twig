@@ -1,6 +1,6 @@
 {% extends '@SyliusAdmin/layout.html.twig' %}
 
-{% set header = configuration.vars.header|default(metadata.applicationName ~ '.ui.show_' ~ metadata.name) %}
+{% set header = configuration.vars.header|default(metadata.applicationName ~ '.' ~ metadata.name ~ '.admin.ui.show') %}
 {% set event_prefix = metadata.applicationName ~ '.admin.' ~ metadata.name ~ '.show' %}
 
 {% block title %}{{ header|trans }} {{ parent() }}{% endblock %}
