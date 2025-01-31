@@ -22,9 +22,9 @@ class AssetRenderer
     {
         $html = '';
 
-        if (!empty($this->assets['css'])) {
+        if (!empty($assets['css'])) {
 
-            foreach ($this->assets['css'] as $asset) {
+            foreach ($assets['css'] as $asset) {
                 $attributes = [];
                 $attributes['rel'] = 'stylesheet';
                 if (is_string($asset)) {
@@ -50,8 +50,8 @@ class AssetRenderer
             }
         }
 
-        if (!empty($this->assets['js'])) {
-            foreach ($this->assets['js'] as $asset) {
+        if (!empty($assets['js'])) {
+            foreach ($assets['js'] as $asset) {
                 $attributes = [];
                 if (is_string($asset)) {
                     $attributes['src'] = $asset;
@@ -76,8 +76,8 @@ class AssetRenderer
             }
         }
 
-        if (!empty($this->assets['webpack'])) {
-            foreach ($this->assets['webpack'] as $webpackAsset) {
+        if (!empty($assets['webpack'])) {
+            foreach ($assets['webpack'] as $webpackAsset) {
                 try {
                     if ($webpackAsset instanceof Asset) {
                         $html .= $this->tagRenderer
