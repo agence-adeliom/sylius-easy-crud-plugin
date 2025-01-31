@@ -35,9 +35,13 @@ class AssetRenderer
                     $attributes['href'] = $asset->getAsDto()->getValue();
                 }
 
+                if ($asset->getAsDto()->getPackageName()) {
+                    $attributes['href'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['href']);
+                }
+
                 $event = new RenderAssetTagEvent(
-                    RenderAssetTagEvent::TYPE_SCRIPT,
-                    $attributes['src'],
+                    RenderAssetTagEvent::TYPE_LINK,
+                    $attributes['href'],
                     $attributes
                 );
                 if (null !== $this->eventDispatcher) {
