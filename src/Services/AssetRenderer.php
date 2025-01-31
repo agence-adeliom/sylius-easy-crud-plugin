@@ -3,6 +3,7 @@
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Symfony\WebpackEncoreBundle\Event\RenderAssetTagEvent;
@@ -12,6 +13,7 @@ class AssetRenderer
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
         private TagRenderer $tagRenderer,
+        private Packages $packages,
     )
     {}
 
@@ -57,6 +59,10 @@ class AssetRenderer
                     $attributes['src'] = $asset;
                 } elseif ($asset instanceof Asset) {
                     $attributes['src'] = $asset->getAsDto()->getValue();
+                }
+
+                if ($asset->getAsDto()->getPackageName()) {
+                    $attributes['src'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['src']);
                 }
 
                 $event = new RenderAssetTagEvent(
@@ -111,7 +117,8 @@ class AssetRenderer
                                 []
                             );
                     }
-                } catch (\Exception) {
+                } catch (\Exception $exception) {
+                    dump($exception);
                     $html .= '';
                 }
             }

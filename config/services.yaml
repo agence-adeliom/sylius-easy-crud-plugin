@@ -151,3 +151,4 @@ services:
     arguments:
       - '@event_dispatcher'
       - '@webpack_encore.tag_renderer'
+      - '@assets.packages'
