@@ -144,3 +144,10 @@ services:
   Adeliom\SyliusEasyCrudPlugin\Form\ImageType:
     arguments:
       - "@sylius.image_uploader"
+
+  adeliom.sylius.asset.renderer:
+    class: Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer
+    public: true
+    arguments:
+      - '@event_dispatcher'
+      - '@webpack_encore.tag_renderer'
