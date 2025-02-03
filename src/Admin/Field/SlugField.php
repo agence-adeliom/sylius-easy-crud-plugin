@@ -22,7 +22,7 @@ final class SlugField implements FieldInterface
             ->setProperty($propertyName)
             ->setLabel($label)
             ->addFormThemes(SlugType::configureAdminFormThemes())
-            ->setShowTemplatePath('@SyliusEasyCrudPlugin/field/slug/show.html.twig')
+            ->setShowTemplatePath('@SyliusEasyCrudPlugin/field/default/show.html.twig')
             ->setGridTemplatePath('@SyliusEasyCrudPlugin/field/slug/grid.html.twig')
             ->setFormType(SlugType::class)
             ->addCssClass('field-slug')
