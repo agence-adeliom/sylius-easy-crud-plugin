@@ -1,2 +1,2 @@
 {% set path = link.url is defined ? link.url : path(link.route, (link.parameters|default({})|merge({'id': data.id ?? null}))) %}
-<a class="item" href="{{ path }}">{% if link.icon is defined %}<i class="{{ link.icon }} icon"></i> {% endif %}{{ link.label|trans }}</a>
+<a class="item" href="{{ path }}" {% for attr, value in link.htmlAttributes %}{{ attr }}="{{ value }}"{% endfor %}>{% if link.icon is defined %}<i class="{{ link.icon }} icon"></i> {% endif %}{{ link.label|trans }}</a>
