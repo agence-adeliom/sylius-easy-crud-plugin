@@ -45,6 +45,7 @@ ${APP_DIR}:
 	(symfony composer create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
 	cd ${APP_DIR} && chmod -R 777 public
 	echo "COMPOSE_PROJECT_NAME=sylius-easy-crud-plugin" >> ${APP_DIR}/.env
+	echo "NODE_VERSION=${NODE_VERSION}" >> ${APP_DIR}/.env
 	${MAKE} apply_dist
 
 apply_dist:
@@ -94,8 +95,10 @@ platform:
 		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\SyliusEasyCrudPlugin\\\\": "lib/sylius-easy-crud-plugin/src/",\n            "App\\\\": "src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|type: annotation|type: attribute|g' config/packages/doctrine.yaml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|- { resource: "../parameters.yaml" }|- { resource: "../parameters.yaml" }\n    - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }|g' config/packages/_sylius.yaml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|plugin-proposal-object-rest-spread|plugin-transform-object-rest-spread|g' .babelrc); \
 		(cd ${APP_DIR} && echo -e 'sylius_easy_crud:\n  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"' config/routes.yaml); \
 		(cd ${APP_DIR} && rm -rf config/packages/doctrine.yaml-e); \
+		(cd ${APP_DIR} && rm -rf .babelrc-e); \
 		(cd ${APP_DIR} && rm -rf config/packages/_sylius.yaml-e); \
 		(cd ${APP_DIR} && rm -rf compose.override.yml-e); \
 		(cd ${APP_DIR} && rm -rf config/bundles.php-e); \
@@ -119,9 +122,6 @@ platform:
 	${MAKE} platform_assets
 
 platform_assets:
-	rm -rf ${APP_DIR}/node_modules
-	mkdir ${APP_DIR}/node_modules
-	rm -rf ${APP_DIR}/package-lock.json
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs "npm run build")
 

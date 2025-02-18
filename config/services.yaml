@@ -26,7 +26,7 @@ services:
 
   Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\TranslationConfigurator:
     arguments:
-      - "@sylius.translation_locale_provider.admin"
+      - "@sylius.translation_locale_provider"
     public: true
 
   sylius.easycrud.intlformatter:

@@ -10,6 +10,7 @@ SHELL=/bin/bash
 
 SYLIUS_VERSION=2.0.0
 SYMFONY_VERSION=7.1
+NODE_VERSION=20
 PLUGIN_NAME=agence-adeliom/sylius-easy-crud-plugin
 PLUGIN_VERSION="*@dev"
 PLUGIN_DIR=lib/sylius-easy-crud-plugin
