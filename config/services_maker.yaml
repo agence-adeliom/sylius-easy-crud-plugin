@@ -6,7 +6,7 @@ services:
       - "@doctrine"
       - "@parameter_bag"
 
-  Adeliom\SyliusEasyCrudPlugin\Maker\CreateTestEntity:
+  Adeliom\SyliusEasyCrudPlugin\Maker\CreateEntity:
     tags: [ 'maker.command' ]
     arguments:
       - "@doctrine"

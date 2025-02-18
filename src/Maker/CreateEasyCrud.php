@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the Sylius package.
- *
- * (c) Paweł Jędrzejewski
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Maker;
@@ -21,6 +12,7 @@ use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,7 +28,7 @@ final class CreateEasyCrud extends AbstractMaker
 
     public static function getCommandName(): string
     {
-        return 'make:easy-crud:generate';
+        return 'make:easy-crud:create-crud';
     }
 
     public static function getCommandDescription(): string
@@ -68,20 +60,31 @@ final class CreateEasyCrud extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $class = $input->getArgument('entity');
+        $entryClassName = $input->getArgument('entity');
+        $entryTranslationClassName = $entryClassName . 'Translation';
 
-        if (!\class_exists($class)) {
-            $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
+        if (!class_exists($entryClassName)) {
+            $entryClassNameDetail = $generator->createClassNameDetails(
+                $entryClassName,
+                'Entity\\',
+            );
+            $entryClassName = $entryClassNameDetail->getFullName();
+        }
+        if (!class_exists($entryTranslationClassName)) {
+            $entryTranslationClassNameDetail = $generator->createClassNameDetails(
+                $entryClassName,
+                'Entity\\',
+                'Translation',
+            );
+            $entryTranslationClassName = $entryTranslationClassNameDetail->getFullName();
         }
 
-        if (!\class_exists($class)) {
-            //throw new RuntimeCommandException(\sprintf('Entity "%s" not found.', $input->getArgument('entity')));
-        }
+        $entryShortClassName = Str::getShortClassName($entryClassName);
 
         $namespace = \trim($generator->getRootNamespace(), '\\');
 
         [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
-            $class,
+            $entryClassName,
             $generator,
             $this->managerRegistry,
         );
@@ -98,13 +101,19 @@ final class CreateEasyCrud extends AbstractMaker
                 $entityTranslation,
             );
 
-            $resourceConfigGenerator->generateMenuListener($class);
+            $resourceConfigGenerator->generateAdmin(
+                className: $entryClassName,
+                variables: [
+                   'entityShortName' => $entryShortClassName,
+                   'namespace' => str_replace('Entity', 'Admin', $entryClassName),
+                ],
+            );
 
-            $resourceConfigGenerator->generateAdmin();
+            $resourceConfigGenerator->generateMenuListener($entryClassName);
 
-            $resourceConfigGenerator->generateController();
-
-            $route = $resourceConfigGenerator->generateRoute();
+            $route = $resourceConfigGenerator->generateRoute(
+                entityName: $entryClassName,
+            );
 
             $io->comment(sprintf(
                 '%s: %s',
@@ -112,7 +121,10 @@ final class CreateEasyCrud extends AbstractMaker
                 $route,
             ));
 
-            $resource = $resourceConfigGenerator->generateResource();
+            $resource = $resourceConfigGenerator->generateResource(
+                entityName: $entryClassName,
+                entityTranslationName: $entryTranslationClassName,
+            );
 
             $io->comment(sprintf(
                 '%s: %s',

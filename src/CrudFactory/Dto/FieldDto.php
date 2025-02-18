@@ -404,7 +404,7 @@ final class FieldDto
      */
     public function addAssets(array $assets): void
     {
-        if (is_array($assets['js'])) {
+        if (isset($assets['js']) && is_array($assets['js'])) {
             foreach ($assets['js'] as $asset) {
                 $found = false;
                 foreach ($this->assets->getJsAssets() as $assetDto) {
@@ -428,7 +428,7 @@ final class FieldDto
             }
         }
 
-        if (is_array($assets['css'])) {
+        if (isset($assets['css']) && is_array($assets['css'])) {
             foreach ($assets['css'] as $asset) {
                 $found = false;
                 foreach ($this->assets->getCssAssets() as $assetDto) {

@@ -1,10 +1,14 @@
 <table class="ui very basic celled table">
     <tbody>
-    <tr>
-        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property)|trans }}</strong></td>
-        <td>
-            {{ data }}
-        </td>
-    </tr>
+        <tr>
+            <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property)|trans }}</strong></td>
+            <td>
+                {%- if data is iterable -%}
+                    {{ data|serialize }}
+                {%- else -%}
+                    {{ data }}
+                {%- endif -%}
+            </td>
+        </tr>
     </tbody>
 </table>

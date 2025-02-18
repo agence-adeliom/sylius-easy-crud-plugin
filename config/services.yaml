@@ -26,7 +26,7 @@ services:
 
   Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\TranslationConfigurator:
     arguments:
-      - "@sylius.translation_locale_provider"
+      - "@sylius.translation_locale_provider.admin"
     public: true
 
   sylius.easycrud.intlformatter:
@@ -129,7 +129,7 @@ services:
       - "@doctrine"
       - "@parameter_bag"
 
-  Adeliom\SyliusEasyCrudPlugin\Maker\CreateTestEntity:
+  Adeliom\SyliusEasyCrudPlugin\Maker\CreateEntity:
     tags: [ 'maker.command' ]
     arguments:
       - "@doctrine"
@@ -144,3 +144,11 @@ services:
   Adeliom\SyliusEasyCrudPlugin\Form\ImageType:
     arguments:
       - "@sylius.uploader.image"
+
+  adeliom.sylius.asset.renderer:
+    class: Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer
+    public: true
+    arguments:
+      - '@event_dispatcher'
+      - '@webpack_encore.tag_renderer'
+      - '@assets.packages'

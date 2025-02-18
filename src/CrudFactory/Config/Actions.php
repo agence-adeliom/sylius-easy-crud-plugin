@@ -195,7 +195,7 @@ final class Actions
 
             return Action::new(
                 Action::EDIT,
-                $this->metadata->getApplicationName() . '.ui.edit_.' . $this->metadata->getName(),
+                \sprintf('%s.%s.admin.action.edit', $this->metadata->getApplicationName(), $this->metadata->getName()),
                 null,
             )->setSyliusAction($action);
         }
@@ -203,14 +203,14 @@ final class Actions
         if (Action::DETAIL === $actionName) {
             return Action::new(
                 Action::DETAIL,
-                $this->metadata->getApplicationName() . '.ui.show_.' . $this->metadata->getName(),
+                \sprintf('%s.%s.admin.action.show', $this->metadata->getApplicationName(), $this->metadata->getName()),
                 null,
             )->setSyliusAction(ShowAction::create([]));
         }
 
         if (Action::INDEX === $actionName) {
             $action = SyliusAction::create(Action::INDEX, 'easy_crud_main_action')
-                ->setLabel($this->metadata->getApplicationName() . '.ui.' . $this->metadata->getPluralName())
+                ->setLabel(\sprintf('%s.%s.admin.action.index', $this->metadata->getApplicationName(), $this->metadata->getName()))
                 ->setOptions([
                     'link' => [
                         'route' => $this->requestConfiguration->getRouteName('index'),
@@ -221,7 +221,7 @@ final class Actions
 
             return Action::new(
                 Action::INDEX,
-                $this->metadata->getApplicationName() . '.ui.' . $this->metadata->getPluralName(),
+                \sprintf('%s.%s.admin.action.index', $this->metadata->getApplicationName(), $this->metadata->getName()),
                 'null',
             )->setSyliusAction($action);
         }

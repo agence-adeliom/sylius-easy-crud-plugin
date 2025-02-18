@@ -64,16 +64,6 @@
     {% endapply %}
 {% endblock sortable_collection_widget %}
 
-{% block sortable_collection_entry_row %}
-    <div class="sortable-collection_row">
-        {{ block('form_row') }}
-    </div>
-{% endblock sortable_collection_entry_row %}
-
-{% block sortable_collection_entry_widget %}
-    {{ form_widget(form) }}
-{% endblock sortable_collection_entry_widget %}
-
 {% macro collectionItem(value, id, form, allow_delete, button_delete_label, button_move_label, index) %}
     {% set is_array_field = 'Adeliom\\SyliusEasyCrudPlugin\\Field\\ArrayField' == form_parent(form).vars.errors.form.config.attributes.field.fieldFqcn ?? false %}
     {% set is_complex = form_parent(form).vars.errors.form.config.attributes.field.customOptions.get('entryIsComplex') ?? false %}
@@ -102,7 +92,7 @@
                             {% if allow_drag %}
                                 <button type="button" class="mini ui icon right floated button field-sortable_collection-drag-button" drag-handler="{{ form.parent.vars.id|default("") }}" style="margin-top:-4px; margin-right:6px; cursor:move;"
                                         title="{{ button_move_label|trans }}">
-                                    <i class="fas fa-arrows-alt-v"></i>
+                                    <i class="icon arrows alternate vertical"></i>
                                 </button>
                             {% endif %}
                         {% endif %}

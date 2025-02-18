@@ -22,7 +22,7 @@ $ src/Repository/PostRepository.php
 
 #### 3. Generate an CRUD based on your entity
 
-- Execute : `php bin/console make:easy-crud:generate Post`
+- Execute : `php bin/console make:easy-crud:create-crud Post`
 
 This command will create or modify files :
 ```bash
@@ -38,7 +38,7 @@ $ modification : config/packages/sylius_resources.yaml
 $ creation and configuration of a Sylius menu Listener : src/Menu/MenuListener.php
 ```
 
-You can execute without entity name `php bin/console make:easy-crud:generate` and choose an existing entity.
+You can execute without entity name `php bin/console make:easy-crud:create-crud` and choose an existing entity.
 
 - Then, `php bin/console cache:clear`
 - Then, `php bin/console doctrine:migrations:diff`

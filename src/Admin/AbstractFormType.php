@@ -17,9 +17,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
-use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\ResourceActions;
+use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -43,6 +44,12 @@ abstract class AbstractFormType extends AbstractGridType
         return $this->user;
     }
 
+    public function getSyliusLocales(): array
+    {
+        $resources = $this->parameterBag->get('sylius.resources');
+        return $this->entityManager->getRepository($resources['sylius.locale']['classes']['model'])->findAll();
+    }
+
     public function __construct(
         string $dataClass,
         array $validationGroups,
@@ -51,6 +58,7 @@ abstract class AbstractFormType extends AbstractGridType
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
         protected Security $security,
+        public ParameterBagInterface $parameterBag
     ) {
         parent::__construct(
             $dataClass,

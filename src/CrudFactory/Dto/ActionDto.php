@@ -399,6 +399,7 @@ class ActionDto
                     [
                         'label' => $subActionDto->getLabel(),
                         'icon' => $subActionDto->getIcon(),
+                        'htmlAttributes' => $subActionDto->getHtmlAttributes(),
                     ],
                     $route,
                 );
