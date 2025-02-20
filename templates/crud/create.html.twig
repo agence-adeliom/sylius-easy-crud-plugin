@@ -10,7 +10,6 @@
 {% block title %}{{ header|trans }} | {{ parent() }}{% endblock %}
 
 {% block body %}
-    {% form_theme form with form.vars.form_themes %}
     {% hook 'create' with { _prefixes: prefixes, resource, metadata, configuration, form } %}
 {% endblock %}
 

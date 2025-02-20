@@ -207,7 +207,7 @@ class CrudAdminFactory
         $vars = [];
         $vars['form_themes'] = array_values(
             [
-                '@SyliusAdmin/Form/theme.html.twig',
+                '@SyliusAdmin/shared/form_theme.html.twig',
             ]
             + $this->formThemes,
         );

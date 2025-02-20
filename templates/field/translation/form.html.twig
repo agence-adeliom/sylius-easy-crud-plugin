@@ -1,6 +1,17 @@
 {% form_theme form _self %}
 
 {% block sylius_translations_row %}
-    {% from '@SyliusAdmin/Macro/translationForm.html.twig' import translationForm %}
-    {{ translationForm(_context.form) }}
+    {% import '@SyliusAdmin/shared/helper/translations.html.twig' as translations %}
+    <div class="tab-pane {% if hookable_metadata.configuration.active|default(false) %}show active{% endif %}" id="product-translations" role="tabpanel" tabindex="0">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h2 class="card-title">
+                    {{ 'sylius.ui.translations'|trans }}
+                </h2>
+            </div>
+            <div>
+                {{ translations.default(form.children, null, {accordion_id: 'product-translations', accordion_flush: true}) }}
+            </div>
+        </div>
+    </div>
 {%- endblock sylius_translations_row %}
