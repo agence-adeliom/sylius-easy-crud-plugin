@@ -122,6 +122,7 @@ platform:
 	${MAKE} platform_assets
 
 platform_assets:
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs "npm install sass-loader@^16.0.1 sass --save-dev")
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm nodejs "npm run build")
 
