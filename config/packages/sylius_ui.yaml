@@ -1,6 +1,6 @@
 sylius_twig_hooks:
   hooks:
-    'sylius_admin.common.update.content.header.title_block':
+    'sylius_admin.common.update.content.header.title_block.actions':
       easy_crud_actions:
         template: "@SyliusEasyCrudPlugin/crud/action/_actions.html.twig"
-        priority: 25
+        priority: 250

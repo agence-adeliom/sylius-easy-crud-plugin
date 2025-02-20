@@ -1,26 +1,39 @@
+{% set form = hookable_metadata.context.form %}
+{% set configuration = hookable_metadata.context.configuration %}
+
 {% if form.vars.actionsGroups is defined %}
     {% set actions_groups = form.vars.actionsGroups %}
-    <div style="position: absolute; right: 30px; z-index: 10; width: 40%; text-align:right; margin-top: {{ marginTop ?? '0' }}">
-            {% if actions_groups['main'] is defined %}
-                <div class="ui buttons">
-                {% for action in actions_groups['main'] %}
-                    {{ crud_render_action(action, configuration) }}
-                {% endfor %}
-                </div>
-            {% endif %}
-            {% if actions_groups['item'] is defined %}
-                <div class="ui buttons" style="margin-top:1rem;">
-                {% for action in actions_groups['item'] %}
-                    {{ crud_render_action(action, configuration) }}
-                {% endfor %}
-                </div>
-            {% endif %}
-            {% if actions_groups['subitem'] is defined %}
-                <div class="ui buttons" style="margin-top:1rem;">
-                {% for action in actions_groups['subitem'] %}
-                    {{ crud_render_action(action, configuration) }}
-                {% endfor %}
-                </div>
-            {% endif %}
-    </div>
+    {% if actions_groups['main'] is defined %}
+        {% for action in actions_groups['main'] %}
+            {{ crud_render_action(action, configuration) }}
+        {% endfor %}
+    {% endif %}
+    {% if actions_groups['item'] is defined %}
+        {% for action in actions_groups['item'] %}
+            {{ crud_render_action(action, configuration) }}
+        {% endfor %}
+    {% endif %}
+    {% if actions_groups['subitem'] is defined %}
+        {% for action in actions_groups['subitem'] %}
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if action.icon|default(action.options.icon|default('')) is not empty %}{{ ux_icon(action.icon|default(action.options.icon|default(''))) }}{% endif %}
+                    {{ action.label|trans }}
+                </button>
+                <ul class="dropdown-menu" {{ sylius_test_html_attribute(action.name) }}>
+                    {% hook 'subitems' %}
+                    {% for link in action.options.links %}
+                        {% set path = link.url is defined ? link.url : path(link.route, link.parameters|default([])) %}
+                        <li>
+                            <a class="dropdown-item" href="{{ path }}" {{ sylius_test_html_attribute('create') }}
+                            {% for attr, value in link.htmlAttributes %}{{ attr }}="{{ value }}"{% endfor %}>
+                                {{ ux_icon(link.icon, {'class': 'icon dropdown-item-icon'}) }}
+                                {{ link.label|trans }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endif %}

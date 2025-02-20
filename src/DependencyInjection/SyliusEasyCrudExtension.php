@@ -27,7 +27,7 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension
         $actionTemplates['easy_crud_main_action'] = '@SyliusEasyCrudPlugin/crud/action/action.html.twig';
         $actionTemplates['easy_crud_main_sub_action'] = '@SyliusEasyCrudPlugin/crud/action/links.html.twig';
         $actionTemplates['easy_crud_item_action'] = '@SyliusEasyCrudPlugin/crud/action/action.html.twig';
-        $actionTemplates['easy_crud_item_sub_action'] = '@SyliusEasyCrudPlugin/crud/action/links.html.twig';
+        $actionTemplates['easy_crud_item_sub_action'] = '@SyliusEasyCrudPlugin/crud/action/list.html.twig';
         $container->setParameter('sylius.grid.templates.action', $actionTemplates);
 
         /**

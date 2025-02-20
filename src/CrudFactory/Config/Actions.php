@@ -204,7 +204,7 @@ final class Actions
             return Action::new(
                 Action::DETAIL,
                 \sprintf('%s.%s.admin.action.show', $this->metadata->getApplicationName(), $this->metadata->getName()),
-                null,
+                'tabler:eye',
             )->setSyliusAction(ShowAction::create([]));
         }
 
@@ -217,7 +217,7 @@ final class Actions
                         //'parameters' =>
                     ],
                 ])
-                ->setIcon('list');
+                ->setIcon('tabler:list');
 
             return Action::new(
                 Action::INDEX,
