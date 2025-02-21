@@ -132,6 +132,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             'invalid_message' => static fn (Options $options, $previousValue) => ($options['legacy_error_messages'] ?? true)
                 ? $previousValue
                 : 'The collection is invalid.',
+            'columns' => 'col-12',
         ]);
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);

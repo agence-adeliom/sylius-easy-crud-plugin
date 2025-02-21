@@ -28,6 +28,7 @@ class CollectionType extends \Symfony\Component\Form\Extension\Core\Type\Collect
         $resolver->setDefaults([
             'button_add_label' => 'sylius.form.collection.add',
             'button_delete_label' => 'sylius.form.collection.delete',
+            'columns' => 'col-12',
         ]);
     }
 }

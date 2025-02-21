@@ -91,6 +91,7 @@ final class FieldCollectionType extends AbstractType
         });
         $resolver->setAllowedTypes('entry_options', ['array', 'callable']);
         $resolver->setNormalizer('entry_options', $this->optionalCallableNormalizer());
+        $resolver->setDefault('columns', 'col-12');
     }
 
     public function getBlockPrefix(): string

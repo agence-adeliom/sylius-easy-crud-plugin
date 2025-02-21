@@ -29,6 +29,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
             'fonts' => [
                 'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
             ],
+            'columns' => 'col-12',
         ]);
 
         // optionally you can also restrict the options type or types (to get

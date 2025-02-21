@@ -48,6 +48,7 @@ class CodeEditorType extends AbstractType implements AdminFormTypeInterface
             CodeEditorField::OPTION_NUM_OF_ROWS => 6,
             CodeEditorField::OPTION_TAB_SIZE => 4,
             CodeEditorField::OPTION_SHOW_LINE_NUMBERS => true,
+            'columns' => 'col-12',
         ]);
     }
 

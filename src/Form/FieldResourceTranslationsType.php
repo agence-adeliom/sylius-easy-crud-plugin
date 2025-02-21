@@ -191,6 +191,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                        'required' => $localeCode === $this->defaultLocaleCode,
                    ];
                },
+               'columns' => 'col-12',
            ]);
     }
 

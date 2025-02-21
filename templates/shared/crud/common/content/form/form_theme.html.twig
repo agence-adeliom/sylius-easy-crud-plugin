@@ -9,9 +9,8 @@
         {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
     {%- endif -%}
     {%- set row_class = row_class|default(row_attr.class|default('mb-3')|trim) -%}
-    {% dump form %}
 
-    <div class="col-md-12">{# TODO SET TO FIELD COLUMN #}
+    <div class="{{ form.vars.columns|default('col-12') }}">
         <{{ element|default('div') }}{% with {attr: row_attr|merge({class: row_class})} %}{{ block('attributes') }}{% endwith %}>
         {%- if 'form-floating' in row_class -%}
             {{- form_widget(form, widget_attr) -}}

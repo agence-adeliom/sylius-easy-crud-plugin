@@ -40,6 +40,7 @@ class ChoiceMaskType extends AbstractType
         $resolver->setDefaults([
             'map' => [],
             'isTranslation' => false,
+            'columns' => 'col-12',
         ]);
         $resolver->setAllowedTypes('map', 'array');
         $resolver->setAllowedTypes('isTranslation', 'bool');

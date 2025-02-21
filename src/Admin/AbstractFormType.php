@@ -13,6 +13,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
+use Adeliom\SyliusEasyCrudPlugin\Form\AbstractType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
@@ -107,6 +108,10 @@ abstract class AbstractFormType extends AbstractGridType
                     $name = str_replace(['.', '[', ']'], '_', $fieldDto->getProperty());
                 } else {
                     $name = $fieldDto->getProperty();
+                }
+
+                if($fieldDto->getFieldFqcn() instanceof AbstractType) {
+                    $formFieldOptions['columns'] = $fieldDto->getColumns();
                 }
 
                 if (null === $formFieldType = $fieldDto->getFormType()) {
@@ -315,6 +320,7 @@ abstract class AbstractFormType extends AbstractGridType
 
                     // TODO: needed to allow override, but check that there is no conflict
                     $field->setOption('template', $fieldDto->getGridTemplatePath());
+                    $field->setOption('columns', $fieldDto->getColumns());
 
                     $field->addOptions([
                        'vars' => ['field' => $fieldDto],

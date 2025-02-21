@@ -93,6 +93,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                 },
                 'repositoryMethod' => null,
                 'repositoryArguments' => null,
+                'columns' => 'col-12',
             ])
             ->setAllowedTypes('resource', ['string'])
             ->setAllowedTypes('multiple', ['bool'])

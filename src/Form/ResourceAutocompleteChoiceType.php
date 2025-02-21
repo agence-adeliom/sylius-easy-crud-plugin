@@ -133,6 +133,7 @@ class ResourceAutocompleteChoiceType extends \Sylius\Bundle\ResourceBundle\Form\
         $resolver->setDefault('choice_name', 'name');
         $resolver->setDefault('resource', 'sylius.product');
         $resolver->setDefault('useResourceTransformers', true);
+        $resolver->setDefault('columns', 'col-12');
 
         $resolver->addAllowedTypes('remote_route', ['array']);
         $resolver->addAllowedTypes('load_edit_route', ['array']);
