@@ -16,8 +16,10 @@
 {% endmacro %}
 
 {% macro start_tab(firstMenuItem, menuItem) %}
-    <div class="ui {{ firstMenuItem ? 'active' : '' }} tab" data-tab="{{ menuItem.name }}">
-        <h3 class="ui top attached header">{{ menuItem.label|trans }}</h3>
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="card-title">{{ menuItem.label|trans }}</div>
+        </div>
 {% endmacro %}
 
 {% macro end_tab(firstMen) %}
@@ -25,6 +27,8 @@
 {% endmacro %}
 
 {% macro show(firstMenuItem, menuItem, fields, columns, resource) %}
+
+    {{ dump() }}
 
     <div class="ui attached segment">
         <div class="ui column stackable grid">

@@ -12,3 +12,11 @@ sylius_twig_hooks:
       easy_crud_actions:
         template: "@SyliusEasyCrudPlugin/crud/action/_actions.html.twig"
         priority: 250
+    'easy_crud.common.show.content':
+      content:
+        template: '@SyliusEasyCrudPlugin/crud/show/content.html.twig'
+        priority: 50
+    'easy_crud.common.show.content.page_body':
+      content:
+        template: '@SyliusEasyCrudPlugin/crud/show/page_body.html.twig'
+        priority: 50
