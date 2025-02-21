@@ -1,33 +1,25 @@
 {% macro start_column(size, newLine, label) %}
-    {% if newLine %}
-    </div>
-    </div>
-    <div class="ui attached segment">
-        <div class="ui column stackable grid">
-    {% endif %}
-            <div class="{{ size.value ?? 'one' }} wide column">
-                {% if label %}
-                    <h4 class="ui dividing header">{{ label|trans }}</h4>
-                {% endif %}
+{#    <div class="row">#}
 {% endmacro %}
 
 {% macro end_column() %}
-    </div>
+{#    </div>#}
 {% endmacro %}
 
 {% macro start_tab(firstMenuItem, menuItem) %}
-    <div class="ui {{ firstMenuItem ? 'active' : '' }} tab" data-tab="{{ menuItem.name }}">
-        <h3 class="ui top attached header">{{ menuItem.label|trans }}</h3>
-{% endmacro %}
-
-{% macro end_tab(firstMen) %}
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="card-title">{{ menuItem.label|trans }}</div>
     </div>
+    {% endmacro %}
+
+    {% macro end_tab(firstMen) %}
+</div>
 {% endmacro %}
 
 {% macro form(firstMenuItem, menuItem, form, fields, view='update') %}
 
-    <div class="ui attached segment">
-        <div class="ui column stackable grid">
+    <div class="row">
 
             {% set column_started = null %}
 
@@ -69,7 +61,6 @@
                 {{ _self.end_column() }}
             {% endif %}
 
-        </div>
     </div>
 
 {% endmacro %}

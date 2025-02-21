@@ -1,26 +1,21 @@
-<table class="ui very basic celled table">
-    <tbody>
-    <tr>
-        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property)|trans }}</strong></td>
-        <td>
-            <div class="preview-icon">
-                <i class="{{ data ?: "" }}"></i>
-            </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<style>
-    .preview-icon {
-        border: var(--border-width) var(--border-style) var(--border-color);
-        width: 4rem;
-        height: 4rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: var(--border-radius);
-        font-size: 2rem;
-        position: relative;
-    }
-</style>
+<div class="row">
+    <div class="col-12 col-md-4 fw-bold">{{ (field.label ?? field.property)|trans }}</div>
+    <div class="col-12 col-md-8">
+        <div class="preview-icon border">
+            <i class="{{ data ?: "" }}"></i>
+        </div>
+    </div>
+    <style>
+        .preview-icon {
+            border: var(--border-width) var(--border-style) var(--border-color);
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: var(--border-radius);
+            font-size: 2rem;
+            position: relative;
+        }
+    </style>
+</div>

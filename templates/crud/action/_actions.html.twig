@@ -1,6 +1,8 @@
 {% set form = hookable_metadata.context.form %}
 {% set configuration = hookable_metadata.context.configuration %}
 
+{{ dump(form.vars.actionsGroups) }}
+
 {% if form.vars.actionsGroups is defined %}
     {% set actions_groups = form.vars.actionsGroups %}
     {% if actions_groups['main'] is defined %}

@@ -1,30 +1,48 @@
-{% import '@SyliusUi/Macro/flags.html.twig' as flags %}
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="card-title">
+            {{ 'sylius.ui.translations'|trans }}
+        </div>
+    </div>
+    <div class="accordion accordion-flush" id="product-translations">
+        {% for locale in field.getCustomOption('definedLocalesCodes') %}
+            {% set first_loop = loop %}
+            {% for locale_value in field.getValue() %}
+                {% if locale == locale_value.locale %}
 
-<div class="ui styled fluid accordion">
-    {% for locale in field.getCustomOption('definedLocalesCodes') %}
-        {% set first_loop = loop %}
-        {% for locale_value in field.getValue() %}
-            {% if locale == locale_value.locale %}
-                <div data-locale="{{ locale_value.locale }}">
-                    <div class="title{% if first_loop.first %} active{% endif %}">
-                        <i class="dropdown icon"></i>
-                        {{ flags.fromLocaleCode(locale_value.locale) }} {{ locale_value.locale|sylius_locale_name }}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#translation-{{ locale }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="translation-{{ locale }}">
+                                {{ locale|sylius_locale_name }}
+                            </button>
+                        </h2>
+                        <div id="translation-{{ locale }}" class="accordion-collapse collapse" data-bs-parent="#product-translations">
+                            <div class="accordion-body bg-gray-400">
+                                <div class="card mb-3 mx-md-5">
+                                    <div class="card-header">
+                                        <div class="card-title">{{ 'sylius.ui.content'|trans }}</div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="divide-y">
+                                            {% set sub_fields = field.getCustomOption('fieldsDto') %}
+                                            {% for sub_field in sub_fields %}
+                                                {% set sub_field_dto = sub_field.getAsDto() %}
+                                                {% set template = sub_field_dto.getShowTemplatePath() %}
+                                                {% set value = get_resource_property_value(locale_value, sub_field_dto.property) %}
+                                                {% include template with {
+                                                    'data': value,
+                                                    'field': sub_field_dto,
+                                                    'resource': resource
+                                                } %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ui content{% if first_loop.first %} active{% endif %}">
-                        {% set sub_fields = field.getCustomOption('fieldsDto') %}
-                        {% for sub_field in sub_fields %}
-                            {% set sub_field_dto = sub_field.getAsDto() %}
-                            {% set template = sub_field_dto.getShowTemplatePath() %}
-                            {% set value = get_resource_property_value(locale_value, sub_field_dto.property) %}
-                            {% include template with {
-                                'data': value,
-                                'field': sub_field_dto,
-                                'resource': resource
-                            } %}
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
+                {% endif %}
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
+    </div>
 </div>

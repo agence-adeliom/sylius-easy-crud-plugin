@@ -1,10 +1,4 @@
-<table class="ui very basic celled table">
-    <tbody>
-    <tr>
-        <td class="five wide"><strong class="gray text">{{ (field.label ?? field.property)|trans }}</strong></td>
-        <td>
-            {{ data|serialize }}
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-12 col-md-4 fw-bold">{{ (field.label ?? field.property)|trans }}</div>
+    <div class="col-12 col-md-8">{{ data|serialize }}</div>
+</div>

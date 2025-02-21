@@ -1,18 +1,9 @@
 {% macro start_column(size, newLine, label) %}
-    {% if newLine %}
-    </div>
-    </div>
-    <div class="ui attached segment">
-        <div class="ui column stackable grid">
-    {% endif %}
-            <div class="{{ size.value ?? 'one' }} wide column">
-                {% if label %}
-                    <h4 class="ui dividing header">{{ label|trans }}</h4>
-                {% endif %}
+{#    <div class="row">#}
 {% endmacro %}
 
 {% macro end_column() %}
-    </div>
+{#    </div>#}
 {% endmacro %}
 
 {% macro start_tab(firstMenuItem, menuItem) %}
@@ -28,10 +19,8 @@
 
 {% macro show(firstMenuItem, menuItem, fields, columns, resource) %}
 
-    {{ dump() }}
-
-    <div class="ui attached segment">
-        <div class="ui column stackable grid">
+    <div class="card-body">
+        <div class="divide-y">
 
             {% set column_started = null %}
 
