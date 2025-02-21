@@ -47,10 +47,12 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
         $actions->setMetadata($this->crudAdminFactory->getMetadata());
         $actions
             ->addBatchAction(Action::BATCH_DELETE)
+
             ->addItemAction(Crud::PAGE_INDEX, Action::EDIT)
             ->addItemAction(Crud::PAGE_INDEX, Action::DELETE)
             ->addItemAction(Crud::PAGE_INDEX, Action::DETAIL)
 
+            ->addGlobalAction(Crud::PAGE_INDEX, Action::NEW)
             ->addGlobalAction(Crud::PAGE_DETAIL, Action::EDIT)
             ->addGlobalAction(Crud::PAGE_DETAIL, Action::INDEX)
         ;
