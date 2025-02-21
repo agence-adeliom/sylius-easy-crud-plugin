@@ -10,7 +10,6 @@ use FOS\RestBundle\View\View;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
 use Sylius\Bundle\ResourceBundle\Grid\View\ResourceGridView;
-use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\ResourceActions;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -79,10 +78,6 @@ class SyliusCrudResourceController extends ResourceController
 
         $this->isGrantedOr403($configuration, ResourceActions::SHOW);
         $resource = $this->findOr404($configuration);
-
-        if ($redirectAfterUpdating = $this->getRedirectAfterUpdating($configuration, $resource)) {
-            return $redirectAfterUpdating;
-        }
 
         $event = $this->eventDispatcher->dispatch(ResourceActions::SHOW, $configuration, $resource);
         $eventResponse = $event->getResponse();
@@ -178,20 +173,5 @@ class SyliusCrudResourceController extends ResourceController
         }
 
         return $formType;
-    }
-
-    private function getRedirectAfterUpdating(RequestConfiguration $configuration, ResourceInterface $resource): ?Response
-    {
-        $configurationParameters = $configuration->getParameters();
-        $configurationParametersVars = $configurationParameters->get('vars');
-        if (isset($configurationParametersVars['route']['parameters']['context']) && str_starts_with($configurationParametersVars['route']['parameters']['context'], 'flexible_content:')) {
-            if (isset($configurationParametersVars['redirect']['route'])) {
-                return $this->redirectHandler->redirectToRoute($configuration, (string) $configuration->getRedirectRoute($configurationParametersVars['redirect']['route']), $configurationParametersVars['redirect']['parameters']);
-            } elseif (isset($configurationParametersVars['redirect'])) {
-                return $this->redirectHandler->redirectToRoute($configuration, (string) $configuration->getRedirectRoute($configurationParametersVars->get('redirect')), $configurationParametersVars['route']['parameters']);
-            }
-        }
-
-        return null;
     }
 }
