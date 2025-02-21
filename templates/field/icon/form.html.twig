@@ -4,7 +4,7 @@
     {% set row_attr = row_attr|merge({
         class: row_attr.class|default('') ~ ' form-group'
     }) %}
-    <div class="field">
+    <div class="mb-3 field">
         <div {% with {attr: row_attr|merge({
             'data-row-id': id
         })} %}{{ block('attributes') }}{% endwith %}>
@@ -20,7 +20,7 @@
                         <button id="{{ form.vars.id }}_picker_delete" class="bg-danger icon-picker-delete" data-tippy data-original-title="{{ form.vars.delete_label }}" title="{{ form.vars.delete_label }}"><i class="icon delete"></i></button>
                     </div>
                     <span class="open-icons-list">
-                        <button type="button" id="{{ form.vars.id }}_picker" class="ui button" data-iconpicker-input="input#{{ form.vars.id }}" data-iconpicker-preview="#{{ form.vars.id }}_result .preview-icon > i" data-iconpicker-delete="#{{ form.vars.id }}_result .icon-picker-delete">{{ form.vars.select_button }}</button>
+                        <button type="button" id="{{ form.vars.id }}_picker" class="btn" data-iconpicker-input="input#{{ form.vars.id }}" data-iconpicker-preview="#{{ form.vars.id }}_result .preview-icon > i" data-iconpicker-delete="#{{ form.vars.id }}_result .icon-picker-delete">{{ form.vars.select_button }}</button>
     </span>
                 </div>
             </div>
