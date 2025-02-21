@@ -9,19 +9,16 @@
             'data-row-id': id
         })} %}{{ block('attributes') }}{% endwith %}>
             {{- form_label(form) -}}
-            <div class="w-field-icon">
-                {{ form_widget(form) }}
-            </div>
+            {{ form_widget(form, {attr: {class: 'd-none'}}) }}
             <div id="{{ form.vars.id }}_result">
                 <div class="get-and-preview">
-
                     <div class="preview-icon">
-                        <i class="{{ value ?: "" }}"></i>
-                        <button id="{{ form.vars.id }}_picker_delete" class="bg-danger icon-picker-delete" data-tippy data-original-title="{{ form.vars.delete_label }}" title="{{ form.vars.delete_label }}"><i class="icon delete"></i></button>
+                        <i class="border {{ value ?: "" }}" style="width: 4rem; height: 4rem;"></i>
+                        <button id="{{ form.vars.id }}_picker_delete" class="bg-danger icon-picker-delete" data-tippy data-original-title="{{ form.vars.delete_label }}" title="{{ form.vars.delete_label }}">{{ ux_icon('tabler:trash', {class: 'icon'}) }}</button>
                     </div>
                     <span class="open-icons-list">
                         <button type="button" id="{{ form.vars.id }}_picker" class="btn" data-iconpicker-input="input#{{ form.vars.id }}" data-iconpicker-preview="#{{ form.vars.id }}_result .preview-icon > i" data-iconpicker-delete="#{{ form.vars.id }}_result .icon-picker-delete">{{ form.vars.select_button }}</button>
-    </span>
+                    </span>
                 </div>
             </div>
             {{- form_help(form) -}}
@@ -51,18 +48,14 @@
                     display: flex;
                     gap: 1rem;
                 }
-                .field-easy-field-iconpicker input[type="text"], .w-field-icon input[type="text"] {
-                    display:none;
-                }
                 .get-and-preview .preview-icon {
-                    border: var(--border-width) var(--border-style) var(--border-color);
                     width: 4rem;
                     height: 4rem;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     border-radius: var(--border-radius);
-                    font-size: 2rem;
+                    font-size: 4rem;
                     position: relative;
                 }
                 .get-and-preview .open-icons-list {
@@ -70,13 +63,12 @@
                     align-items: center;
                 }
                 .get-and-preview .icon-picker-delete {
-                    width: 1.5rem;
-                    height: 1.5rem;
+                    width: 2rem;
+                    height: 2rem;
                     border-radius: 50%;
                     position: absolute;
                     left:100%;
                     bottom: 100%;
-                    display: flex;
                     align-items: center;
                     justify-content: center;
                     font-size: 0.85rem;
