@@ -1,7 +1,9 @@
 {% set form = hookable_metadata.context.form %}
 {% set configuration = hookable_metadata.context.configuration %}
 
-{{ dump(form.vars.actionsGroups) }}
+{% if hookable_metadata.renderedBy.name == 'easy_crud.common.show.content.header.title_block' %}
+    <div class="col-12 col-md-auto ms-auto d-print-none">
+{% endif %}
 
 {% if form.vars.actionsGroups is defined %}
     {% set actions_groups = form.vars.actionsGroups %}
@@ -38,4 +40,8 @@
             </div>
         {% endfor %}
     {% endif %}
+{% endif %}
+
+{% if hookable_metadata.renderedBy.name == 'easy_crud.common.show.content.header.title_block' %}
+    </div>
 {% endif %}
