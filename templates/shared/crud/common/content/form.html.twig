@@ -1,0 +1,39 @@
+{% if form is not defined %}
+    {% set form = hookable_metadata.context.form %}
+{% endif %}
+
+{% if resource is not defined %}
+    {% set resource = hookable_metadata.context.resource|default(null) %}
+{% endif %}
+
+{% form_theme form '@SyliusAdmin/shared/form_theme.html.twig' %}
+{% form_theme form with form.vars.form_themes %}
+
+<div class="container-xl" {% if attributes is defined %} {{ attributes }} {% endif %}>
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': form.vars.id}}) }}
+    <div class="card-body">
+        {% if hookable_metadata.configuration.method is defined %}
+            <input type="hidden" name="_method" value="{{ hookable_metadata.configuration.method }}"/>
+        {% elseif form.vars.data.id|default(null) is not null %}
+            <input type="hidden" name="_method" value="PUT"/>
+        {% endif %}
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        {% if form.vars.menu and form.vars.menu.children|length %}
+            {{ knp_menu_render(form.vars.menu, {
+                'template': '@SyliusEasyCrudPlugin/crud/form/_menu.html.twig',
+                'fields': [],
+                'form': form,
+                'columns': form.vars.columns,
+                'resource': resource
+            }) }}
+        {% else %}
+            {% hook 'form' with { form, resource } %}
+        {% endif %}
+
+    </div>
+    {{ form_end(form, {render_rest: hookable_metadata.configuration.render_rest|default(false)}) }}
+</div>
+
+

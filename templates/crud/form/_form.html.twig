@@ -1,13 +1,20 @@
-{{ form_errors(form) }}
-{% if form.vars.menu and form.vars.menu.children|length %}
-    {{ knp_menu_render(form.vars.menu, {
-        'template': '@SyliusEasyCrudPlugin/crud/form/_menu.html.twig',
-        'fields': fields|default([]),
-        'form': form,
-        'columns': form.vars.columns,
-        'resource': resource
-    }) }}
-{% else %}
-    {% import "@SyliusEasyCrudPlugin/crud/form/_macros.html.twig" as _macros %}
-    {{ _macros.form(null, null, form, fields|default([]), view ?? null) }}
-{% endif %}
+{#{% set form = hookable_metadata.context.form %}#}
+{#{% set resource = hookable_metadata.context.resource %}#}
+{#{% set fields = hookable_metadata.context.fields %}#}
+{#{% dump(form) %}#}
+{#{% dump(hookable_metadata) %}#}
+{#{% form_theme form with form.vars.form_themes %}#}
+{#{{ form_errors(form) }}#}
+{#{% dump(form.vars.menu) %}#}
+{#{% if form.vars.menu and form.vars.menu.children|length %}#}
+{#    {{ knp_menu_render(form.vars.menu, {#}
+{#        'template': '@SyliusEasyCrudPlugin/crud/form/_menu.html.twig',#}
+{#        'fields': [],#}
+{#        'form': form,#}
+{#        'columns': form.vars.columns,#}
+{#        'resource': resource#}
+{#    }) }}#}
+{#{% else %}#}
+{#    {% import "@SyliusEasyCrudPlugin/crud/form/_macros.html.twig" as _macros %}#}
+{#    {{ _macros.form(null, null, form, [], view ?? null) }}#}
+{#{% endif %}#}

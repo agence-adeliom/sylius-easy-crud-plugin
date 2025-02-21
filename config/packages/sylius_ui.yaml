@@ -1,13 +1,11 @@
 sylius_twig_hooks:
   hooks:
-    'sylius_admin.common.create.content.form.sections.general':
-      default:
-        template: '@SyliusEasyCrudPlugin/shared/crud/common/content/form/sections/general/default.html.twig'
-        priority: 0
-    'sylius_admin.common.update.content.form.sections.general':
-      default:
-        template: '@SyliusEasyCrudPlugin/shared/crud/common/content/form/sections/general/default.html.twig'
-        priority: 0
+    'easy_crud.common.create.content.form.sections':
+      general:
+        enabled: false
+    'easy_crud.common.update.content.form.sections':
+      general:
+        enabled: false
     'sylius_admin.common.update.content.header.title_block.actions':
       easy_crud_actions:
         template: "@SyliusEasyCrudPlugin/crud/action/_actions.html.twig"
@@ -23,4 +21,12 @@ sylius_twig_hooks:
     'easy_crud.common.show.content.page_body':
       content:
         template: '@SyliusEasyCrudPlugin/crud/show/page_body.html.twig'
+        priority: 50
+    'easy_crud.common.create.content':
+      form:
+        template: '@SyliusEasyCrudPlugin/shared/crud/common/content/form.html.twig'
+        priority: 50
+    'easy_crud.common.update.content':
+      form:
+        template: '@SyliusEasyCrudPlugin/shared/crud/common/content/form.html.twig'
         priority: 50
