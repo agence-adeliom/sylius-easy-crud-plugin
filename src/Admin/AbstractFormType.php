@@ -47,6 +47,7 @@ abstract class AbstractFormType extends AbstractGridType
     public function getSyliusLocales(): array
     {
         $resources = $this->parameterBag->get('sylius.resources');
+
         return $this->entityManager->getRepository($resources['sylius.locale']['classes']['model'])->findAll();
     }
 
@@ -58,7 +59,7 @@ abstract class AbstractFormType extends AbstractGridType
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
         protected Security $security,
-        public ParameterBagInterface $parameterBag
+        public ParameterBagInterface $parameterBag,
     ) {
         parent::__construct(
             $dataClass,
@@ -118,10 +119,12 @@ abstract class AbstractFormType extends AbstractGridType
                 }
 
                 if ($fieldDto->getFieldFqcn() === TabField::class) {
+                    dump($fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY));
                     [$menuItem, $column] = $this->crudAdminFactory
                         ->addTab(
-                            $fieldDto->getProperty(),
-                            $fieldDto->getLabel(),
+                            name: $fieldDto->getProperty(),
+                            label:  $fieldDto->getLabel(),
+                            horizontalDisplay:  $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY),
                         );
                 }
 
@@ -254,9 +257,10 @@ abstract class AbstractFormType extends AbstractGridType
 
                 if ($fieldDto->getFieldFqcn() === TabField::class) {
                     [$menuItem, $column] = $this->crudAdminFactory->addTab(
-                        $fieldDto->getProperty(),
-                        $fieldDto->getLabel(),
-                        '@SyliusEasyCrudPlugin/crud/show/_tab.html.twig',
+                        name: $fieldDto->getProperty(),
+                        label:  $fieldDto->getLabel(),
+                        template: '@SyliusEasyCrudPlugin/crud/show/_tab.html.twig',
+                        horizontalDisplay:  $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY),
                     );
                 }
 

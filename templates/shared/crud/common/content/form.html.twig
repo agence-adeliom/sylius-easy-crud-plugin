@@ -24,6 +24,7 @@
             {{ knp_menu_render(form.vars.menu, {
                 'template': '@SyliusEasyCrudPlugin/crud/form/_menu.html.twig',
                 'fields': [],
+                'menu': form.vars.menu,
                 'form': form,
                 'columns': form.vars.columns,
                 'resource': resource

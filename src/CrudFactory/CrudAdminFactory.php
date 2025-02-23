@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory;
 
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
@@ -145,7 +146,8 @@ class CrudAdminFactory
     /**
      * @return array{MenuItem, array<string, mixed>}
      */
-    public function addTab(string $name, ?string $label = null, ?string $template = null): array
+    public function addTab(string $name, ?string $label = null, ?string $template = null, ?bool $horizontalDisplay =
+    false): array
     {
         $menuItem = new MenuItem($name, $this->getMenuFactory());
         $menuItem->setAttribute(
@@ -156,6 +158,9 @@ class CrudAdminFactory
         );
         $menuItem->setLabel($label);
         $this->getMenu()->addChild($menuItem);
+        if (null === $this->getMenu()->getAttribute(TabField::HORIZONTAL_DISPLAY)) {
+            $this->getMenu()->setAttribute(TabField::HORIZONTAL_DISPLAY, $horizontalDisplay);
+        }
         $column = $this->newColumn($menuItem, 'default_column', null);
         $this->columns[] = $column;
 
@@ -207,7 +212,7 @@ class CrudAdminFactory
         $vars = [];
         $vars['form_themes'] = array_values(
             [
-                '@SyliusAdmin/shared/form_theme.html.twig'
+                '@SyliusAdmin/shared/form_theme.html.twig',
             ]
             + $this->formThemes,
         );

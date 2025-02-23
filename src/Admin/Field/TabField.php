@@ -12,6 +12,8 @@ final class TabField implements FieldInterface
 {
     use FieldTrait;
 
+    public const HORIZONTAL_DISPLAY = 'horizontal_display';
+
     public static function new(string $propertyName, ?string $label = null): self
     {
         return (new self())
@@ -20,6 +22,14 @@ final class TabField implements FieldInterface
             ->setFormType(HiddenType::class)
             ->hideOnIndex()
             ->setFormTypeOption('mapped', false)
+            ->setCustomOption(self::HORIZONTAL_DISPLAY, false)
         ;
+    }
+
+    public function renderHorizontal(): self
+    {
+        $this->setCustomOption(self::HORIZONTAL_DISPLAY, true);
+
+        return $this;
     }
 }

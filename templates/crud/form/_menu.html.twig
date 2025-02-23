@@ -10,18 +10,20 @@
     {% set form = (options.form) %}
     {% set fields = (options.fields) %}
     {% set resource = (options.resource) %}
+    {% set menu = (options.menu) %}
+    {% set horizontal = (menu.getAttribute('horizontal_display')|default(false)) %}
 
     <div class="row">
-        <div class="col-12 col-lg-3">
+        <div class="col-12{{ horizontal ? '' : ' col-lg-3' }}">
             <div id="side-nav" class="sticky-md-top" style="top: 7.6rem;">
-                <div class="list-group bg-white mb-5" id="crudTab" role="tablist">
+                <div class="list-group{{ horizontal ? ' list-group-horizontal' : '' }} bg-white mb-5" id="crudTab" role="tablist">
                     {% for item in item.children %}
                         {{ block('item') }}
                     {% endfor %}
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-9">
+        <div class="col-12{{ horizontal ? '' : ' col-lg-9' }}">
             <div class="tab-content" id="crudTabContent">
                 {% for item in item.children %}
                     {% include item.attribute('template') with {
