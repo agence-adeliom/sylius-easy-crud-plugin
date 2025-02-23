@@ -6,17 +6,6 @@
 {#    </div>#}
 {% endmacro %}
 
-{% macro start_tab(firstMenuItem, menuItem) %}
-<div class="card mb-3">
-    <div class="card-header">
-        <div class="card-title">{{ menuItem.label|trans }}</div>
-    </div>
-    {% endmacro %}
-
-    {% macro end_tab(firstMen) %}
-</div>
-{% endmacro %}
-
 {% macro form(firstMenuItem, menuItem, form, fields, view='update') %}
 
     <div class="row">

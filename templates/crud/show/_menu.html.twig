@@ -2,17 +2,18 @@
 
 {% block list %}
     {% set fields = (options.fields) %}
-
-{#    <div class="ui stackable grid sylius-tabular-form">#}
-{#        <div class="three wide column">#}
-{#            <div class="ui large fluid vertical menu">#}
-{#                {% for item in item.children %}#}
-{#                    {{ block('item') }}#}
-{#                {% endfor %}#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="thirteen wide column">#}
-{#            <div>#}
+    <div class="row">
+        <div class="col-12 col-lg-3">
+            <div id="side-nav" class="sticky-md-top" style="top: 7.6rem;">
+                <div class="list-group bg-white mb-5" id="crudTab" role="tablist">
+                    {% for item in item.children %}
+                        {{ block('item') }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-9">
+            <div class="tab-content" id="crudTabContent">
                 {% for item in item.children %}
                     {% include item.attribute('template') with {
                         'fields': fields,
@@ -22,19 +23,21 @@
                         'columns': options.columns
                     } %}
                 {% endfor %}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
-{#{% block item %}#}
-{#    {%- set attributes = item.attributes %}#}
-{#    {%- set classes = item.attribute('class') is not empty ? [item.attribute('class')] : [] %}#}
-{#    {%- if item.actsLikeFirst %}#}
-{#        {%- set classes = classes|merge(['active']) %}#}
-{#    {%- endif %}#}
-{#    {%- if classes is not empty %}#}
-{#        {%- set attributes = attributes|merge({'class': classes|join(' ')}) %}#}
-{#    {%- endif %}#}
-{#    <a class="item{% if attributes.class is defined %} {{ attributes.class }}{% endif %}" data-tab="{{ item.name }}">{{ item.label|trans }}</a>#}
-{#{% endblock %}#}
+{% block item %}
+    {%- set attributes = item.attributes %}
+    {%- set classes = item.attribute('class') is not empty ? [item.attribute('class')] : [] %}
+    {%- if item.actsLikeFirst %}
+        {%- set classes = classes|merge(['active']) %}
+    {%- endif %}
+    {%- if classes is not empty %}
+        {%- set attributes = attributes|merge({'class': classes|join(' ')}) %}
+    {%- endif %}
+    <button type="button" class="list-group-item list-group-item-action{% if attributes.class is defined %} {{ attributes.class }}{% endif %}" data-bs-toggle="tab" data-bs-target="#{{ item.name }}" role="tab" data-test-side-navigation-tab="{{ item.name }}" aria-selected="true">
+        {{ item.label|trans }}
+    </button>
+{% endblock %}

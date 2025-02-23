@@ -1,7 +1,20 @@
 {% import "@SyliusEasyCrudPlugin/crud/form/_macros.html.twig" as _macros %}
 
-{{ _macros.start_tab(firstMenuItem, menuItem) }}
+{%- set classes = [] %}
+{%- if item.actsLikeFirst %}
+    {%- set classes = classes|merge(['active', 'show']) %}
+{%- endif %}
 
-{{ _macros.form(firstMenuItem, menuItem, form, fields, view) }}
+<div class="tab-pane {{ classes|join(' ') }}" id="{{ menuItem.name }}" role="tabpanel" aria-labelledby="{{ menuItem.label|trans }}">
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="card-title">{{ menuItem.label|trans }}</div>
+        </div>
+        <div class="card-body">
+            {{ _macros.form(firstMenuItem, menuItem, form, fields, view) }}
+        </div>
+    </div>
+</div>
 
-{{ _macros.end_tab() }}
+
+

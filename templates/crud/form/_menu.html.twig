@@ -14,7 +14,7 @@
     <div class="row">
         <div class="col-12 col-lg-3">
             <div id="side-nav" class="sticky-md-top" style="top: 7.6rem;">
-                <div class="list-group bg-white mb-5" role="tablist">
+                <div class="list-group bg-white mb-5" id="crudTab" role="tablist">
                     {% for item in item.children %}
                         {{ block('item') }}
                     {% endfor %}
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="col-12 col-lg-9">
-            <div>
+            <div class="tab-content" id="crudTabContent">
                 {% for item in item.children %}
                     {% include item.attribute('template') with {
                         'form': form,
@@ -47,5 +47,7 @@
     {%- if classes is not empty %}
         {%- set attributes = attributes|merge({'class': classes|join(' ')}) %}
     {%- endif %}
-    <a class="item{% if attributes.class is defined %} {{ attributes.class }}{% endif %}" data-tab="{{ item.name }}">{{ item.label|trans }}</a>
+    <button type="button" class="list-group-item list-group-item-action{% if attributes.class is defined %} {{ attributes.class }}{% endif %}" data-bs-toggle="tab" data-bs-target="#{{ item.name }}" role="tab" data-test-side-navigation-tab="{{ item.name }}" aria-selected="true">
+        {{ item.label|trans }}
+    </button>
 {% endblock %}
