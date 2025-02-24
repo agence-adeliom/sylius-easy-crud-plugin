@@ -41,7 +41,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         $field->setFormTypeOptionIfNotSet('choices', $choices);
         $field->setFormTypeOptionIfNotSet('map', $map);
         $field->setFormTypeOptionIfNotSet('expanded', $isExpanded);
-        $field->setFormTypeOptionIfNotSet('isTranslation', $field->getCustomOption(ChoiceMaskField::OPTION_IS_TRANSLATION));
+        $field->setFormTypeOptionIfNotSet('isTranslation', (bool) $field->getCustomOption(ChoiceMaskField::OPTION_IS_TRANSLATION));
 
         $field->setCustomOption(ChoiceMaskField::OPTION_WIDGET, ChoiceMaskField::WIDGET_NATIVE);
 

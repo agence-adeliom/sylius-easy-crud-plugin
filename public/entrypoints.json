@@ -20,12 +20,12 @@
     },
     "field-image": {
       "js": [
-        "/bundles/syliuseasycrudplugin/field-image.b37321af.js"
+        "/bundles/syliuseasycrudplugin/field-image.d88b960f.js"
       ]
     },
     "form-nested-accordion": {
       "js": [
-        "/bundles/syliuseasycrudplugin/form-nested-accordion.d9faa3e6.js"
+        "/bundles/syliuseasycrudplugin/form-nested-accordion.cd17effe.js"
       ]
     },
     "text-editor": {

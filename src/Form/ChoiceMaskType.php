@@ -31,7 +31,7 @@ class ChoiceMaskType extends AbstractType
 
         $view->vars['all_fields'] = array_values(array_unique($allFieldNames));
         $view->vars['map'] = $sanitizedMap;
-        $view->vars['is_translation'] = $options['isTranslation'];
+        $view->vars['is_translation'] = (bool) $options['isTranslation'] ?? false;
         $options['expanded'] = false;
     }
 

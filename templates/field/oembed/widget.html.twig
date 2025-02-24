@@ -18,7 +18,7 @@
                 let opts = {
                     "url": url
                 }
-                fetch('/admin/oembed/',{
+                fetch('{{ path('sylius_easy_crud.get_oembed') }}',{
                     method: "POST",
                     headers: {
                         'Accept': 'application/json',

@@ -1,9 +1,4 @@
-/* global $ */
-$(document).ready(() => {
-  setTimeout(() => {
-    $('.ui.accordion').accordion('destroy');
-  },1);
-});
+
 
 window.addEventListener('DOMContentLoaded', () => {
   const initAccordion = function(target) {

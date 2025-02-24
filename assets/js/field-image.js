@@ -6,7 +6,6 @@ const displayUploadedImage = function displayUploadedImage(input) {
 
     reader.onload = (event) => {
       const image = $('.image', $(input).parent().parent());
-console.log(image);
       if (image.length > 0) {
         image.attr('src', event.target.result);
       } else {
