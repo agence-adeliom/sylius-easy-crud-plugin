@@ -15,10 +15,16 @@ namespace <?= $namespace ?>;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CodeEditorField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\DateField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\DateTimeField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\IconField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ImageField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\OembedField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TimeField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
@@ -83,8 +89,29 @@ AdminInterface
         yield TabField::new('tab2', 'Tab 2');
 
         yield EnumField::new('state')
-        ->setEnum(ThreeStateStatusEnum::class)
-        ->renderExpanded();
+            ->setEnum(ThreeStateStatusEnum::class)
+            ->renderExpanded();
+
+        yield CodeEditorField::new('codeEditor')
+            ->setLanguage('json')
+            ->setVirtual();
+
+        yield DateField::new('date1')
+            ->setVirtual();
+
+        yield DateTimeField::new('date2')
+            ->setVirtual();
+
+        yield TimeField::new('time1')
+            ->setVirtual();
+
+        yield TabField::new('tab3', 'Tab 3');
+
+        yield ImageField::new('image')
+            ->setVirtual();
+
+        yield OembedField::new('embed')
+            ->setVirtual();
     }
 }
 <?php } ?>

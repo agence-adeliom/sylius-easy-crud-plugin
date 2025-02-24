@@ -5,14 +5,16 @@ const displayUploadedImage = function displayUploadedImage(input) {
     const reader = new FileReader();
 
     reader.onload = (event) => {
-      const image = $(input).parent().siblings('.image');
-
+      const image = $('.image', $(input).parent().parent());
+console.log(image);
       if (image.length > 0) {
         image.attr('src', event.target.result);
       } else {
-        const img = $('<img class="ui small bordered image"/>');
+        const img = $('<img class="card-img-top img-thumbnail mb-3 image"/>');
+        const div = $('<div class="card" style="width: 200px">');
         img.attr('src', event.target.result);
-        $(input).parent().before(img);
+        div.prepend(img);
+        $(input).parent().before(div);
       }
     };
 
