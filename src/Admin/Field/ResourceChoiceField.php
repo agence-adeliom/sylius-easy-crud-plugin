@@ -32,6 +32,13 @@ final class ResourceChoiceField implements FieldInterface
         return $this;
     }
 
+    public function disableAutocomplete(): self
+    {
+        $this->setFormTypeOption('autocomplete', false);
+
+        return $this;
+    }
+
     public function setEntityClass(string $class): self
     {
         $this->setFormTypeOption('class', $class);
