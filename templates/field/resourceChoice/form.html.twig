@@ -1,0 +1,10 @@
+{% form_theme form _self %}
+
+{% block sylius_resource_autocomplete_choice_row %}
+  {% set product_attributes = [] %}
+    <twig:sylius_admin:product:product_attribute_autocomplete
+            data-model="attributesToBeAdded:selectedAttributeCodes"
+            :excludedAttributeCodes="product_attributes|keys"
+            template="@SyliusEasyCrudPlugin/field/resourceChoice/live_form.html.twig"
+    />
+{% endblock %}

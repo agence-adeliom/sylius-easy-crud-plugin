@@ -30,7 +30,7 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
             ->add('text2', TextType::class)
             ->add('text3', TextareaType::class)
             ->add('product', ResourceAutocompleteChoiceType::class, [
-                'useResourceTransformers' => false
+                'useResourceTransformers' => false,
             ])
             ->add('products', ResourceAutocompleteChoiceType::class, [
                 'useResourceTransformers' => false,
@@ -58,14 +58,14 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
 //                'multiple' => true,
 //                'resource' => 'easy.page',
 //            ])
-            ;
+        ;
     }
 
     public static function configureAdminFormThemes(): array
     {
         return array_merge(
             [],
-            SortableCollectionType::configureAdminFormThemes()
+            SortableCollectionType::configureAdminFormThemes(),
         );
     }
 
@@ -73,7 +73,7 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
     {
         return array_merge(
             [],
-            SortableCollectionType::configureAdminAssets()
+            SortableCollectionType::configureAdminAssets(),
         );
     }
 }

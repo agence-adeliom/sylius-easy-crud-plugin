@@ -119,7 +119,6 @@ abstract class AbstractFormType extends AbstractGridType
                 }
 
                 if ($fieldDto->getFieldFqcn() === TabField::class) {
-                    dump($fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY));
                     [$menuItem, $column] = $this->crudAdminFactory
                         ->addTab(
                             name: $fieldDto->getProperty(),
@@ -180,6 +179,7 @@ abstract class AbstractFormType extends AbstractGridType
                         }
                     }
 
+                    dump($formFieldOptions);
                     $formField = $builder
                         ->getFormFactory()
                         ->createNamedBuilder(

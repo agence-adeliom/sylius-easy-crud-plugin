@@ -20,17 +20,26 @@ final class ResourceChoiceField implements FieldInterface
             ->setShowTemplatePath('@SyliusEasyCrudPlugin/field/resourceChoice/show.html.twig')
             ->setGridTemplatePath('@SyliusEasyCrudPlugin/field/resourceChoice/grid.html.twig')
             ->setFormTypeOption('useResourceTransformers', false)
+            ->setFormTypeOption('multiple', false)
+            ->setFormTypeOption('autocomplete', true)
             ->setLabel($label);
     }
 
-    public function setResource(string $resource): self
+    public function setResourceAlias(string $resource): self
     {
         $this->setFormTypeOption('resource', $resource);
 
         return $this;
     }
 
-    public function setMultiple(bool $multiple = false): self
+    public function setEntityClass(string $class): self
+    {
+        $this->setFormTypeOption('class', $class);
+
+        return $this;
+    }
+
+    public function setMultiple(bool $multiple = true): self
     {
         $this->setFormTypeOption('multiple', $multiple);
 

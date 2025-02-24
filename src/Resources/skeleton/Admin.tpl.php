@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace <?= $namespace ?>;
 
-
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
@@ -22,12 +21,10 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\DateField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\DateTimeField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\FormTypeField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\IconField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ImageField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\OembedField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceAutocompleteChoiceField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\SortableCollectionField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceChoiceField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TimeField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
@@ -35,10 +32,9 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
-use Adeliom\SyliusEasyCrudPlugin\Form\Test\DataTestType;
 use <?= $entity ?>;
-use Sylius\Bundle\ProductBundle\Form\Type\ProductChoiceType;
-use Sylius\Bundle\ProductBundle\Form\Type\ProductCodeChoiceType;
+use App\Entity\Product\Product;
+use App\Entity\Taxonomy\Taxon;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -123,55 +119,47 @@ AdminInterface
 
         yield TabField::new('tabrel', 'Relations');
 
-        yield ResourceAutocompleteChoiceField::new('products')
-            ->setVirtual()
-            ->setMultiple()
-            ->setLabel('sylius.ui.products')
-            ->setChoiceValue('id')
-            ->setChoiceName('name')
-            ->setResource('sylius.product')
-            ->setRepositoryMethod('findByPhrase')
-            ->setRemoteCriteriaName('phrase')
-            ->setRepositoryArguments([
-            'phrase' => '$phrase',
-            'locale' => "expr:service('sylius.context.locale').getLocaleCode()",
-            'limit' => 10
-            ]);
+        yield ResourceChoiceField::new('taxon')
+        ->setVirtual()
+        ->setLabel('Taxon')
+        ->hideOnIndex()
+        ->setEntityClass(Taxon::class)
+        ->setResourceAlias('sylius.taxon');
 
-        yield ResourceAutocompleteChoiceField::new('product')
-            ->setVirtual()
-            ->setMultiple(false)
-            ->setLabel('sylius.ui.product')
-            ->setChoiceValue('id')
-            ->setChoiceName('name')
-            ->setResource('sylius.product')
-            ->setRepositoryMethod('findByPhrase')
-            ->setRemoteCriteriaName('phrase')
-            ->setRepositoryArguments([
-            'phrase' => '$phrase',
-            'locale' => "expr:service('sylius.context.locale').getLocaleCode()",
-            'limit' => 10
-            ]);
+        yield ResourceChoiceField::new('product')
+        ->setVirtual()
+        ->setLabel('Product')
+        ->hideOnIndex()
+        ->setEntityClass(Product::class)
+        ->setResourceAlias('sylius.product');
 
-        yield FormTypeField::new('product2')
-            ->setVirtual()
-            ->setLabel('product with existing sylius form type')
-            ->hideOnIndex()
-            ->setVirtual()
-            ->setFormType(ProductChoiceType::class);
+        yield ResourceChoiceField::new('products')
+        ->setVirtual()
+        ->setLabel('Products')
+        ->hideOnIndex()
+        ->setEntityClass(Product::class)
+        ->setResourceAlias('sylius.product')
+        ->setMultiple();
 
-        yield TabField::new('tabcol', 'Collections');
+        yield ResourceChoiceField::new('demo')
+        ->setVirtual()
+        ->setLabel('Demo')
+        ->hideOnIndex()
+        ->setEntityClass(Demo::class)
+        ->setResourceAlias('app.app_entity_demo');
 
-        yield SortableCollectionField::new('options')
-            ->setVirtual()
-            ->setEntryType(ProductCodeChoiceType::class)
-            ->setLabel('Options')
-            ->hideOnIndex();
-
-        yield SortableCollectionField::new('data')
-            ->setVirtual()
-            ->setEntryType(DataTestType::class)
-            ->hideOnIndex();
+<!--        yield TabField::new('tabcol', 'Collections');-->
+<!---->
+<!--        yield SortableCollectionField::new('options')-->
+<!--            ->setVirtual()-->
+<!--            ->setEntryType(ProductCodeChoiceType::class)-->
+<!--            ->setLabel('Options')-->
+<!--            ->hideOnIndex();-->
+<!---->
+<!--        yield SortableCollectionField::new('data')-->
+<!--            ->setVirtual()-->
+<!--            ->setEntryType(DataTestType::class)-->
+<!--            ->hideOnIndex();-->
 
         yield TabField::new('choice_mask', 'Choice mask');
 
