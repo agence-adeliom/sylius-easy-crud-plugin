@@ -21,7 +21,7 @@ trait EntityThreeStateStatusTrait
      */
     public function __construct()
     {
-        $this->state = ThreeStateStatusEnum::UNPUBLISHED();
+        $this->state = ThreeStateStatusEnum::UNPUBLISHED()->getValue();
     }
 
     public function getState(): ?string
