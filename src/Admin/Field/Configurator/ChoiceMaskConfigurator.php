@@ -7,7 +7,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 use function Symfony\Component\String\u;
 
 /**

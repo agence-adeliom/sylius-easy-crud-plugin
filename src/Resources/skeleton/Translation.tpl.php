@@ -9,8 +9,8 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Sylius\Component\Resource\Model\AbstractTranslation;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\AbstractTranslation;
+use Sylius\Resource\Model\ResourceInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: '<?= strtolower(str_replace('translation', '_translation', $class_name)) ?>')]

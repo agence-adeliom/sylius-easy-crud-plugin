@@ -10,7 +10,7 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TimeField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Adeliom\SyliusEasyCrudPlugin\Intl\IntlFormatter;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 
 final class DateTimeConfigurator implements FieldConfiguratorInterface
 {

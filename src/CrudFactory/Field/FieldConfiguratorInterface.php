@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 
 interface FieldConfiguratorInterface
 {
