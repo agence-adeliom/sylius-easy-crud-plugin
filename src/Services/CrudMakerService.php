@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;

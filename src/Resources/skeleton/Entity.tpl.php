@@ -10,10 +10,10 @@ namespace App\Entity;
 
 use App\Repository\<?= $class_name ?>Repository;
 use Doctrine\ORM\Mapping as ORM;
-use Sylius\Component\Resource\Model\ResourceInterface;
-use Sylius\Component\Resource\Model\TranslatableInterface;
-use Sylius\Component\Resource\Model\TranslatableTrait;
-use Sylius\Component\Resource\Model\TranslationInterface;
+use Sylius\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\TranslatableInterface;
+use Sylius\Resource\Model\TranslatableTrait;
+use Sylius\Resource\Model\TranslationInterface;
 
 #[ORM\Entity(repositoryClass: <?= $class_name ?>Repository::class)]
 #[ORM\Table(name: '<?= Str::asSnakeCase(($class_name)) ?>')]
