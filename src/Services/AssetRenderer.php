@@ -25,43 +25,50 @@ class AssetRenderer
         $html = '';
 
         if (!empty($assets['css'])) {
-
             foreach ($assets['css'] as $asset) {
+                if (is_null($asset)) {
+                    continue;
+                }
                 $attributes = [];
                 $attributes['rel'] = 'stylesheet';
                 if (is_string($asset)) {
                     $attributes['href'] = $asset;
                 } elseif ($asset instanceof Asset) {
                     $attributes['href'] = $asset->getAsDto()->getValue();
+
+                    if ($asset->getAsDto()->getPackageName()) {
+                        $attributes['href'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['href']);
+                    }
                 }
 
-                if ($asset->getAsDto()->getPackageName()) {
-                    $attributes['href'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['href']);
-                }
+                if (isset($attributes['href'])) {
+                    $event = new RenderAssetTagEvent(
+                        RenderAssetTagEvent::TYPE_LINK,
+                        $attributes['href'],
+                        $attributes
+                    );
+                    if (null !== $this->eventDispatcher) {
+                        $event = $this->eventDispatcher->dispatch($event);
+                    }
+                    $attributes = $event->getAttributes();
 
-                $event = new RenderAssetTagEvent(
-                    RenderAssetTagEvent::TYPE_LINK,
-                    $attributes['href'],
-                    $attributes
-                );
-                if (null !== $this->eventDispatcher) {
-                    $event = $this->eventDispatcher->dispatch($event);
+                    $html .= sprintf(
+                        '<link %s>',
+                        $this->convertArrayToAttributes($attributes)
+                    );
                 }
-                $attributes = $event->getAttributes();
-
-                $html .= sprintf(
-                    '<link %s>',
-                    $this->convertArrayToAttributes($attributes)
-                );
             }
         }
 
         if (!empty($assets['js'])) {
             foreach ($assets['js'] as $asset) {
+                if (is_null($asset)) {
+                    continue;
+                }
                 $attributes = [];
                 if (is_string($asset)) {
                     $attributes['src'] = $asset;
-                } elseif ($asset instanceof Asset) {
+                } else if ($asset instanceof Asset) {
                     $attributes['src'] = $asset->getAsDto()->getValue();
                 }
 
@@ -88,6 +95,9 @@ class AssetRenderer
 
         if (!empty($assets['webpack'])) {
             foreach ($assets['webpack'] as $webpackAsset) {
+                if (is_null($webpackAsset)) {
+                    continue;
+                }
                 try {
                     if ($webpackAsset instanceof Asset) {
                         $html .= $this->tagRenderer
