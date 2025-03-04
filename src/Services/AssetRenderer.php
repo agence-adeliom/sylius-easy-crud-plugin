@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
@@ -16,8 +14,8 @@ class AssetRenderer
         private EventDispatcherInterface $eventDispatcher,
         private TagRenderer $tagRenderer,
         private Packages $packages,
-    ) {
-    }
+    )
+    {}
 
     /**
      * @param array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $assets
@@ -28,41 +26,49 @@ class AssetRenderer
 
         if (!empty($assets['css'])) {
             foreach ($assets['css'] as $asset) {
+                if (is_null($asset)) {
+                    continue;
+                }
                 $attributes = [];
                 $attributes['rel'] = 'stylesheet';
                 if (is_string($asset)) {
                     $attributes['href'] = $asset;
                 } elseif ($asset instanceof Asset) {
                     $attributes['href'] = $asset->getAsDto()->getValue();
+
+                    if ($asset->getAsDto()->getPackageName()) {
+                        $attributes['href'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['href']);
+                    }
                 }
 
-                if ($asset->getAsDto()->getPackageName()) {
-                    $attributes['href'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['href']);
-                }
+                if (isset($attributes['href'])) {
+                    $event = new RenderAssetTagEvent(
+                        RenderAssetTagEvent::TYPE_LINK,
+                        $attributes['href'],
+                        $attributes
+                    );
+                    if (null !== $this->eventDispatcher) {
+                        $event = $this->eventDispatcher->dispatch($event);
+                    }
+                    $attributes = $event->getAttributes();
 
-                $event = new RenderAssetTagEvent(
-                    RenderAssetTagEvent::TYPE_LINK,
-                    $attributes['href'],
-                    $attributes,
-                );
-                if (null !== $this->eventDispatcher) {
-                    $event = $this->eventDispatcher->dispatch($event);
+                    $html .= sprintf(
+                        '<link %s>',
+                        $this->convertArrayToAttributes($attributes)
+                    );
                 }
-                $attributes = $event->getAttributes();
-
-                $html .= sprintf(
-                    '<link %s>',
-                    $this->convertArrayToAttributes($attributes),
-                );
             }
         }
 
         if (!empty($assets['js'])) {
             foreach ($assets['js'] as $asset) {
+                if (is_null($asset)) {
+                    continue;
+                }
                 $attributes = [];
                 if (is_string($asset)) {
                     $attributes['src'] = $asset;
-                } elseif ($asset instanceof Asset) {
+                } else if ($asset instanceof Asset) {
                     $attributes['src'] = $asset->getAsDto()->getValue();
                 }
 
@@ -73,7 +79,7 @@ class AssetRenderer
                 $event = new RenderAssetTagEvent(
                     RenderAssetTagEvent::TYPE_SCRIPT,
                     $attributes['src'],
-                    $attributes,
+                    $attributes
                 );
                 if (null !== $this->eventDispatcher) {
                     $event = $this->eventDispatcher->dispatch($event);
@@ -82,13 +88,16 @@ class AssetRenderer
 
                 $html .= sprintf(
                     '<script %s></script>',
-                    $this->convertArrayToAttributes($attributes),
+                    $this->convertArrayToAttributes($attributes)
                 );
             }
         }
 
         if (!empty($assets['webpack'])) {
             foreach ($assets['webpack'] as $webpackAsset) {
+                if (is_null($webpackAsset)) {
+                    continue;
+                }
                 try {
                     if ($webpackAsset instanceof Asset) {
                         $html .= $this->tagRenderer
@@ -96,32 +105,30 @@ class AssetRenderer
                                 $webpackAsset->getAsDto()->getValue(),
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
-                                [],
+                                []
                             );
                         $html .= $this->tagRenderer
                             ->renderWebpackLinkTags(
                                 $webpackAsset->getAsDto()->getValue(),
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
-                                [],
+                                []
                             );
-
                         continue;
-                    }
-                    if (is_string($webpackAsset)) {
+                    } else if (is_string($webpackAsset)) {
                         $html .= $this->tagRenderer
                             ->renderWebpackScriptTags(
                                 $webpackAsset,
                                 null,
                                 null,
-                                [],
+                                []
                             );
                         $html .= $this->tagRenderer
                             ->renderWebpackLinkTags(
                                 $webpackAsset,
                                 null,
                                 null,
-                                [],
+                                []
                             );
                     }
                 } catch (\Exception $exception) {
@@ -133,6 +140,7 @@ class AssetRenderer
 
         return $html;
     }
+
 
     private function convertArrayToAttributes(array $attributesMap): string
     {
@@ -151,7 +159,8 @@ class AssetRenderer
                 return sprintf('%s="%s"', $key, htmlentities($value));
             },
             array_keys($attributesMap),
-            $attributesMap,
+            $attributesMap
         ));
     }
+
 }
