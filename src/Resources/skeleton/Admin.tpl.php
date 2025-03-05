@@ -148,18 +148,18 @@ AdminInterface
         ->setEntityClass(Demo::class)
         ->setResourceAlias('app.app_entity_demo');
 
-<!--        yield TabField::new('tabcol', 'Collections');-->
-<!---->
-<!--        yield SortableCollectionField::new('options')-->
-<!--            ->setVirtual()-->
-<!--            ->setEntryType(ProductCodeChoiceType::class)-->
-<!--            ->setLabel('Options')-->
-<!--            ->hideOnIndex();-->
-<!---->
-<!--        yield SortableCollectionField::new('data')-->
-<!--            ->setVirtual()-->
-<!--            ->setEntryType(DataTestType::class)-->
-<!--            ->hideOnIndex();-->
+        //yield TabField::new('tabcol', 'Collections');
+
+    //yield SortableCollectionField::new('options')
+    //    ->setVirtual()
+    //     ->setEntryType(ProductCodeChoiceType::class)
+    //     ->setLabel('Options')
+    //     ->hideOnIndex();
+
+    //yield SortableCollectionField::new('data')
+    //    ->setVirtual()
+    //    ->setEntryType(DataTestType::class)
+    //    ->hideOnIndex();
 
         yield TabField::new('choice_mask', 'Choice mask');
 
