@@ -14,7 +14,7 @@
     <div class="card-body">
         {% if hookable_metadata.configuration.method is defined %}
             <input type="hidden" name="_method" value="{{ hookable_metadata.configuration.method }}"/>
-        {% elseif form.vars.data.id|default(null) is not null %}
+        {% elseif form.vars.data.id|default(null) is not null and form.vars.data.id > 0 %}
             <input type="hidden" name="_method" value="PUT"/>
         {% endif %}
         {{ form_errors(form) }}
