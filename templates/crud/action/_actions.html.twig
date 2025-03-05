@@ -27,7 +27,8 @@
                 <ul class="dropdown-menu" {{ sylius_test_html_attribute(action.name) }}>
                     {% hook 'subitems' %}
                     {% for link in action.options.links %}
-                        {% set path = link.url is defined ? link.url : path(link.route, link.parameters|default([])) %}
+                        {% set id = options.link.parameters['id']|default(hookable_metadata.context.resource.id|default(null))  %}
+                        {% set path = link.url is defined ? link.url : path(link.route, (link.parameters|default({})|merge((id?{'id': id}:{})))) %}
                         <li>
                             <a class="dropdown-item" href="{{ path }}" {{ sylius_test_html_attribute('create') }}
                             {% for attr, value in link.htmlAttributes %}{{ attr }}="{{ value }}"{% endfor %}>

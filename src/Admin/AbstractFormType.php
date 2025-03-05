@@ -179,7 +179,6 @@ abstract class AbstractFormType extends AbstractGridType
                         }
                     }
 
-                    dump($formFieldOptions);
                     $formField = $builder
                         ->getFormFactory()
                         ->createNamedBuilder(
