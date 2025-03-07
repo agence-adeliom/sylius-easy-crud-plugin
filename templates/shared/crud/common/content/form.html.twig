@@ -30,7 +30,7 @@
                 'resource': resource
             }) }}
         {% else %}
-            {% hook 'form' with { form, resource } %}
+            {{ form_row(form) }}
         {% endif %}
 
     </div>
