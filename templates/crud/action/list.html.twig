@@ -10,6 +10,11 @@
             {% set is_link_visible = link.visible is defined ? link.visible : true %}
 
             {% if is_link_visible %}
+                {% if link.parameters.context is defined and link.parameters.context starts with 'flexible_content' %}
+                    {% set updatedParameters = link.parameters|merge({ 'id': data.id }) %}
+                    {% set link = link|merge({ 'parameters': link.parameters|merge({ 'id': data.id }) }) %}
+                {% endif %}
+
                 {% set path = link.url is defined ? link.url : path(link.route, link.parameters|default([])) %}
                 <a class="dropdown-item" href="{{ path }}">
                     {% if link.icon is defined %}
