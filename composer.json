@@ -21,7 +21,7 @@
         "symfony/webpack-encore-bundle": "^1.12 || ^2.0",
         "ext-json": "*",
         "ext-intl": "*",
-        "sylius/sylius": "^v1.13.0 || ^v2.0",
+        "sylius/sylius": "^v1.13.0 || ^v1.14.0",
         "embed/embed": "^4.4",
         "symfony/uid": "^6.4 || ^v7.0"
     },
