@@ -87,16 +87,6 @@ services:
     public: true
     alias: adeliom.sylius.form.type.field_resource_translations
 
-  adeliom.sylius.form.type.resource_autocomplete_choice:
-    public: true
-    class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceAutocompleteChoiceType
-    tags: [ 'form.type' ]
-    arguments:
-      - "@sylius.registry.resource_repository"
-  Adeliom\SyliusEasyCrudPlugin\Form\ResourceAutocompleteChoiceType:
-    public: true
-    alias: adeliom.sylius.form.type.resource_autocomplete_choice
-
   adeliom.sylius.form.type.resource_choice:
     public: true
     class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType
