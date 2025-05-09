@@ -1,10 +1,3 @@
-/* global $ */
-$(document).ready(() => {
-  setTimeout(() => {
-    $('.ui.accordion').accordion('destroy');
-  },1);
-});
-
 window.addEventListener('DOMContentLoaded', () => {
   const initAccordion = function(target) {
     if (target
@@ -52,6 +45,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.querySelectorAll('[data-form-collection="item"]')
       .forEach(function (selector) {
+          $('.ui.accordion', $('.w-flexible-content').parents('form')).accordion('destroy');
         initAccordion($(selector));
       });
   },1);
