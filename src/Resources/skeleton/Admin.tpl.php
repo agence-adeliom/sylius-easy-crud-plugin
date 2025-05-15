@@ -25,6 +25,7 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\IconField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ImageField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\OembedField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceChoiceField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\SortableCollectionField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TimeField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
@@ -32,6 +33,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
+use Adeliom\SyliusEasyCrudPlugin\Form\Test\DataTestType;
 use <?= $entity ?>;
 use App\Entity\Product\Product;
 use App\Entity\Taxonomy\Taxon;
@@ -156,10 +158,10 @@ AdminInterface
     //     ->setLabel('Options')
     //     ->hideOnIndex();
 
-    //yield SortableCollectionField::new('data')
-    //    ->setVirtual()
-    //    ->setEntryType(DataTestType::class)
-    //    ->hideOnIndex();
+    yield SortableCollectionField::new('data')
+        ->setVirtual()
+        ->setEntryType(DataTestType::class)
+        ->hideOnIndex();
 
         yield TabField::new('choice_mask', 'Choice mask');
 

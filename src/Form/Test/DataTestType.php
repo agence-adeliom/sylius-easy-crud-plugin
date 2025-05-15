@@ -13,6 +13,7 @@ use Adeliom\SyliusEasyCrudPlugin\Form\AdminFormTypeInterface;
 use Adeliom\SyliusEasyCrudPlugin\Form\ResourceAutocompleteChoiceType;
 use Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType;
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
+use App\Entity\Product\Product;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -29,12 +30,17 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
             ->add('text', TextType::class)
             ->add('text2', TextType::class)
             ->add('text3', TextareaType::class)
-            ->add('product', ResourceAutocompleteChoiceType::class, [
-                'useResourceTransformers' => false,
+            ->add('product', ResourceChoiceType::class, [
+                'resource' => 'sylius.product',
+                'class' => Product::class,
+                'autocomplete' => true,
             ])
-            ->add('products', ResourceAutocompleteChoiceType::class, [
-                'useResourceTransformers' => false,
+            ->add('products', ResourceChoiceType::class, [
+                'resource' => 'sylius.product',
+                'class' => Product::class,
                 'multiple' => true,
+                'autocomplete' => true,
+                'useResourceTransformers' => false,
             ])
             ->add('textList', SortableCollectionType::class, [
                 'label' => 'textList',
@@ -45,19 +51,6 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
                 'entry_options' => ['label' => false],
                 'prototype_name' => '__textList__',
             ])
-            ->add('page', ResourceChoiceType::class, [
-                'multiple' => false,
-                'resource' => 'app.app_entity_demo',
-            ])
-            /*
-            * TODO :
-             * The code below doesn't work because of the "multiple" option :
-             * "Unable to transform value for property path "[pages]": Expected an array."
-             */
-//            ->add('pages', ResourceChoiceType::class, [
-//                'multiple' => true,
-//                'resource' => 'easy.page',
-//            ])
         ;
     }
 
