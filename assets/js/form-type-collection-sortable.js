@@ -128,3 +128,14 @@ if (document.readyState == 'loading') {
 } else {
   sortableCollectionHandler();
 }
+
+document.addEventListener('collection-form-add', (event) => {
+    sortableCollectionHandler();
+});
+document.addEventListener('collection-form-update', (event) => {
+    sortableCollectionHandler();
+});
+document.addEventListener('collection-form-delete', (event) => {
+    sortableCollectionHandler();
+});
+

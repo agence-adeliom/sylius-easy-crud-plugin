@@ -16,10 +16,10 @@ Encore
   })
 
   .addEntry('form-type-collection-sortable', './assets/js/form-type-collection-sortable.js')
+  .addEntry('form-type-collection', './assets/js/form-type-collection.js')
   .addEntry('field-code-editor', './assets/js/field-code-editor.js')
   .addEntry('field-slug', './assets/js/field-slug.js')
   .addEntry('field-image', './assets/js/field-image.js')
-  .addEntry('form-nested-accordion', './assets/js/form-nested-accordion.js')
   .addEntry('text-editor', './assets/js/text-editor.js')
 ;
 

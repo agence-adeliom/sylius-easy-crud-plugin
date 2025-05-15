@@ -154,8 +154,8 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
     {
         return [
             'js' => [
+                (Asset::new('form-type-collection.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
                 (Asset::new('form-type-collection-sortable.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
-                (Asset::new('form-nested-accordion.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
             ],
         ];
     }

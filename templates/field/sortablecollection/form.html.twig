@@ -27,12 +27,12 @@
 
     {% apply spaceless %}
         <div
-             data-form-type="collection"
-            {{ block('widget_container_attributes') }}
-            {% if prototype is defined and allow_add %}
-                data-prototype='{{ _self.collectionItem(null, id, prototype, allow_delete, button_delete_label, button_move_label, prototype.vars.name ?? '__name__')|e }}'
-                data-prototype-name='{{ prototype.vars.name }}'
-            {%- endif -%}>
+                data-form-type="collection"
+                {{ block('widget_container_attributes') }}
+                {% if prototype is defined and allow_add %}
+            data-prototype='{{ _self.collectionItem(null, id, prototype, allow_delete, button_delete_label, button_move_label, prototype.vars.name ?? '__name__')|e }}'
+            data-prototype-name='{{ prototype.vars.name }}'
+                {%- endif -%}>
 
             {{ error(form.vars.errors) }}
 
@@ -55,7 +55,7 @@
 
             {% if prototype is defined and allow_add %}
                 <button type="button" style="margin-top: 6px;" class="btn field-sortable_collection-add-button"
-                   data-form-collection="add">
+                        data-form-collection="add">
                     <i class="glyphicon glyphicon-plus"></i>
                     {{ button_add_label|trans }}
                 </button>
@@ -75,27 +75,35 @@
     {% apply spaceless %}
         <div data-form-collection="item"
              data-form-collection-index="{{ index }}"
-             class="collection-item field-collection-item">
+             class="collection-item field-collection-item alert text-body">
             <div class="collection-box{% if form|length == 1 %} unique-field{% endif %} field-sortable_collection-item {{ is_complex ? 'field-sortable_collection-item-complex' }} {{ error ? "border-danger" }}" data-form-type-parent-id="{{ form_parent(form).parent.vars.id|default("") }}">
                 <div class="ui styled fluid accordion" data-accordion-id="{{ form.vars.id|default("") }}">
                     <div class="{{ value is null ? 'active ' : '' }}title">
-                        <i class="dropdown icon"></i>
-                        {% if not hide_title %}
-                            <span>{{ form.vars.data|display_as_string }}</span>
-                        {% endif %}
-                        {% if allow_delete or allow_drag %}
-                            {% if allow_delete %}
-                                <button type="button" title="{{ button_delete_label|trans }}" data-form-collection="delete" class="mini red ui icon right floated button field-sortable_collection-delete-button" style="margin-top:-4px;">
-                                    <i class="icon trash"></i>
-                                </button>
-                            {% endif %}
-                            {% if allow_drag %}
-                                <button type="button" class="mini ui icon right floated button field-sortable_collection-drag-button" drag-handler="{{ form.parent.vars.id|default("") }}" style="margin-top:-4px; margin-right:6px; cursor:move;"
-                                        title="{{ button_move_label|trans }}">
-                                    <i class="icon arrows alternate vertical"></i>
-                                </button>
-                            {% endif %}
-                        {% endif %}
+                        <div class="d-flex mb-3">
+                            <div class="me-auto">
+                                {% if not hide_title %}
+                                    <strong>{{ form.vars.data|display_as_string }}</strong>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3 btn-group">
+                                {% if allow_delete or allow_drag %}
+                                    {% if allow_drag %}
+                                        <button type="button" title="{{ button_move_label|trans }}" class="btn btn-sm btn-outline field-sortable_collection-drag-button" drag-handler="{{ form.parent.vars.id|default("") }}" >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-move" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+                                            </svg>
+                                        </button>
+                                    {% endif %}
+                                    {% if allow_delete %}
+                                        <button type="button" title="{{ button_delete_label|trans }}" data-form-collection="delete" class="btn btn-sm btn-outline-danger field-sortable_collection-delete-button">
+                                            <svg data-form-collection="delete" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                            </svg>
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                     <div class="{{ value is null ? 'active ' : '' }}content">
                         {% if not form.children|length %}
