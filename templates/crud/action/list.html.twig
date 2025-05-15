@@ -1,27 +1,50 @@
 {% set visible = options.visible is defined ? options.visible : true %}
+{% set has_dropdown = grid is defined and grid is iterable ? true : false %}
 
 {% if visible %}
-    <div class="dropdown">
-        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+    {% if has_dropdown %}
+        <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                {% if action.label %}
+                    {{ action.label|trans }}
+                {% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                {% for link in options.links %}
+                    {% set is_link_visible = link.visible is defined ? link.visible : true %}
+
+                    {% if is_link_visible %}
+                        {% set id = data.id|default(null) %}
+                        {% set path = link.url is defined ? link.url : path(link.route, link.parameters|merge({id: id})|default([])) %}
+                        <li><a class="dropdown-item" href="{{ path }}">
+                                {% if link.icon is defined %}
+                                    {{ ux_icon(link.icon, {'class': 'icon dropdown-item-icon' }) }}
+                                {% endif %}
+                                {{ link.label|trans }}
+                            </a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div>
             {% if action.label %}
-                {{ action.label|trans }}
+                <span class="dropdown-header">{{ action.label|trans }}</span>
             {% endif %}
-        </button>
-        <ul class="dropdown-menu">
             {% for link in options.links %}
                 {% set is_link_visible = link.visible is defined ? link.visible : true %}
 
                 {% if is_link_visible %}
                     {% set id = data.id|default(null) %}
                     {% set path = link.url is defined ? link.url : path(link.route, link.parameters|merge({id: id})|default([])) %}
-                    <li><a class="dropdown-item" href="{{ path }}">
-                            {% if link.icon is defined %}
-                                {{ ux_icon(link.icon, {'class': 'icon dropdown-item-icon' }) }}
-                            {% endif %}
-                            {{ link.label|trans }}
-                        </a></li>
+                    <a class="dropdown-item" href="{{ path }}">
+                        {% if link.icon is defined %}
+                            {{ ux_icon(link.icon, {'class': 'icon dropdown-item-icon' }) }}
+                        {% endif %}
+                        {{ link.label|trans }}
+                    </a>
                 {% endif %}
             {% endfor %}
-        </ul>
-    </div>
+        </div>
+    {% endif %}
 {% endif %}
