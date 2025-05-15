@@ -2,7 +2,12 @@
   "entrypoints": {
     "form-type-collection-sortable": {
       "js": [
-        "/bundles/syliuseasycrudplugin/form-type-collection-sortable.beddc93a.js"
+        "/bundles/syliuseasycrudplugin/form-type-collection-sortable.0d6ab612.js"
+      ]
+    },
+    "form-type-collection": {
+      "js": [
+        "/bundles/syliuseasycrudplugin/form-type-collection.0a0dae08.js"
       ]
     },
     "field-code-editor": {
@@ -21,11 +26,6 @@
     "field-image": {
       "js": [
         "/bundles/syliuseasycrudplugin/field-image.d88b960f.js"
-      ]
-    },
-    "form-nested-accordion": {
-      "js": [
-        "/bundles/syliuseasycrudplugin/form-nested-accordion.cd17effe.js"
       ]
     },
     "text-editor": {
