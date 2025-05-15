@@ -2,7 +2,7 @@
     <div class="col-12 col-md-4 fw-bold">{{ (field.label ?? field.property)|trans }}</div>
     <div class="col-12 col-md-8">
         {% if data is defined %}
-            <time datetime="{{ data|date('c') }}" title="{{ data|date('r') }}">{{ field.configurator.formatValue(field, data)|default(data|date('r')) }}</time>
+            {{ data }}
         {% endif %}
     </div>
 </div>
