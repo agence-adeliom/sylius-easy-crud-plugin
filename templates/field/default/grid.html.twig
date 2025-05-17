@@ -2,7 +2,7 @@
     {% if data is same as ({}) or data is same as ([]) %}
         {{ data|serialize }}
     {% elseif data is same as (true) or data is same as (false) %}
-        {% import '@SyliusUi/Macro/labels.html.twig' as label %}
+        {% import '@SyliusUi/macro/labels.html.twig' as label %}
         {{ label.yesNo(data) }}
     {% else %}
         {{ data }}
