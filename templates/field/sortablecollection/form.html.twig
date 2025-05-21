@@ -75,8 +75,8 @@
     {% apply spaceless %}
         <div data-form-collection="item"
              data-form-collection-index="{{ index }}"
-             class="collection-item field-collection-item alert text-body">
-            <div class="collection-box{% if form|length == 1 %} unique-field{% endif %} field-sortable_collection-item {{ is_complex ? 'field-sortable_collection-item-complex' }} {{ error ? "border-danger" }}" data-form-type-parent-id="{{ form_parent(form).parent.vars.id|default("") }}">
+             class="collection-item field-collection-item">
+            <div class="ms-4 alert text-body collection-box{% if form|length == 1 %} unique-field{% endif %} field-sortable_collection-item {{ is_complex ? 'field-sortable_collection-item-complex' }} {{ error ? "border-danger" }}" data-form-type-parent-id="{{ form_parent(form).parent.vars.id|default("") }}">
                 <div class="ui styled fluid accordion" data-accordion-id="{{ form.vars.id|default("") }}">
                     <div class="{{ value is null ? 'active ' : '' }}title">
                         <div class="d-flex mb-3">
