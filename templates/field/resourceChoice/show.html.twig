@@ -2,7 +2,11 @@
     <div class="col-12 col-md-4 fw-bold">{{ (field.label ?? field.property)|trans }}</div>
     <div class="col-12 col-md-8">
         {% if data is defined %}
-            {{ data }}
+            {% if data is iterable %}
+                {{ data|join(', ') }}
+            {% else %}
+                {{ data }}
+            {% endif %}
         {% endif %}
     </div>
 </div>
