@@ -12,9 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 trait EntityPublishableTrait
 {
     #[Groups('main')]
-    #[Assert\NotBlank]
-    #[ORM\Column(length: 100)]
-    private string $publishState;
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $publishState;
 
     #[Groups('main')]
     #[ORM\Column(name: 'publish_date', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
@@ -93,7 +92,7 @@ trait EntityPublishableTrait
 
     public function isStateUnpublished(): bool
     {
-        return $this->hasState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
+        return is_null($this->publishState) || $this->hasState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
     }
 
     public function isStatePending(): bool
@@ -103,7 +102,7 @@ trait EntityPublishableTrait
 
     public function hasState(?string $state): bool
     {
-        return strtolower($this->publishState) === strtolower($state);
+        return !is_null($this->publishState) && strtolower($this->publishState) === strtolower($state);
     }
 
     public function isDatePublished(): bool
