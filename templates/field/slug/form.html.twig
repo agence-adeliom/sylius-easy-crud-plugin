@@ -2,7 +2,7 @@
 
 {% block slug_row %}
     <div data-slug-for="name"
-        class="{% if form.vars.required %}required {% endif %}field{% if form.vars.errors|length > 0 %} error{% endif %} ui loadable form">
+        class="{% if form.vars.required %}required {% endif %}field{% if form.vars.errors|length > 0 %} error{% endif %} ui loadable form mb-3">
         {{ form_label(form) }}
         {% if form.vars.value == null %}
             {{ form_widget(form) }}
