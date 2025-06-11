@@ -34,7 +34,7 @@ trait EntityPublishableTrait
     {
         $this->publishDate = null;
         $this->unpublishDate = null;
-        $this->publishedState = ThreeStateStatusEnum::UNPUBLISHED();
+        $this->publishState = ThreeStateStatusEnum::UNPUBLISHED;
     }
 
     public function getPublishState(): ?string
