@@ -132,7 +132,6 @@ class AssetRenderer
                             );
                     }
                 } catch (\Exception $exception) {
-                    dump($exception);
                     $html .= '';
                 }
             }
