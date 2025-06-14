@@ -19,7 +19,7 @@ final class ResourceChoiceField implements FieldInterface
             ->setFormType(ResourceChoiceType::class)
             ->setShowTemplatePath('@SyliusEasyCrudPlugin/field/resourceChoice/show.html.twig')
             ->setGridTemplatePath('@SyliusEasyCrudPlugin/field/resourceChoice/grid.html.twig')
-            ->setFormTypeOption('useResourceTransformers', false)
+            ->setFormTypeOption('persist_into_an_array', false)
             ->setFormTypeOption('multiple', false)
             ->setFormTypeOption('autocomplete', true)
             ->setLabel($label);
@@ -42,6 +42,13 @@ final class ResourceChoiceField implements FieldInterface
     public function setEntityClass(string $class): self
     {
         $this->setFormTypeOption('class', $class);
+
+        return $this;
+    }
+
+    public function valueIsPersistedIntoAnArray(): self
+    {
+        $this->setFormTypeOption('persist_into_an_array', true);
 
         return $this;
     }
