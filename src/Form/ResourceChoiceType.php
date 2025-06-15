@@ -120,19 +120,18 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                               'choice_value' => 'id',
                               'choice_label' => 'name',
                               'choice_name' => 'name',
-                              //'choices' => function (Options $options) {
-                              //    return [];
-                              //    Assert::string($options['resource']);
-                              //    $repository = $this->resourceRepositoryRegistry->get($options['resource']);
-                              //
-                              //    if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
-                              //        Assert::isArray($options['repositoryArguments']);
-                              //
-                              //        return $repository->$options['repositoryMethod'](...$options['repositoryArguments']);
-                              //    }
-                              //
-                              //    return method_exists($repository, 'findAll') ? $repository->findAll() : [];
-                              //},
+                              'choices' => function (Options $options) {
+                                  Assert::string($options['resource']);
+                                  $repository = $this->resourceRepositoryRegistry->get($options['resource']);
+
+                                  if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
+                                      Assert::isArray($options['repositoryArguments']);
+
+                                      return $repository->$options['repositoryMethod'](...$options['repositoryArguments']);
+                                  }
+
+                                  return method_exists($repository, 'findAll') ? $repository->findAll() : [];
+                              },
                               'repository' => function (Options $options) {
                                   Assert::string($options['resource']);
 
