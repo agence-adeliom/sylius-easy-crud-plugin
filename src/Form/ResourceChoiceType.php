@@ -152,9 +152,6 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        dump($form);
-        dump($view);
-        dump($options);
         parent::buildView($view, $form, $options);
     }
 
