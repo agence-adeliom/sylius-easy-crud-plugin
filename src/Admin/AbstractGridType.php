@@ -48,6 +48,9 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
                     $grid->setDriverOption('repository', $this::getRepositoryMethod());
                 }
             }
+            if (method_exists($this, 'getLimits')) {
+                $grid->setLimits( $this::getLimits());
+            }
         }
 
         return $grid;
