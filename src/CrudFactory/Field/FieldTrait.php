@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetsDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Sylius\Bundle\GridBundle\Builder\Field\TwigField;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -235,6 +236,13 @@ trait FieldTrait
                 $this->dto->addCssAsset($asset->getAsDto());
             }
         }
+
+        return $this;
+    }
+
+    public function resetAssets(): self
+    {
+        $this->dto->setAssets(new AssetsDto());
 
         return $this;
     }

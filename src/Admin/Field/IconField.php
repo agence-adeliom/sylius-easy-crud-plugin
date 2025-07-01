@@ -32,13 +32,6 @@ final class IconField implements FieldInterface
         return $this;
     }
 
-    public function setJsonUrl(string $jsonUrl): self
-    {
-        $this->setFormTypeOption('json_url', $jsonUrl);
-
-        return $this;
-    }
-
     public function setSelectButtonLabel(string $label): self
     {
         $this->setFormTypeOption('select_button', $label);
@@ -82,11 +75,26 @@ final class IconField implements FieldInterface
     }
 
     /**
+     * Path to css compiled fonts
      * @param string|mixed[] $fonts
      */
     public function setFonts(string|array $fonts = []): self
     {
         $this->setFormTypeOption('fonts', $fonts);
+        $this->resetAssets();
+        $this->addAssets([
+            'css' => is_string($fonts) ? [$fonts] : $fonts,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * List of icons in JSON format
+     */
+    public function setJsonIconList(string $jsonUrl): self
+    {
+        $this->setFormTypeOption('json_url', $jsonUrl);
 
         return $this;
     }
