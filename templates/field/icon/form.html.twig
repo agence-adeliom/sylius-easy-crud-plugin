@@ -14,7 +14,7 @@
                 <div class="get-and-preview">
                     <div class="preview-icon">
                         <i class="border {{ value ?: "" }}" style="width: 4rem; height: 4rem;"></i>
-                        <button id="{{ form.vars.id }}_picker_delete" class="bg-danger icon-picker-delete" data-tippy data-original-title="{{ form.vars.delete_label }}" title="{{ form.vars.delete_label }}">{{ ux_icon('tabler:trash', {class: 'icon'}) }}</button>
+                        <button id="{{ form.vars.id }}_picker_delete" class="icon-picker-delete" data-tippy data-original-title="{{ form.vars.delete_label }}" title="{{ form.vars.delete_label }}">{{ ux_icon('tabler:cancel', {class: 'icon'}) }}</button>
                     </div>
                     <span class="open-icons-list">
                         <button type="button" id="{{ form.vars.id }}_picker" class="btn" data-iconpicker-input="input#{{ form.vars.id }}" data-iconpicker-preview="#{{ form.vars.id }}_result .preview-icon > i" data-iconpicker-delete="#{{ form.vars.id }}_result .icon-picker-delete">{{ form.vars.select_button }}</button>
@@ -44,47 +44,46 @@
                 });
             </script>
             <style>
-                .get-and-preview {
-                    display: flex;
-                    gap: 1rem;
-                }
-                .get-and-preview .preview-icon {
-                    width: 4rem;
-                    height: 4rem;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    border-radius: var(--border-radius);
-                    font-size: 4rem;
-                    position: relative;
-                }
-                .get-and-preview .preview-icon i {
-                  display: flex;
-                }
-                .get-and-preview .preview-icon i:before {
-                  font-size: 65%;
-                  margin: auto;
-                }
-                .get-and-preview .open-icons-list {
-                    display: flex;
-                    align-items: center;
-                }
-                .get-and-preview .icon-picker-delete {
-                    width: 2rem;
-                    height: 2rem;
-                    border-radius: 50%;
-                    position: absolute;
-                    left:100%;
-                    bottom: 100%;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 0.85rem;
-                    line-height: 0.85rem;
-                    transform: translate(-50%, 50%);
-                    border:none;
-                    display: none;
-                    padding-top: 0.2rem;
-                }
+              .get-and-preview {
+                display: flex;
+                gap: 1rem;
+              }
+              .get-and-preview .preview-icon {
+                width: 4rem;
+                height: 4rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: var(--border-radius);
+                font-size: 4rem;
+                position: relative;
+              }
+              .get-and-preview .preview-icon i {
+                display: flex;
+              }
+              .get-and-preview .preview-icon i:before {
+                font-size: 65%;
+                margin: auto;
+              }
+              .get-and-preview .open-icons-list {
+                display: flex;
+                align-items: center;
+              }
+              .get-and-preview .icon-picker-delete {
+                border-radius: 6px;
+                position: absolute;
+                left:100%;
+                bottom: 100%;
+                align-items: center;
+                justify-content: center;
+                font-size: 80%;
+                line-height: 80%;
+                transform: translate(-50%, 50%);
+                border:none;
+                display: none;
+                padding-top: 0.2rem;
+                padding: 3px !important;
+              }
             </style>
         </div>
     </div>
