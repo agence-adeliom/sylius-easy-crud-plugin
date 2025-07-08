@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use ArrayIterator;
+use Sylius\Resource\Model\ResourceInterface;
 
 /**
  * Initial class from EasyAdmin
@@ -23,6 +24,7 @@ final class FieldCollection implements CollectionInterface
     private function __construct(
         iterable $fields,
         protected FieldConfiguratorCollection $fieldConfiguratorCollection,
+        protected ?ResourceInterface $resource = null,
     ) {
         $this->fields = $this->processFields($fields);
     }
@@ -41,9 +43,9 @@ final class FieldCollection implements CollectionInterface
     /**
      * @param FieldInterface[] $fields
      */
-    public static function new(iterable $fields, FieldConfiguratorCollection $fieldConfiguratorCollection): self
+    public static function new(iterable $fields, FieldConfiguratorCollection $fieldConfiguratorCollection, ?ResourceInterface $resource = null): self
     {
-        return new self($fields, $fieldConfiguratorCollection);
+        return new self($fields, $fieldConfiguratorCollection, $resource);
     }
 
     public function get(string $fieldUniqueId): ?FieldDto
@@ -156,7 +158,7 @@ final class FieldCollection implements CollectionInterface
                     continue;
                 }
 
-                $configurator->configure($dto); //, $entityDto, $context
+                $configurator->configure($dto, $this->resource); //, $entityDto, $context
                 $dto->setConfigurator($configurator);
             }
 
