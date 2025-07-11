@@ -127,7 +127,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                   if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
                                       Assert::isArray($options['repositoryArguments']);
 
-                                      return $repository->$options['repositoryMethod'](...$options['repositoryArguments']);
+                                      return call_user_func([$repository, $options['repositoryMethod']], ...$options['repositoryArguments']);
                                   }
 
                                   return method_exists($repository, 'findAll') ? $repository->findAll() : [];
