@@ -58,7 +58,6 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 
             ->addItemAction(Crud::PAGE_INDEX, Action::EDIT)
             ->addItemAction(Crud::PAGE_INDEX, Action::DELETE)
-            ->addItemAction(Crud::PAGE_INDEX, Action::DETAIL)
 
             ->addGlobalAction(Crud::PAGE_INDEX, Action::NEW)
             ->addGlobalAction(Crud::PAGE_DETAIL, Action::EDIT)
