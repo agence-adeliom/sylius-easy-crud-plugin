@@ -20,7 +20,7 @@ class AssetRenderer
     /**
      * @param array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $assets
      */
-    public function renderAssets(array $assets): string
+    public function renderAssets(array $assets, ?string $nonce = null): string
     {
         $html = '';
 
@@ -30,7 +30,7 @@ class AssetRenderer
                     continue;
                 }
                 $attributes = [
-                    'nonce' => 'happycms',
+                    'nonce' => $nonce,
                 ];
                 $attributes['rel'] = 'stylesheet';
                 if (is_string($asset)) {
@@ -68,7 +68,7 @@ class AssetRenderer
                     continue;
                 }
                 $attributes = [
-                    'nonce' => 'happycms',
+                    'nonce' => $nonce,
                 ];
                 if (is_string($asset)) {
                     $attributes['src'] = $asset;
@@ -110,7 +110,7 @@ class AssetRenderer
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
                                 [
-                                    'nonce' => 'happycms',
+                                    'nonce' => $nonce,
                                 ],
                                 true
                             );
@@ -120,7 +120,7 @@ class AssetRenderer
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
                                 [
-                                    'nonce' => 'happycms',
+                                    'nonce' => $nonce,
                                 ],
                                 true
                             );
@@ -132,7 +132,7 @@ class AssetRenderer
                                 null,
                                 null,
                                 [
-                                    'nonce' => 'happycms',
+                                    'nonce' => $nonce,
                                 ],
                                 true
                             );
@@ -142,7 +142,7 @@ class AssetRenderer
                                 null,
                                 null,
                                 [
-                                    'nonce' => 'happycms',
+                                    'nonce' => $nonce,
                                 ],
                                 true
                             );
