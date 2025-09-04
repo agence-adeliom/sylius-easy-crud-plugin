@@ -29,7 +29,9 @@ class AssetRenderer
                 if (is_null($asset)) {
                     continue;
                 }
-                $attributes = [];
+                $attributes = [
+                    'nonce' => 'happycms',
+                ];
                 $attributes['rel'] = 'stylesheet';
                 if (is_string($asset)) {
                     $attributes['href'] = $asset;
@@ -65,7 +67,9 @@ class AssetRenderer
                 if (is_null($asset)) {
                     continue;
                 }
-                $attributes = [];
+                $attributes = [
+                    'nonce' => 'happycms',
+                ];
                 if (is_string($asset)) {
                     $attributes['src'] = $asset;
                 } else if ($asset instanceof Asset) {
@@ -105,14 +109,20 @@ class AssetRenderer
                                 $webpackAsset->getAsDto()->getValue(),
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
-                                []
+                                [
+                                    'nonce' => 'happycms',
+                                ],
+                                true
                             );
                         $html .= $this->tagRenderer
                             ->renderWebpackLinkTags(
                                 $webpackAsset->getAsDto()->getValue(),
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
-                                []
+                                [
+                                    'nonce' => 'happycms',
+                                ],
+                                true
                             );
                         continue;
                     } else if (is_string($webpackAsset)) {
@@ -121,14 +131,20 @@ class AssetRenderer
                                 $webpackAsset,
                                 null,
                                 null,
-                                []
+                                [
+                                    'nonce' => 'happycms',
+                                ],
+                                true
                             );
                         $html .= $this->tagRenderer
                             ->renderWebpackLinkTags(
                                 $webpackAsset,
                                 null,
                                 null,
-                                []
+                                [
+                                    'nonce' => 'happycms',
+                                ],
+                                true
                             );
                     }
                 } catch (\Exception $exception) {
