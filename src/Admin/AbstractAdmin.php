@@ -39,6 +39,14 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
         return 'asc';
     }
 
+    /**
+     * @return int[]
+     */
+    public static function getLimits(): array
+    {
+        return [10, 25, 50];
+    }
+
     public function configureActions(string $pageName): Actions
     {
         $actions = Actions::new();
