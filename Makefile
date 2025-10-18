@@ -4,14 +4,39 @@ DOCKER_COMPOSE ?= docker compose
 DOCKER_USER ?= "$(shell id -u):$(shell id -g)"
 ENV ?= "dev"
 
+reset:
+	@make -s clean
+	@rm -rf vendor composer.lock node_modules yarn.lock
+	@rm -rf compose.override.yml
+
+install:
+	yarn install
+	yarn build
+	@make init
+	@make database-init
+	@make load-fixtures
+	@make assets-init
+
+# Run QA tools
+publish:
+	@make phpstan
+	@make ecs
+	@make phpunit
+	@make behat
+
 init:
 	@make -s docker-compose-check
 	@if [ ! -e compose.override.yml ]; then \
 		cp compose.override.dist.yml compose.override.yml; \
 	fi
+	sed -i'' -e 's|"8025:8025"|"8027:8025"|g' compose.override.yml
+	rm -rf compose.override.yml-e
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer install --no-interaction --no-scripts --no-plugins
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
+
+assets-init:
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i php "vendor/bin/console assets:install"
 
 run:
 	@make -s up
@@ -59,6 +84,9 @@ phpstan:
 
 ecs:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/ecs check src
+
+ecs-fix:
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/ecs-fix check src
 
 phpunit:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/phpunit

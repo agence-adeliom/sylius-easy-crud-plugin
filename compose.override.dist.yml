@@ -43,13 +43,13 @@ services:
             - "3306:3306"
     nginx:
         environment:
-            WORKING_DIR: /srv/sylius/tests/Application
+            WORKING_DIR: /srv/sylius/vendor/sylius/test-application
         volumes:
             - .:/srv/sylius:ro
             # if you develop on Linux, you may use a bind-mounted host directory instead
 #            - ./public/media:/srv/sylius/public/media:ro
         ports:
-            - "80:80"
+            - "8080:80"
     nodejs:
         image: node:${NODE_VERSION:-20}-alpine
         user: ${DOCKER_USER:-1000:1000}
@@ -57,15 +57,15 @@ services:
         entrypoint: [ "/bin/sh","-c" ]
         command:
             - |
-                cd tests/Application
+                cd vendor/sylius/test-application
                 yarn install
                 yarn build
         volumes:
             - .:/srv/sylius:rw,cached
-            - ./public:/srv/sylius/public:rw,delegated
+            - ./vendor/sylius/test-application:/srv/sylius/vendor/sylius/test-application/public:rw,delegated
     mailhog:
         ports:
-            - "8025:8025"
+            - "8027:8025"
 
 volumes:
     mysql-data:
