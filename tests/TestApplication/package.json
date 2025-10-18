@@ -1,0 +1,15 @@
+{
+  "name": "adeliom-sylius-easy-crud-plugin",
+  "version": "2.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}

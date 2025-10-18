@@ -1,17 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 use PhpCsFixer\Fixer\ClassNotation\VisibilityRequiredFixer;
-use PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer;
-use PhpCsFixer\Fixer\Phpdoc\PhpdocSeparationFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return static function (ECSConfig $config): void {
-    $config->paths(['src']);
-
-    $config->skip([
-        VisibilityRequiredFixer::class => ['*Spec.php'],
+return static function (ECSConfig $ecsConfig): void {
+    $ecsConfig->paths([
+        __DIR__ . '/src',
+        __DIR__ . '/tests/Behat',
+        __DIR__ . '/ecs.php',
     ]);
 
-    $config->ruleWithConfiguration(BinaryOperatorSpacesFixer::class, []);
-    $config->ruleWithConfiguration(PhpdocSeparationFixer::class, ['groups' => [['ORM\\*']]]);
+    $ecsConfig->import('vendor/sylius-labs/coding-standard/ecs.php');
 };
+

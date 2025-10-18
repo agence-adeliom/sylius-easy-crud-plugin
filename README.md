@@ -1,6 +1,6 @@
 # Sylius Easy Crud Bundle
 
-This bundle allow you to quickly create custom admin crud interfaces in Sylius. 
+This bundle allow you to quickly create custom admin crud interfaces in Sylius.
 And with a similar way you configure CRUD with EasyAdminBundle.
 For example :
 ```php

@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin;
 
 use Adeliom\SyliusEasyCrudPlugin\CompilerPass\RegisterAdminPass;
-use Adeliom\SyliusEasyCrudPlugin\DependencyInjection\SyliusEasyCrudExtension;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class SyliusEasyCrudPlugin extends AbstractBundle
+final class SyliusEasyCrudPlugin extends Bundle
 {
     use SyliusPluginTrait;
 
@@ -22,8 +20,8 @@ class SyliusEasyCrudPlugin extends AbstractBundle
         $container->addCompilerPass(new RegisterAdminPass());
     }
 
-    public function getContainerExtension(): ?ExtensionInterface
+    public function getPath(): string
     {
-        return new SyliusEasyCrudExtension();
+        return \dirname(__DIR__);
     }
 }
