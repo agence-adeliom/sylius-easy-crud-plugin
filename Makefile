@@ -1,6 +1,7 @@
 .PHONY: run
 
 DOCKER_COMPOSE ?= docker compose
+DDEV ?= ddev
 DOCKER_USER ?= "$(shell id -u):$(shell id -g)"
 ENV ?= "dev"
 
@@ -15,7 +16,7 @@ install:
 	@make init
 	@make database-init
 	@make load-fixtures
-	@make assets-init
+	@make frontend-clear
 
 # Run QA tools
 publish:
@@ -26,17 +27,18 @@ publish:
 
 init:
 	@make -s docker-compose-check
+	@make -s ddev-check
 	@if [ ! -e compose.override.yml ]; then \
 		cp compose.override.dist.yml compose.override.yml; \
 	fi
-	sed -i'' -e 's|"8025:8025"|"8027:8025"|g' compose.override.yml
-	rm -rf compose.override.yml-e
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer install --no-interaction --no-scripts --no-plugins
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
 
-assets-init:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i php "vendor/bin/console assets:install"
+frontend-clear:
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn install" || true
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn build" || true
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console assets:install
 
 run:
 	@make -s up
@@ -60,12 +62,15 @@ node-shell:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i nodejs sh
 
 node-watch:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i nodejs "npm run watch"
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i nodejs "yarn run watch"
 
 docker-compose-check:
 	@$(DOCKER_COMPOSE) version >/dev/null 2>&1 || (echo "Please install docker compose binary or set DOCKER_COMPOSE=\"docker-compose\" for legacy binary" && exit 1)
 	@echo "You are using \"$(DOCKER_COMPOSE)\" binary"
 	@echo "Current version is \"$$($(DOCKER_COMPOSE) version)\""
+
+ddev-check:
+	@$(DDEV) poweroff >/dev/null 2>&1 && echo "You are using ddev, we need to stop it to free needed ports" || (echo "DDEV is not installed, no port conflicts detected")
 
 database-init:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:create -n --if-not-exists

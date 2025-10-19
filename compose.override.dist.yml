@@ -29,13 +29,10 @@ services:
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
-          - .:/srv/sylius:rw,cached
-          # if you develop on Linux, you may use a bind-mounted host directory instead
-#          - ./var:/srv/sylius/var:rw
-          - ./public:/srv/sylius/public:rw,delegated
-          # if you develop on Linux, you may use a bind-mounted host directory instead
-#          - ./public/media:/srv/sylius/public/media:rw
-          - public-media:/srv/sylius/public/media:rw
+            - .:/srv/sylius:rw,cached
+            # if you develop on Linux, you may use a bind-mounted host directory instead
+            #          - ./var:/srv/sylius/var:rw
+            - public-media:/srv/sylius/vendor/sylius/test-application/public/media:rw
     mysql:
         volumes:
             - mysql-data:/var/lib/mysql:rw
@@ -47,9 +44,9 @@ services:
         volumes:
             - .:/srv/sylius:ro
             # if you develop on Linux, you may use a bind-mounted host directory instead
-#            - ./public/media:/srv/sylius/public/media:ro
+        #            - ./public/media:/srv/sylius/public/media:ro
         ports:
-            - "8080:80"
+            - "80:80"
     nodejs:
         image: node:${NODE_VERSION:-20}-alpine
         user: ${DOCKER_USER:-1000:1000}
@@ -62,10 +59,9 @@ services:
                 yarn build
         volumes:
             - .:/srv/sylius:rw,cached
-            - ./vendor/sylius/test-application:/srv/sylius/vendor/sylius/test-application/public:rw,delegated
     mailhog:
         ports:
-            - "8027:8025"
+            - "8025:8025"
 
 volumes:
     mysql-data:
