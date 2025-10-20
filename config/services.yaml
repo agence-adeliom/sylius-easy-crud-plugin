@@ -1,144 +1,145 @@
 services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
-
-  Adeliom\SyliusEasyCrudPlugin\Controller\OembedController:
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType:
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\SortableCollectionConfigurator:
-    public: true
-
-  #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\AssociationConfigurator:
-  #    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Form\ChoiceMaskType:
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\ChoiceMaskConfigurator:
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\EnumConfigurator:
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\TranslationConfigurator:
-    arguments:
-      - "@sylius.translation_locale_provider"
-    public: true
-
-  sylius.easycrud.intlformatter:
-    class: Adeliom\SyliusEasyCrudPlugin\Intl\IntlFormatter
-
-  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\DateTimeConfigurator:
-    arguments:
-      - "@sylius.easycrud.intlformatter"
-    public: true
-
-  #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\PositionSortableConfigurator:
-  #    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension:
-    public: true
-    tags: [ twig.extension ]
-
-  adeliom.sylius.twig.oembed_extension:
-    alias: Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Twig\ResourcePropertyAccessorExtension:
-    public: true
-    arguments:
-      - "@property_accessor"
-    tags: [ twig.extension ]
-
-  adeliom.sylius.twig.resource_property_extension:
-    alias: Adeliom\SyliusEasyCrudPlugin\Twig\ResourcePropertyAccessorExtension
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\Twig\CrudRenderExtension:
-    public: true
-    arguments:
-      - "@property_accessor"
-    tags: [ twig.extension ]
-  adeliom.sylius.twig.crud_render_extension:
-    alias: Adeliom\SyliusEasyCrudPlugin\Twig\CrudRenderExtension
-    public: true
-
-  Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection:
-    arguments:
-      - !tagged_iterator easy.fields.configurator
-
-  adeliom.sylius.field.configurator.collection:
-    alias: Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection
-    public: true
-
-  adeliom.sylius.form.type.field_resource_translations:
-    public: true
-    class: Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType
-    tags: [ 'form.type' ]
-    arguments:
-      - "@sylius.translation_locale_provider"
-      - "@property_accessor"
-
-  Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType:
-    public: true
-    alias: adeliom.sylius.form.type.field_resource_translations
-
-  adeliom.sylius.form.type.resource_choice:
-    public: true
-    class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType
-    tags: [ 'form.type' ]
-    arguments:
-      - "@sylius.registry.resource_repository"
-  Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType:
-    public: true
-    alias: adeliom.sylius.form.type.resource_choice
-
-  adeliom.sylius.crud.admin.factory:
-    class: Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory
-    public: true
-    arguments:
-      - "@form.type_guesser.doctrine"
-      - "@adeliom.sylius.field.configurator.collection"
-      - "@knp_menu.factory"
-      - "@property_accessor"
-      - "@sylius.resource_controller.request_configuration_factory"
-      - "@request_stack"
-      - "@parameter_bag"
-
-  Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
-    public: true
-    alias: adeliom.sylius.crud.admin.factory
-
-  Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
-    tags: [ 'maker.command' ]
-    arguments:
-      - "@doctrine"
-      - "@parameter_bag"
-
-  Adeliom\SyliusEasyCrudPlugin\Maker\CreateEntity:
-    tags: [ 'maker.command' ]
-    arguments:
-      - "@doctrine"
-      - "@parameter_bag"
-
-  Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage:
-    arguments:
-      - "@request_stack"
-    tags:
-      - assets.package: { package: 'sylius.easy.crud.assets.package' }
-
-  Adeliom\SyliusEasyCrudPlugin\Form\ImageType:
-    arguments:
-      - "@sylius.uploader.image"
-
-  adeliom.sylius.asset.renderer:
-    class: Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer
-    public: true
-    arguments:
-      - '@event_dispatcher'
-      - '@webpack_encore.tag_renderer'
-      - '@assets.packages'
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Controller\OembedController:
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType:
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\SortableCollectionConfigurator:
+        public: true
+    
+    #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\AssociationConfigurator:
+    #    public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Form\ChoiceMaskType:
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\ChoiceMaskConfigurator:
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\EnumConfigurator:
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\TranslationConfigurator:
+        arguments:
+            - "@sylius.translation_locale_provider"
+        public: true
+    
+    sylius.easycrud.intlformatter:
+        class: Adeliom\SyliusEasyCrudPlugin\Intl\IntlFormatter
+    
+    Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\DateTimeConfigurator:
+        arguments:
+            - "@sylius.easycrud.intlformatter"
+        public: true
+    
+    #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\PositionSortableConfigurator:
+    #    public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension:
+        public: true
+        tags: [ twig.extension ]
+    
+    adeliom.sylius.twig.oembed_extension:
+        alias: Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Twig\ResourcePropertyAccessorExtension:
+        public: true
+        arguments:
+            - "@property_accessor"
+        tags: [ twig.extension ]
+    
+    adeliom.sylius.twig.resource_property_extension:
+        alias: Adeliom\SyliusEasyCrudPlugin\Twig\ResourcePropertyAccessorExtension
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\Twig\CrudRenderExtension:
+        public: true
+        arguments:
+            - "@property_accessor"
+        tags: [ twig.extension ]
+    adeliom.sylius.twig.crud_render_extension:
+        alias: Adeliom\SyliusEasyCrudPlugin\Twig\CrudRenderExtension
+        public: true
+    
+    Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection:
+        arguments:
+            - !tagged_iterator easy.fields.configurator
+    
+    adeliom.sylius.field.configurator.collection:
+        alias: Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection
+        public: true
+    
+    adeliom.sylius.form.type.field_resource_translations:
+        public: true
+        class: Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType
+        tags: [ 'form.type' ]
+        arguments:
+            - "@sylius.translation_locale_provider"
+            - "@property_accessor"
+    
+    Adeliom\SyliusEasyCrudPlugin\Form\FieldResourceTranslationsType:
+        public: true
+        alias: adeliom.sylius.form.type.field_resource_translations
+    
+    adeliom.sylius.form.type.resource_choice:
+        public: true
+        class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType
+        tags: [ 'form.type' ]
+        arguments:
+            - "@sylius.registry.resource_repository"
+    Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType:
+        public: true
+        alias: adeliom.sylius.form.type.resource_choice
+    
+    adeliom.sylius.crud.admin.factory:
+        class: Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory
+        public: true
+        arguments:
+            - "@form.type_guesser.doctrine"
+            - "@adeliom.sylius.field.configurator.collection"
+            - "@knp_menu.factory"
+            - "@property_accessor"
+            - "@sylius.resource_controller.request_configuration_factory"
+            - "@request_stack"
+            - "@parameter_bag"
+    
+    Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
+        public: true
+        alias: adeliom.sylius.crud.admin.factory
+    
+    Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
+        tags: [ 'maker.command' ]
+        arguments:
+            - "@doctrine"
+            - "@parameter_bag"
+    
+    Adeliom\SyliusEasyCrudPlugin\Maker\CreateEntity:
+        tags: [ 'maker.command' ]
+        arguments:
+            - "@doctrine"
+            - "@parameter_bag"
+    
+    'assets._package_sylius.easy_crud':
+        class: Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage
+        arguments:
+            - "@request_stack"
+        tags:
+            -   assets.package: { package: 'sylius.easy_crud' }
+    
+    Adeliom\SyliusEasyCrudPlugin\Form\ImageType:
+        arguments:
+            - "@sylius.uploader.image"
+    
+    adeliom.sylius.asset.renderer:
+        class: Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer
+        public: true
+        arguments:
+            - '@event_dispatcher'
+            - '@webpack_encore.tag_renderer'
+            - '@assets.packages'
