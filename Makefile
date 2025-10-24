@@ -11,6 +11,9 @@ reset:
 	@rm -rf compose.override.yml
 
 install:
+	yarn install
+	yarn run build
+	@make init
 	@make database-init
 	@make load-fixtures
 	@make frontend-clear
