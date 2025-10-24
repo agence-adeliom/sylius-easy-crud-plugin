@@ -7,13 +7,10 @@ ENV ?= "dev"
 
 reset:
 	@make -s clean
-	@rm -rf vendor composer.lock node_modules yarn.lock
+	@rm -rf vendor composer.lock node_modules
 	@rm -rf compose.override.yml
 
 install:
-	yarn install
-	yarn build
-	@make init
 	@make database-init
 	@make load-fixtures
 	@make frontend-clear

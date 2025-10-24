@@ -32,7 +32,10 @@ services:
             - .:/srv/sylius:rw,cached
             # if you develop on Linux, you may use a bind-mounted host directory instead
             #          - ./var:/srv/sylius/var:rw
-            - public-media:/srv/sylius/vendor/sylius/test-application/public/media:rw
+            - ./public:/srv/sylius/public:rw,delegated
+            # if you develop on Linux, you may use a bind-mounted host directory instead
+            #          - ./public/media:/srv/sylius/public/media:rw
+            - public-media:/srv/sylius/public/media:rw
     mysql:
         volumes:
             - mysql-data:/var/lib/mysql:rw
@@ -59,6 +62,7 @@ services:
                 yarn build
         volumes:
             - .:/srv/sylius:rw,cached
+            - ./public:/srv/sylius/public:rw,delegated
     mailhog:
         ports:
             - "8025:8025"
