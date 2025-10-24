@@ -87,7 +87,7 @@ abstract class AbstractFormType extends AbstractGridType
         $fields = FieldCollection::new(
             $this->configureFields($pageName, $context),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),
-            $this->resource
+            $this->resource,
         );
 
         $menuItem = null;
@@ -142,7 +142,7 @@ abstract class AbstractFormType extends AbstractGridType
                         $subFieldsDto = FieldCollection::new(
                             $fieldDto->getCustomOption('fieldsDto'),
                             $this->crudAdminFactory->getFieldConfiguratorCollection(),
-                            $this->resource
+                            $this->resource,
                         );
                         if (method_exists($options['data_class'], 'getTranslationClass')) {
                             $formFieldOptions['data_translation_class'] = $options['data_class']::getTranslationClass();
@@ -235,7 +235,7 @@ abstract class AbstractFormType extends AbstractGridType
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_DETAIL),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),
-            $resource
+            $resource,
         );
 
         $menuItem = null;
@@ -301,7 +301,7 @@ abstract class AbstractFormType extends AbstractGridType
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_INDEX),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),
-            null
+            null,
         );
 
         foreach ($fields as $fieldDto) {

@@ -38,8 +38,8 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
             if (!$options['multiple']) {
                 $builder->addModelTransformer(
                     new CallbackTransformer(
-                        function (string|int|null $tag) use ($options) : ?ResourceInterface {
-                            if (!is_null($tag)) {
+                        function (string|int|null $tag) use ($options): ?ResourceInterface {
+                            if (null !== $tag) {
                                 return $options['repository']->findOneBy([
                                                                              $options['choice_value'] => $tag,
                                                                          ]);
@@ -48,20 +48,21 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                             return null;
                         },
                         function (?ResourceInterface $tagsAsResource) use ($options): string|int {
-                            if (!is_null($tagsAsResource)) {
-                                if (method_exists($tagsAsResource, 'get'.ucfirst($options['choice_value']))) {
-                                    return call_user_func([$tagsAsResource, 'get'.ucfirst($options['choice_value'])]);
+                            if (null !== $tagsAsResource) {
+                                if (method_exists($tagsAsResource, 'get' . ucfirst($options['choice_value']))) {
+                                    return call_user_func([$tagsAsResource, 'get' . ucfirst($options['choice_value'])]);
                                 }
                             }
+
                             return '';
-                        }
-                    )
+                        },
+                    ),
                 );
             } elseif ($options['multiple']) {
                 $builder
                     ->addModelTransformer(
                         new CallbackTransformer(
-                            function (array|string|null $tagsAsArray) use ($options) : Collection {
+                            function (array|string|null $tagsAsArray) use ($options): Collection {
                                 $valueAsCollection = new ArrayCollection();
                                 if (is_string($tagsAsArray)) {
                                     // If you switch from non multiple value to multiple value, the value will be a string
@@ -85,18 +86,18 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                             function (Collection $tagsAsCollection) use ($options): string {
                                 $valuesAsString = '';
                                 foreach ($tagsAsCollection as $key => $tag) {
-                                    if (is_object($tag) && method_exists($tag, 'get'.ucfirst($options['choice_value']))) {
-                                        $valuesAsString .= call_user_func([$tag, 'get'.ucfirst($options['choice_value'])]);
+                                    if (is_object($tag) && method_exists($tag, 'get' . ucfirst($options['choice_value']))) {
+                                        $valuesAsString .= call_user_func([$tag, 'get' . ucfirst($options['choice_value'])]);
                                     }
                                     $valuesAsString .= ',';
                                 }
+
                                 return substr($valuesAsString, 0, -1); // Remove the last comma
-                            }
-                        )
+                            },
+                        ),
                     );
             }
         }
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -76,6 +76,7 @@ final class IconField implements FieldInterface
 
     /**
      * Path to css compiled fonts
+     *
      * @param string|mixed[] $fonts
      */
     public function setFonts(string|array $fonts = []): self

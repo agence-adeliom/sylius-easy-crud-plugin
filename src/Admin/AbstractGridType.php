@@ -49,7 +49,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
                 }
             }
             if (method_exists($this, 'getLimits')) {
-                $grid->setLimits( $this::getLimits());
+                $grid->setLimits($this::getLimits());
             }
         }
 

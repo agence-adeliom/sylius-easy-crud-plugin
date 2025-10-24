@@ -16,8 +16,8 @@ namespace Adeliom\SyliusEasyCrudPlugin\Form;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
-use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Translation\Provider\TranslationLocaleProviderInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -148,7 +148,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                                 $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
                             ) {
                                 $objectClassName = $reflectionExtractor->getTypes($className, $property)[0]->getClassName();
-                                if (!is_null($actualValue) && method_exists($actualValue, 'normalizeFormData')) {
+                                if (null !== $actualValue && method_exists($actualValue, 'normalizeFormData')) {
                                     $value = $actualValue::normalizeFormData($value);
                                 }
                                 $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [

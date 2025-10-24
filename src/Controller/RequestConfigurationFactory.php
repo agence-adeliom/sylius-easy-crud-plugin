@@ -34,7 +34,6 @@ final class RequestConfigurationFactory implements RequestConfigurationFactoryIn
 
     /**
      * @var string
-     *
      * @psalm-var class-string<RequestConfiguration>
      */
     private $configurationClass;
@@ -44,7 +43,6 @@ final class RequestConfigurationFactory implements RequestConfigurationFactoryIn
 
     /**
      * @psalm-param class-string<RequestConfiguration> $configurationClass
-     *
      * @param array<string, mixed> $defaultParameters
      */
     public function __construct(ParametersParserInterface $parametersParser, string $configurationClass, array $defaultParameters = [])

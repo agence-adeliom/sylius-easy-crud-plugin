@@ -92,7 +92,7 @@ trait EntityPublishableTrait
 
     public function isStateUnpublished(): bool
     {
-        return is_null($this->publishState) || $this->hasState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
+        return null === $this->publishState || $this->hasState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
     }
 
     public function isStatePending(): bool
@@ -102,7 +102,7 @@ trait EntityPublishableTrait
 
     public function hasState(?string $state): bool
     {
-        return !is_null($this->publishState) && strtolower($this->publishState) === strtolower($state);
+        return null !== $this->publishState && strtolower($this->publishState) === strtolower($state);
     }
 
     public function isDatePublished(): bool

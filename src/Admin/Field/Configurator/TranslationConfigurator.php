@@ -7,13 +7,13 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
-use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Translation\Provider\TranslationLocaleProviderInterface;
+use Sylius\Resource\Model\ResourceInterface;
 
 final class TranslationConfigurator implements FieldConfiguratorInterface
 {
     public function __construct(
-        protected TranslationLocaleProviderInterface $localeProvider,
+        private TranslationLocaleProviderInterface $localeProvider,
     ) {
     }
 

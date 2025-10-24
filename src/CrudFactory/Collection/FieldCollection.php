@@ -23,8 +23,8 @@ final class FieldCollection implements CollectionInterface
      */
     private function __construct(
         iterable $fields,
-        protected FieldConfiguratorCollection $fieldConfiguratorCollection,
-        protected ?ResourceInterface $resource = null,
+        private FieldConfiguratorCollection $fieldConfiguratorCollection,
+        private ?ResourceInterface $resource = null,
     ) {
         $this->fields = $this->processFields($fields);
     }

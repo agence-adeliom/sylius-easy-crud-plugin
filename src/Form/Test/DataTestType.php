@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Form\Test;
 
 use Adeliom\SyliusEasyCrudPlugin\Form\AdminFormTypeInterface;
-use Adeliom\SyliusEasyCrudPlugin\Form\ResourceAutocompleteChoiceType;
 use Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType;
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use App\Entity\Product\Product;
