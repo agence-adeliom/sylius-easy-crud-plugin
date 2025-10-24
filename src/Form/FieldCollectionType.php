@@ -24,6 +24,7 @@ final class FieldCollectionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         Assert::isIterable($options['entries']);
+        Assert::isArray($options['fields']);
 
         foreach ($options['entries'] as $entry) {
             Assert::isCallable($options['entry_type']);
@@ -34,6 +35,10 @@ final class FieldCollectionType extends AbstractType
             $entryOptions = $options['entry_options']($entry);
             $entryType = $options['entry_type']($entry);
 
+            Assert::string($entryName);
+            Assert::isArray($entryOptions);
+            Assert::string($entryType);
+
             if ($entryType !== FormType::class) {
                 Assert::isCallable($options['entry_type']);
 
@@ -42,6 +47,8 @@ final class FieldCollectionType extends AbstractType
                     'block_name' => 'entry',
                 ], $entryOptions));
             } else {
+                Assert::string($options['data_translation_class']);
+
                 $formField = $builder
                     ->getFormFactory()
                     ->createNamedBuilder(
@@ -55,11 +62,16 @@ final class FieldCollectionType extends AbstractType
                         ], $entryOptions),
                     );
 
+                /** @var array{name: string, type: class-string, options: array<string, mixed>, customOptions?: array<string, mixed>} $field */
                 foreach ($options['fields'] as $field) {
+                    $fieldOptions = !is_subclass_of($field['type'], CodeEditorTypeInterface::class)
+                        ? $field['options']
+                        : array_merge($field['options'], $field['customOptions'] ?? []);
+
                     $formField->add(
                         $field['name'],
                         $field['type'],
-                        $field['type'] !== CodeEditorType::class ? $field['options'] : array_merge($field['options'], $field['customOptions'] ?? []),
+                        $fieldOptions,
                     );
                 }
 
