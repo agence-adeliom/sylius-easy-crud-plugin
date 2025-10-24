@@ -49,8 +49,9 @@ You can execute without entity name `php bin/console make:easy-crud:create-crud`
 Follow documentation [here](https://docs.sylius.com/en/latest/customization/menu.html).
 
 - Do not forget to add new entity into [menu](https://docs.sylius.com/en/latest/customization/menu.html).
-- Navigate to https://sylius-site.ddev.site/admin/posts/
+- Navigate to /admin/posts/
 
-5. Now you can learn more about Admin class configuration
+## Next Steps
 
-- Visit [here](./discover_fields) to see all default form fields available.
+- **Explore [Field Types](./discover_fields.md)** to understand available fields
+- **Review [Entity Traits](./entity_traits.md)** for common entity features

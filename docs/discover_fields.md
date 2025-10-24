@@ -1,180 +1,181 @@
-## Configure your custom CRUD
+## Discover available fields
 
 Here is the list of default fields available with this plugin and configuration example.
 
-### ResourceChoiceField
+## Table of Contents
 
-Is a field that allow you to choose a single resource in a select field
+- [Available Field Types](#available-field-types)
+- [Fields Types](#Field-Types)
+  - [Basic Fields](#basic-fields)
+  - [Collections Fields](#collections-fields)
+  - [CMS Fields](#cms-fields)
+  - [Layout Fields](#layout-fields)
+  - [Work with translations](#work-with-translations)
+- [Configure Fields Visibility](#configure-fields-visibility)
 
-#### Usage
+
+
+## Available Field Types
+
+The plugin includes 18+ specialized fields:
+
+| Field | Description                          |
+|-------|--------------------------------------|
+| `Field` | Basic field base on a FormType       |
+| `CheckboxField` | Boolean checkbox                     |
+| `DateField`, `DateTimeField`, `TimeField` | Date/time pickers                    |
+| `ImageField` | File upload with image preview       |
+| `TextEditorField` | WYSIWYG rich text editor             |
+| `CodeEditorField` | Syntax-highlighted code editor       |
+| `SlugField` | Auto-generated URL-friendly slugs    |
+| `EnumField` | PHP 8.1+ enum support                |
+| `ResourceChoiceField` | Select related Sylius resources      |
+| `TranslationField` | Multi-language content editing       |
+| `TabField` | Organize fields into tabs            |
+| `ColumnField` | Create responsive layouts            |
+| `SortableCollectionField` | Drag-and-drop sortable items         |
+| `ChoiceMaskField` | Conditional field visibility         |
+| `OembedField` | Embed external media (YouTube, etc.) |
+| `IconField` | Icon picker                          |
+| `FormTypeField` | Use any custom Symfony form type     |
+
+## Field Types
+
+### Basic Fields
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\AssociationField;
+// Text input
+yield Field::new('title');
 
-// You have to add this form theme @SyliusEasyCrudPlugin/form/association_widget.html.twig
-...
-yield ResourceChoiceField::new('page')
-    ->setResource('happy_cms.page')
-;
+// Textarea
+yield Field::new('description')->setFormType(TextareaType::class);
+
+// Checkbox
+yield CheckboxField::new('enabled');
+
+// Date/Time
+yield DateField::new('publishedDate');
+yield DateTimeField::new('publishedAt');
+yield TimeField::new('publishTime');
+
+// Auto-generated slug
+yield SlugField::new('slug')
+    ->setTargetFieldName('title');
 ```
 
-### ResourceAutocompleteChoiceField
-
-Is a field that allow you to choose one or more resources using an dynamic select field
-
-#### Usage
+### Choices Fields
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceAutocompleteChoiceField;
 
+// Choice field based on Enum
+yield EnumField::new('state')
+    ->setEnum(ThreeStateStatusEnum::class)
+    ->renderExpanded();
 
-yield ResourceAutocompleteChoiceField::new('products')
-    ->setMultiple()
-    ->setLabel('sylius.ui.products')
-    ->setChoiceValue('id')
-    ->setChoiceName('name')
-    ->setResource('sylius.product')
-    ->setRepositoryMethod('findByPhrase')
-    ->setRemoteCriteriaName('phrase')
-    ->setRepositoryArguments([
-         'phrase' => '$phrase',
-         'locale' => "expr:service('sylius.context.locale').getLocaleCode()",
-         'limit' => 10
-     ]);
+// Select related resource
+yield ResourceChoiceField::new('taxon')
+    ->setResource('sylius.taxon');
+
+yield ResourceChoiceField::new('products')
+        ->setLabel('Products')
+        ->hideOnIndex()
+        ->setEntityClass(Product::class)
+        ->setResourceAlias('sylius.product')
+        ->setMultiple();
+
 ```
 
-### EnumField
-
-#### Usage
+### Collections Fields
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
-...
-yield EnumField::new('property', "label")
-    ->setEnum(YourEnumClass::class);
+
+// Collection with sortable entries
+yield SortableCollectionField::new('data')
+        ->setEntryType(SubType::class);
+
 ```
 
-### FormTypeField
-
-This field is a custom integration that allow you to bind any raw form type to your admin.
-
-#### Usage
+### CMS Fields
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\FormTypeField;
-...
-yield FormTypeField::new('property', "label", YourFormTypeClass::class)
+
+// Image upload
+yield ImageField::new('featuredImage');
+
+// WYSIWYG editor
+yield TextEditorField::new('content');
+
+// Code editor with syntax highlighting
+yield CodeEditorField::new('customCss')->setLanguage('css');
+yield CodeEditorField::new('codeEditor')
+    ->setLanguage('json');
+
+// Icon picker
+yield IconField::new('icon')
+        ->setJsonUrl('/path/to/icons.json')
+        ->setFonts(['/path/to/icons.css']);
+
+// Oembed (YouTube, Vimeo, etc.)
+yield OembedField::new('videoUrl');
+
 ```
 
-### TranslationField
-
-An A2lix TranslationFormBundle integration for EasyAdmin.
-
-#### Usage
+### Layout Fields
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
+// Create tabs
+yield TabField::new('main', 'Main Information');
+yield TabField::new('seo', 'SEO Settings');
 
-yield TranslationField::new('translations')
-    ->restrictToLocales(['fr_FR'])
-    ->addField(
-        Field::new('name')
-            ->setDisabled(false)
-            ->setRequired(true)
-            ->setFormTypeOption('constraints', [
-                // ...
+// Create columns
+yield ColumnField::new('_col1')->setSize(ColumnSizeEnum::WIDE_8_OF_16);
+yield ColumnField::new('_col2')->setSize(ColumnSizeEnum::REGULAR_4_OF_16);
+
+// Conditional fields based on choice
+yield ChoiceMaskField::new('choice_mask')
+            ->renderExpanded()
+            ->setVirtual()
+            ->setChoices([
+                'field1 + virtual2' => 'both',
+                'field1' => 'field1',
+                'field2' => 'field2',
             ])
-    )
-    ->addField(
-        SlugField::new('slug')
-            ->setRequired(true)
-    )
-    ->hideOnIndex();
+            ->setMap([
+                'both' => ['field1', 'virtual2'],
+                'field1' => ['field1'],
+                'field2' => ['field2'],
+            ]);
+
+yield Field::new('field1');
+yield Field::new('field2');
 ```
 
-### ChoiceMaskField
+### Work with translations
 
-An fork of Sonata's ChoiceMaskField for EasyAdmin.
-
-#### Usage
+You can wrap any fields inside a `TranslationField` to manage multi-language content.
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
-
-// You have to add this form theme @SyliusEasyCrudPlugin/form/choice_mask_widget.html.twig
-...
-yield ChoiceMaskField::new('property', "label")
-    ->setChoices([
-        'uri' => 'uri',
-        'route' => 'route',
-    ])
-    // Associative array. Describes the fields that are displayed for each choice.
-    ->setMap([
-        'route' => ['route', 'parameters'],
-        'uri' => ['uri'],
-    ]);
+// Multi-language content
+yield TranslationField::new('translations')
+    ->addField(Field::new('name'))
+    ->addField(SlugField::new('slug')->setRequired(true));
 ```
 
-### SortableCollectionField
+## Configure Fields Visibility
 
-Is an extension of EasyAdmin's CollectionField that allow you to sort entries.
-
-#### Usage
+A field can be shown or hidden on specific pages: Index (grid), Form (create/edit), Detail (view).
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\SortableCollectionField;
 
-// You have to add this form theme @SyliusEasyCrudPlugin/form/sortable_widget.html.twig
-...
-// NOTE : property can be a *ToMany or an array.
-yield SortableCollectionField::new('property', "label")
-    ->setEntryType(YourEntryFromType::class)
-    ->allowAdd() // Allow to add new entry
-    ->allowDelete() // Allow to remove entries
-    ->allowDrag()  // Allow to drag entries
-    ;
-```
-
-### IconField
-
-Is an icon picker.
-
-#### Usage
-
-```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\IconField;
-
-// You have to add this form theme @SyliusEasyCrudPlugin/form/icon_widget.html.twig
-...
-yield IconField::new('property', "label")
-    ->setJsonUrl($url) // Must be a public json file with an array of your icon's classes
-    ->setFonts($fonts) // Must be an array of yours fonticon css file
-    ->setSelectButtonLabel() // Change label
-    ->setCancelButtonLabel()  // Change label
-    ->setShowAllButtonLabel()  // Change label
-    ->setSearchPlaceholder()  // Change label
-    ->setNotResultMessage()  // Change label
-    ->setDeleteLabel()
-    ;
-```
-
-### OembedField
-
-#### Usage
-```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\OembedField;
-
-// You have to add this form theme @SyliusEasyCrudPlugin/form/widget.html.twig
-...
-yield OembedField::new('property', "label");
-```
-
-##### Twig render
-
-```php
-# Get HTML code
-{{ property|oembed_html }}
-
-# Get Dimensions
-{{ property|oembed_size }}
+yield Field::new('propertyName')
+    ->hideOnIndex() // Hide on index page (grid)
+    ->hideOnForm()  // Hide on create/edit form
+    ->hideOnDetail(); // Hide on detail view
+    
+    ->onlyOnIndex(); // Show only on index page (grid)
+    ->onlyOnForms()  // Show only on create/edit form
+    ->onlyOnDetail() // Show only on detail view
+    
+    ->onlyWhenCreating(); // Show only on create form
+    ->onlyWhenUpdating()  // Show only on edit form
 ```
