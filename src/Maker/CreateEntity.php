@@ -23,6 +23,7 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final class CreateEntity extends AbstractMaker
@@ -48,6 +49,7 @@ final class CreateEntity extends AbstractMaker
         $command
             ->setDescription(self::getCommandDescription())
             ->addArgument('className', InputArgument::REQUIRED, 'Ex : Post')
+            ->addOption('namespace', null, InputOption::VALUE_OPTIONAL, 'Custom namespace (default: auto-detect from Doctrine)')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('className');
@@ -55,10 +57,38 @@ final class CreateEntity extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $class = 'App\Entity\\' . $input->getArgument('className');
+        $className = $input->getArgument('className');
+
+        // Allow custom namespace override via option
+        $customNamespace = $input->getOption('namespace');
+
+        if ($customNamespace) {
+            // Use the provided namespace
+            $class = rtrim($customNamespace, '\\') . '\\Entity\\' . $className;
+        } else {
+
+            // Use Generator to automatically resolve the correct namespace based on Doctrine configuration
+            $entityClassDetails = $generator->createClassNameDetails(
+                $className,
+                'Entity\\'
+            );
+            $class = $entityClassDetails->getFullName();
+        }
+
+        $io->comment(sprintf('Creating entity: %s', $class));
 
         if (!\class_exists($class)) {
-            $namespace = \trim($generator->getRootNamespace(), '\\');
+            // Extract the root namespace from the class name
+            // For "App\Entity\Post", rootNamespace should be "App"
+            $classParts = explode('\\', $class);
+            if (count($classParts) >= 3) {
+                // Remove "Entity" and class name to get root namespace
+                array_pop($classParts); // Remove class name
+                array_pop($classParts); // Remove "Entity"
+                $namespace = implode('\\', $classParts);
+            } else {
+                $namespace = \trim($generator->getRootNamespace(), '\\');
+            }
 
             [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
 

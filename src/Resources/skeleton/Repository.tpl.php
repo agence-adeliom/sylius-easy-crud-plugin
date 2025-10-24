@@ -4,11 +4,11 @@ if (isset($class_name, $entity_name)) {
     ?>
 <?= "<?php\n" ?>
 
-namespace App\Repository;
+namespace <?= $repository_namespace ?? 'App\Repository' ?>;
 
 use Adeliom\SyliusEasyCrudPlugin\Repository\TranslationRepositoryInterface;
 use Adeliom\SyliusEasyCrudPlugin\Traits\TranslationRepositoryTrait;
-use App\Entity\<?= $entity_name ?>;
+use <?= $entity_namespace ?? 'App\Entity' ?>\<?= $entity_name ?>;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 
 /**

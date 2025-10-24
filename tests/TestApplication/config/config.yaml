@@ -6,6 +6,9 @@ twig:
     paths:
         '%kernel.project_dir%/../../../tests/TestApplication/templates': ~
 
+maker:
+  root_namespace: 'Tests\Adeliom\SyliusEasyCrudPlugin'
+
 # Remove if you do not need to extend entities
 doctrine:
     orm:
@@ -16,4 +19,4 @@ doctrine:
                         is_bundle: false
                         type: attribute
                         dir: '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
-                        prefix: Tests\Adeliom
+                        prefix: Tests\Adeliom\SyliusEasyCrudPlugin

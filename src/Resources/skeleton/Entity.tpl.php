@@ -6,9 +6,9 @@ if (isset($class_name)) {
     ?>
 <?= "<?php\n" ?>
 
-namespace App\Entity;
+namespace <?= $entity_namespace ?? 'App\Entity' ?>;
 
-use App\Repository\<?= $class_name ?>Repository;
+use <?= $repository_namespace ?? 'App\Repository' ?>\<?= $class_name ?>Repository;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslatableInterface;
@@ -20,8 +20,8 @@ use Sylius\Resource\Model\TranslationInterface;
 class <?= $class_name ?> implements ResourceInterface, TranslatableInterface
 {
     use TranslatableTrait {
-        __construct as private initializeTranslationsCollection;
-        getTranslation as private doGetTranslation;
+        TranslatableTrait::__construct as private initializeTranslationsCollection;
+        TranslatableTrait::getTranslation as private doGetTranslation;
     }
 
     #[ORM\Id]

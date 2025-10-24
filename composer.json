@@ -10,9 +10,9 @@
     ],
     "license": "MIT",
     "require": {
-        "ext-json": "*",
-        "ext-intl": "*",
         "php": "^8.2 || ^8.3 || ^8.4",
+        "ext-intl": "*",
+        "ext-json": "*",
         "embed/embed": "^4.4",
         "sylius/sylius": "^2.0",
         "symfony/uid": "^6.4 || ^7.1"
@@ -44,6 +44,7 @@
         "symfony/dotenv": "^6.4 || ^7.1",
         "symfony/http-client": "^6.4 || ^7.1",
         "symfony/intl": "^6.4 || ^7.1",
+        "symfony/maker-bundle": "^1.64",
         "symfony/runtime": "^6.4 || ^7.1",
         "symfony/web-profiler-bundle": "^6.4 || ^7.1",
         "symfony/webpack-encore-bundle": "^2.2"

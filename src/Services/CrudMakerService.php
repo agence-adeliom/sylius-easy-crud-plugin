@@ -78,10 +78,30 @@ class CrudMakerService
      */
     public function generateEntity(string $className, ?string $template = null, ?array $variables = []): void
     {
+        // Extract namespace parts from full class name
+        // For "App\Entity\Post", we get: entity_namespace = "App\Entity", repository_namespace = "App\Repository"
+        $namespaceParts = explode('\\', $className);
+        $shortClassName = array_pop($namespaceParts); // Remove class name
+        $entityNamespace = implode('\\', $namespaceParts); // App\Entity
+
+        // Calculate repository namespace by replacing "Entity" with "Repository"
+        $repositoryNamespaceParts = $namespaceParts;
+        $lastPart = array_pop($repositoryNamespaceParts);
+        if ($lastPart === 'Entity') {
+            $repositoryNamespaceParts[] = 'Repository';
+        } else {
+            $repositoryNamespaceParts[] = $lastPart;
+            $repositoryNamespaceParts[] = 'Repository';
+        }
+        $repositoryNamespace = implode('\\', $repositoryNamespaceParts);
+
         $this->generator->generateClass(
             $className,
             (is_string($template) && file_exists($template)) ? $template : __DIR__ . '/../Resources/skeleton/Entity.tpl.php',
-            $variables,
+            array_merge([
+                'entity_namespace' => $entityNamespace,
+                'repository_namespace' => $repositoryNamespace,
+            ], $variables),
         );
         $this->generator->writeChanges();
         $this->namespaces['entity'] = $className;
@@ -94,10 +114,17 @@ class CrudMakerService
      */
     public function generateEntityTranslation(string $className, ?string $template = null, ?array $variables = []): void
     {
+        // Extract namespace from full class name
+        $namespaceParts = explode('\\', $className);
+        array_pop($namespaceParts); // Remove class name
+        $entityNamespace = implode('\\', $namespaceParts);
+
         $this->generator->generateClass(
             $className . 'Translation',
             (is_string($template) && file_exists($template)) ? $template : __DIR__ . '/../Resources/skeleton/Translation.tpl.php',
-            $variables,
+            array_merge([
+                'entity_namespace' => $entityNamespace,
+            ], $variables),
         );
         $this->generator->writeChanges();
         $this->namespaces['entityTranslation'] = $className . 'Translation';
@@ -110,12 +137,30 @@ class CrudMakerService
      */
     public function generateRepository(string $className, ?string $template = null, ?array $variables = []): void
     {
+        // Extract namespace parts
+        $namespaceParts = explode('\\', $className);
+        $shortClassName = array_pop($namespaceParts); // Remove class name
+        $entityNamespace = implode('\\', $namespaceParts);
+
+        // Calculate repository namespace
+        $repositoryNamespaceParts = $namespaceParts;
+        $lastPart = array_pop($repositoryNamespaceParts);
+        if ($lastPart === 'Entity') {
+            $repositoryNamespaceParts[] = 'Repository';
+        } else {
+            $repositoryNamespaceParts[] = $lastPart;
+            $repositoryNamespaceParts[] = 'Repository';
+        }
+        $repositoryNamespace = implode('\\', $repositoryNamespaceParts);
+
         $this->generator->generateClass(
             str_replace('Entity', 'Repository', $className) . 'Repository',
             (is_string($template) && file_exists($template)) ? $template : __DIR__ . '/../Resources/skeleton/Repository.tpl.php',
             array_merge([
-                            'entity_name' => Str::getShortClassName($className),
-                        ], $variables),
+                'entity_name' => Str::getShortClassName($className),
+                'entity_namespace' => $entityNamespace,
+                'repository_namespace' => $repositoryNamespace,
+            ], $variables),
         );
         $this->generator->writeChanges();
     }
@@ -125,18 +170,25 @@ class CrudMakerService
      */
     public function generateMenuListener(string $className): void
     {
-        if (!\class_exists('App\Menu\AdminMenuListener')) {
+        // Extract root namespace from the entity class name
+        $namespaceParts = explode('\\', $className);
+        $rootNamespace = $namespaceParts[0] ?? 'App';
+        $menuListenerFqcn = $rootNamespace . '\Menu\AdminMenuListener';
+        $menuNamespace = $rootNamespace . '\Menu';
+
+        if (!\class_exists($menuListenerFqcn)) {
             $this->generator->generateClass(
-                'App\Menu\AdminMenuListener',
+                $menuListenerFqcn,
                 __DIR__ . '/../Resources/skeleton/AdminMenuListener.tpl.php',
                 [
                     'route' => $this->namespace . '_admin_' . mb_strtolower(Str::asSnakeCase($className)),
+                    'menu_namespace' => $menuNamespace,
                 ],
             );
             $this->generator->writeChanges();
 
-            $yaml['app.listener.admin.menu_builder'] = [
-                 'class' => 'App\Menu\AdminMenuListener',
+            $yaml[strtolower($rootNamespace) . '.listener.admin.menu_builder'] = [
+                 'class' => $menuListenerFqcn,
                  'tags' => [
                      0 => [
                          'name' => 'kernel.event_listener',

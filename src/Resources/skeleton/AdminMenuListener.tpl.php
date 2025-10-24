@@ -4,7 +4,7 @@ if (isset($class_name, $route)) {
     ?>
 <?= "<?php\n" ?>
 
-namespace App\Menu;
+namespace <?= $menu_namespace ?? 'App\Menu' ?>;
 
 use Sylius\Bundle\UiBundle\Menu\Event\MenuBuilderEvent;
 

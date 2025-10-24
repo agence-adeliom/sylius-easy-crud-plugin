@@ -83,6 +83,7 @@ Finally, alongside this plugin, we migrated our other EasyAdmin-based bundles â€
 
 ```bash
 composer require adeliom/sylius-easy-crud-plugin
+composer require --dev symfony/maker-bundle
 ```
 
 ### 2. Enable the Bundle

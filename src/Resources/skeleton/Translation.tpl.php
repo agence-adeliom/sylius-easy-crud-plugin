@@ -5,7 +5,7 @@ if (isset($class_name)) {
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace <?= $entity_namespace ?? 'App\Entity' ?>;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

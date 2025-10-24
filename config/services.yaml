@@ -115,12 +115,14 @@ services:
     
     Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
         tags: [ 'maker.command' ]
+        public: true
         arguments:
             - "@doctrine"
             - "@parameter_bag"
     
     Adeliom\SyliusEasyCrudPlugin\Maker\CreateEntity:
         tags: [ 'maker.command' ]
+        public: true
         arguments:
             - "@doctrine"
             - "@parameter_bag"
