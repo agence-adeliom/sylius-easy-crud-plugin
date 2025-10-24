@@ -1,13 +1,26 @@
 /vendor/
+/var/
+/node_modules/
+/public/
+/composer.lock
 
-###> friendsofphp/php-cs-fixer ###
-/.php_cs
-/.php_cs.cache
-###< friendsofphp/php-cs-fixer ###
-node_modules
-tests/Application
+/etc/build/*
+!/etc/build/.gitignore
+
+/.phpunit.result.cache
+/behat.yml
+/phpunit.xml
+/compose.override.yml
+.phpunit.result.cache
+
+# Symfony CLI https://symfony.com/doc/current/setup/symfony_server.html#different-php-settings-per-project
+/.php-version
+/php.ini
+
+/tests/TestApplication/.env.local
+/tests/TestApplication/.env.*.local
+/var/
+
 .idea/*
-php.ini
-.php-version
-.makefile/composer.mk
-composer.lock
+.claude/*
+.ddev/*

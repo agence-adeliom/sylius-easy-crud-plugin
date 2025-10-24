@@ -1,2 +1,3 @@
+# Put your plugin configuration here
 imports:
-  - { resource: "./packages/sylius_ui.yaml" }
+    - { resource: "./packages/sylius_ui.yaml" }

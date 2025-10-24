@@ -6,13 +6,17 @@ namespace Adeliom\SyliusEasyCrudPlugin\DependencyInjection;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
+use Sylius\Bundle\CoreBundle\DependencyInjection\PrependDoctrineMigrationsTrait;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-final class SyliusEasyCrudExtension extends AbstractResourceExtension
+final class SyliusEasyCrudExtension extends AbstractResourceExtension implements PrependExtensionInterface
 {
+    use PrependDoctrineMigrationsTrait;
+
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -43,6 +47,28 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension
 
         $container->registerForAutoconfiguration(AdminInterface::class)
             ->addTag('sylius_easy_crud');
+    }
+
+    public function prepend(ContainerBuilder $container): void
+    {
+        $this->prependDoctrineMigrations($container);
+    }
+
+    protected function getMigrationsNamespace(): string
+    {
+        return 'DoctrineMigrations';
+    }
+
+    protected function getMigrationsDirectory(): string
+    {
+        return '@SyliusEasyCrudPlugin/src/Migrations';
+    }
+
+    protected function getNamespacesOfMigrationsExecutedBefore(): array
+    {
+        return [
+            'Sylius\Bundle\CoreBundle\Migrations',
+        ];
     }
 
     public function getAlias(): string
