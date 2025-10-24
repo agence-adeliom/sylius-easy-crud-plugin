@@ -10,8 +10,12 @@
     ],
     "license": "MIT",
     "require": {
+        "ext-json": "*",
+        "ext-intl": "*",
         "php": "^8.2 || ^8.3 || ^8.4",
-        "sylius/sylius": "^2.0"
+        "embed/embed": "^4.4",
+        "sylius/sylius": "^2.0",
+        "symfony/uid": "^6.4 || ^7.1"
     },
     "require-dev": {
         "behat/behat": "^3.16",
