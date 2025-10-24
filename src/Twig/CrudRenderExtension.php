@@ -71,6 +71,7 @@ class CrudRenderExtension extends AbstractExtension
         );
 
         if (
+            is_array($requestConfiguration->getRequest()->get('_route_params')) &&
             $requestConfiguration->getRequest()->get('_route_params')['id'] &&
             'index' !== $action->getName() &&
             'new' !== $action->getName()

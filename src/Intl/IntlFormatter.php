@@ -207,7 +207,7 @@ final class IntlFormatter
         $dateFormatValue = self::DATE_FORMATS[$dateFormat] ?? self::DATE_FORMATS['full'];
         $timeFormatValue = self::DATE_FORMATS[$timeFormat] ?? self::DATE_FORMATS['full'];
 
-        $hash = $locale . '|' . $dateFormatValue . '|' . $timeFormatValue . '|' . $timezone->getName() . '|' . $calendar . '|' . $pattern;
+        $hash = $locale . '|' . $dateFormatValue . '|' . $timeFormatValue . '|' . ($timezone?->getName() ?? '') . '|' . $calendar . '|' . $pattern;
 
         if (!isset($this->dateFormatters[$hash])) {
             $this->dateFormatters[$hash] = new \IntlDateFormatter($locale, $dateFormatValue, $timeFormatValue, $timezone, $calendar, $pattern);

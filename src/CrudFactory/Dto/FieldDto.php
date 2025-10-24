@@ -235,7 +235,7 @@ final class FieldDto
         return $this->virtual;
     }
 
-    public function setVirtual(bool $isVirtual): void
+    public function setVirtual(?bool $isVirtual = true): void
     {
         $this->virtual = $isVirtual;
         $this->formTypeOptions->set('mapped', !$isVirtual);
