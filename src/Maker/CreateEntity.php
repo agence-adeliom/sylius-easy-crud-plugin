@@ -104,9 +104,31 @@ final class CreateEntity extends AbstractMaker
                     $entityTranslation,
                 );
 
-                $resourceConfigGenerator->generateEntity($class);
-                $resourceConfigGenerator->generateEntityTranslation($class);
-                $resourceConfigGenerator->generateRepository($class);
+                // Generate Entity
+                if (class_exists($class)) {
+                    $io->note(sprintf('Entity already exists, skipping: %s', $class));
+                } else {
+                    $resourceConfigGenerator->generateEntity($class);
+                    $io->success(sprintf('Created: %s', $class));
+                }
+
+                // Generate Translation
+                $translationClass = $class . 'Translation';
+                if (class_exists($translationClass)) {
+                    $io->note(sprintf('Translation entity already exists, skipping: %s', $translationClass));
+                } else {
+                    $resourceConfigGenerator->generateEntityTranslation($class);
+                    $io->success(sprintf('Created: %s', $translationClass));
+                }
+
+                // Generate Repository
+                $repositoryClass = str_replace('Entity', 'Repository', $class) . 'Repository';
+                if (class_exists($repositoryClass)) {
+                    $io->note(sprintf('Repository already exists, skipping: %s', $repositoryClass));
+                } else {
+                    $resourceConfigGenerator->generateRepository($class);
+                    $io->success(sprintf('Created: %s', $repositoryClass));
+                }
 
                 $io->comment('Now run bin/console make:easy-crud:create-crud to create a sylius easy crud based on an entity');
 

@@ -78,6 +78,12 @@ class CrudMakerService
      */
     public function generateEntity(string $className, ?string $template = null, ?array $variables = []): void
     {
+        // Check if entity already exists
+        if (class_exists($className)) {
+            $this->namespaces['entity'] = $className;
+            return;
+        }
+
         // Extract namespace parts from full class name
         // For "App\Entity\Post", we get: entity_namespace = "App\Entity", repository_namespace = "App\Repository"
         $namespaceParts = explode('\\', $className);
@@ -114,20 +120,28 @@ class CrudMakerService
      */
     public function generateEntityTranslation(string $className, ?string $template = null, ?array $variables = []): void
     {
+        $translationClassName = $className . 'Translation';
+
+        // Check if translation entity already exists
+        if (class_exists($translationClassName)) {
+            $this->namespaces['entityTranslation'] = $translationClassName;
+            return;
+        }
+
         // Extract namespace from full class name
         $namespaceParts = explode('\\', $className);
         array_pop($namespaceParts); // Remove class name
         $entityNamespace = implode('\\', $namespaceParts);
 
         $this->generator->generateClass(
-            $className . 'Translation',
+            $translationClassName,
             (is_string($template) && file_exists($template)) ? $template : __DIR__ . '/../Resources/skeleton/Translation.tpl.php',
             array_merge([
                 'entity_namespace' => $entityNamespace,
             ], $variables),
         );
         $this->generator->writeChanges();
-        $this->namespaces['entityTranslation'] = $className . 'Translation';
+        $this->namespaces['entityTranslation'] = $translationClassName;
     }
 
     /**
@@ -137,6 +151,13 @@ class CrudMakerService
      */
     public function generateRepository(string $className, ?string $template = null, ?array $variables = []): void
     {
+        $repositoryClassName = str_replace('Entity', 'Repository', $className) . 'Repository';
+
+        // Check if repository already exists
+        if (class_exists($repositoryClassName)) {
+            return;
+        }
+
         // Extract namespace parts
         $namespaceParts = explode('\\', $className);
         $shortClassName = array_pop($namespaceParts); // Remove class name
@@ -154,7 +175,7 @@ class CrudMakerService
         $repositoryNamespace = implode('\\', $repositoryNamespaceParts);
 
         $this->generator->generateClass(
-            str_replace('Entity', 'Repository', $className) . 'Repository',
+            $repositoryClassName,
             (is_string($template) && file_exists($template)) ? $template : __DIR__ . '/../Resources/skeleton/Repository.tpl.php',
             array_merge([
                 'entity_name' => Str::getShortClassName($className),
@@ -238,8 +259,18 @@ class CrudMakerService
             $templateName,
             $suffix,
         );
+
+        $fullClassName = str_replace('Entity', $templateName, $className) . $templateName;
+
+        // Check if class already exists
+        if (class_exists($fullClassName)) {
+            // Don't generate if already exists, just return the class details
+            $this->namespaces[strtolower($templateName)] = $file->getFullName();
+            return $file;
+        }
+
         $this->generator->generateClass(
-            str_replace('Entity', $templateName, $className) . $templateName,
+            $fullClassName,
             (is_string($templatePath) && file_exists($templatePath)) ? $templatePath : __DIR__ . '/../Resources/skeleton/' . $templateName . '.tpl.php',
             array_merge([
                             'entity' => $this->entity ? ($this->entity->getName() ?? $this->namespaces['entity']) : $this->namespaces['entity'],

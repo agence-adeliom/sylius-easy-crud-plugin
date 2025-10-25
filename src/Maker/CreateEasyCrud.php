@@ -101,16 +101,51 @@ final class CreateEasyCrud extends AbstractMaker
                 $entityTranslation,
             );
 
-            $resourceConfigGenerator->generateAdmin(
-                className: $entryClassName,
-                variables: [
-                   'entityShortName' => $entryShortClassName,
-                   'namespace' => str_replace('Entity', 'Admin', $entryClassName),
-                ],
+            // Generate Admin class
+            $adminClassName = str_replace('Entity', 'Admin', $entryClassName) . 'Admin';
+            $adminClassDetails = $generator->createClassNameDetails(
+                $entryShortClassName,
+                'Admin',
+                'Admin'
             );
+            $adminFilePath = $generator->getRootDirectory() . '/' . $adminClassDetails->getRelativeName();
 
-            $resourceConfigGenerator->generateMenuListener($entryClassName);
+            if (class_exists($adminClassName) || file_exists($adminFilePath)) {
+                $io->note(sprintf('Admin class already exists, skipping: %s', $adminClassName));
+            } else {
+                $adminDetails = $resourceConfigGenerator->generateAdmin(
+                    className: $entryClassName,
+                    variables: [
+                       'entityShortName' => $entryShortClassName,
+                       'namespace' => str_replace('Entity', 'Admin', $entryClassName),
+                    ],
+                );
+                $io->success(sprintf('Created: %s', $adminDetails->getFullName()));
+            }
 
+            // Generate Menu Listener
+            $namespaceParts = explode('\\', $entryClassName);
+            array_pop($namespaceParts); // Remove class name
+            $lastPart = array_pop($namespaceParts);
+            if ($lastPart !== 'Entity') {
+                $namespaceParts[] = $lastPart;
+            }
+            $baseNamespace = implode('\\', $namespaceParts);
+            $menuListenerFqcn = $baseNamespace . '\\Menu\\AdminMenuListener';
+
+            // Build the file path for the menu listener
+            $menuListenerPath = str_replace('\\', '/', $menuListenerFqcn);
+            $menuListenerPath = str_replace($generator->getRootNamespace() . '/', '', $menuListenerPath);
+            $menuListenerFilePath = $generator->getRootDirectory() . '/' . $menuListenerPath . '.php';
+
+            if (class_exists($menuListenerFqcn) || file_exists($menuListenerFilePath)) {
+                $io->note(sprintf('Menu listener already exists, skipping: %s', $menuListenerFqcn));
+            } else {
+                $resourceConfigGenerator->generateMenuListener($entryClassName);
+                $io->success(sprintf('Created: %s', $menuListenerFqcn));
+            }
+
+            // Generate/Update routes
             $route = $resourceConfigGenerator->generateRoute(
                 entityName: $entryClassName,
             );
@@ -121,6 +156,7 @@ final class CreateEasyCrud extends AbstractMaker
                 $route,
             ));
 
+            // Generate/Update resource configuration
             $resource = $resourceConfigGenerator->generateResource(
                 entityName: $entryClassName,
                 entityTranslationName: $entryTranslationClassName,
