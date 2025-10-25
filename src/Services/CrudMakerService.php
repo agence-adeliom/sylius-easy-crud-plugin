@@ -170,11 +170,21 @@ class CrudMakerService
      */
     public function generateMenuListener(string $className): void
     {
-        // Extract root namespace from the entity class name
+        // Extract namespace from entity class name
         $namespaceParts = explode('\\', $className);
-        $rootNamespace = $namespaceParts[0] ?? 'App';
-        $menuListenerFqcn = $rootNamespace . '\Menu\AdminMenuListener';
-        $menuNamespace = $rootNamespace . '\Menu';
+        array_pop($namespaceParts); // Remove class name (Post)
+
+        // Remove "Entity" if it's the last part
+        $lastPart = array_pop($namespaceParts);
+        if ($lastPart !== 'Entity') {
+            // If it's not "Entity", put it back
+            $namespaceParts[] = $lastPart;
+        }
+
+        // Now add "Menu"
+        $baseNamespace = implode('\\', $namespaceParts);
+        $menuNamespace = $baseNamespace . '\\Menu';
+        $menuListenerFqcn = $menuNamespace . '\\AdminMenuListener';
 
         if (!\class_exists($menuListenerFqcn)) {
             $this->generator->generateClass(
@@ -187,7 +197,9 @@ class CrudMakerService
             );
             $this->generator->writeChanges();
 
-            $yaml[strtolower($rootNamespace) . '.listener.admin.menu_builder'] = [
+            // Use a simpler service name based on the menu namespace
+            $serviceId = strtolower(str_replace('\\', '_', $menuNamespace)) . '.admin.menu_builder';
+            $yaml[$serviceId] = [
                  'class' => $menuListenerFqcn,
                  'tags' => [
                      0 => [

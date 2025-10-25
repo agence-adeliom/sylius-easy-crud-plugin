@@ -133,6 +133,8 @@ Create a new entity with translation support:
 
 ```bash
 php bin/console make:easy-crud:create-entity Post
+php bin/console doc:mig:diff
+php bin/console doc:mig:mig
 ```
 
 This generates:
