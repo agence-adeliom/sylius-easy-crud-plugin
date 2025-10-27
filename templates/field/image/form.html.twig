@@ -4,15 +4,17 @@
     {% apply spaceless %}
     <div class="fields">
         <div class="field" data-file>
-            <div class="mb-3">
-                {{ form_widget(form) }}
-                {% if data|default(null) is not null %}
-                    <div class="card" style="width: 200px">
-                        <img class="card-img-top mb-3 image" src="{{ data|imagine_filter('sylius_small') }}" alt="{{ data }}" />
+            <div class="mb-3 row">
+                <div class="col-12 col-md-6 row mb-4">
+                    <div class="col-auto">
+                        <span class="avatar avatar-xl" style="background-image: url('{{ data|default(null) ? data|imagine_filter('sylius_small') : '' }}')"></span>
                     </div>
-                {% endif %}
-                <div class="invalid-feedback">
-                    {{- form_errors(form) -}}
+                    <div class="col">
+                        {{ form_widget(form) }}
+                        <div class="invalid-feedback">
+                            {{- form_errors(form) -}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

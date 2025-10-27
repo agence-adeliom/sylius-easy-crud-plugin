@@ -128,8 +128,8 @@ yield TabField::new('main', 'Main Information');
 yield TabField::new('seo', 'SEO Settings');
 
 // Create columns
-yield ColumnField::new('_col1')->setSize(ColumnSizeEnum::WIDE_8_OF_16);
-yield ColumnField::new('_col2')->setSize(ColumnSizeEnum::REGULAR_4_OF_16);
+yield ColumnField::new('_col1')->setSize(ColumnSizeEnum::WIDE_8_OF_12);
+yield ColumnField::new('_col2')->setSize(ColumnSizeEnum::WIDE_4_OF_12);
 
 // Conditional fields based on choice
 yield ChoiceMaskField::new('choice_mask')

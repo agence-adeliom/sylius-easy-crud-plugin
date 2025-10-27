@@ -16,3 +16,14 @@ sylius_easy_crud_plugin:
         subheader: Manage en entity
         index: List
         update: Update entity
+
+# test-application
+tests_adeliom_sylius_easy_crud_plugin:
+    ui:
+        tests_adeliom_sylius_easy_crud_plugin_entity_post: 'Post'
+        tests_adeliom_sylius_easy_crud_plugin_entity_posts: 'Posts'
+
+    tests_adeliom_sylius_easy_crud_plugin_entity_post:
+        admin:
+            action:
+                index: 'Posts list'

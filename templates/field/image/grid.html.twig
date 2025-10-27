@@ -1,3 +1,15 @@
-{% if data|default(null) is not null %}
-    <img class="ui small bordered image" src="{{ data|imagine_filter('sylius_small') }}" alt="{{ data }}" />
-{% endif %}
+<div class="thumbnail-box-image">
+    {% set config = {
+        class: 'img-fluid',
+        type: 'thumbnail',
+        filter: 'sylius_admin_product_thumbnail'
+    } %}
+    {% if data|default(null) %}
+        {% set path = data|imagine_filter(config.filter) %}
+    {% else %}
+        {% set path = asset('bundles/syliusui/images/200x200.png') %}
+    {% endif %}
+
+    <img src="{{ path }}" alt="{{ data|default('') }}" class="{{ config.class }}" />
+
+</div>

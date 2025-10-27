@@ -67,7 +67,7 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         yield TabField::new('tab1', 'Tab 1');
 
         yield ColumnField::new('Title')
-        ->setSize(ColumnSizeEnum::WIDE_12_OF_16);
+        ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
 
         yield TranslationField::new('translations')
         ->addField(
@@ -81,7 +81,7 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         )->onlyOnForms();
 
         yield ColumnField::new('data')
-        ->setSize(ColumnSizeEnum::WIDE_4_OF_16);
+        ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
 
         yield IconField::new('icon');
 
@@ -110,30 +110,27 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
 
         yield TabField::new('tab3', 'Tab 3');
 
-        yield ImageField::new('image')
-            ->setVirtual();
+        yield ImageField::new('image');
 
         yield OembedField::new('embed')
-            ->setVirtual();
+            ->hideOnIndex();
 
         yield TabField::new('tabrel', 'Relations');
 
         yield ResourceChoiceField::new('taxon')
-        ->setVirtual()
-        ->setLabel('Taxon')
-            ->onlyOnForms()
-        ->setEntityClass(Taxon::class)
-        ->setResourceAlias('sylius.taxon');
+            ->setLabel('Taxon')
+                ->onlyOnForms()
+            ->setEntityClass(Taxon::class)
+            ->setResourceAlias('sylius.taxon');
 
         yield ResourceChoiceField::new('products')
-        ->setLabel('Products')
-        ->hideOnIndex()
-        ->setEntityClass(Product::class)
-        ->setResourceAlias('sylius.product')
-        ->setMultiple();
+            ->setLabel('Products')
+            ->hideOnIndex()
+            ->setEntityClass(Product::class)
+            ->setResourceAlias('sylius.product')
+            ->setMultiple();
 
         yield SortableCollectionField::new('data')
-            ->setVirtual()
             ->setEntryType(DataTestType::class)
             ->hideOnIndex();
 

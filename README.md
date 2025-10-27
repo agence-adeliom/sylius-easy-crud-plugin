@@ -190,7 +190,7 @@ class PostAdmin extends AbstractAdmin
         yield TabField::new('main', 'Main Information');
 
         yield ColumnField::new('_col1')
-            ->setSize(ColumnSizeEnum::WIDE_8_OF_16)
+            ->setSize(ColumnSizeEnum::WIDE_8_OF_12)
             ->setLabel('Content');
 
         yield Field::new('title')
@@ -207,7 +207,7 @@ class PostAdmin extends AbstractAdmin
             ->setHelp('Post main content');
 
         yield ColumnField::new('_col2')
-            ->setSize(ColumnSizeEnum::REGULAR_4_OF_16)
+            ->setSize(ColumnSizeEnum::REGULAR_4_OF_12)
             ->setLabel('Sidebar');
 
         yield ImageField::new('featuredImage')

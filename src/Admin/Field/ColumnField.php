@@ -22,7 +22,7 @@ final class ColumnField implements FieldInterface
             ->hideOnIndex()
             ->setFormTypeOption('mapped', false)
             ->setCustomOption('newLine', false)
-            ->setCustomOption('columnSize', ColumnSizeEnum::WIDE_16_OF_16)
+            ->setCustomOption('columnSize', ColumnSizeEnum::WIDE_12_OF_12)
         ;
     }
 

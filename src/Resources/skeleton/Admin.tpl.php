@@ -69,7 +69,7 @@ AdminInterface
         yield TabField::new('tab1', 'Tab 1');
 
         yield ColumnField::new('Title')
-        ->setSize(ColumnSizeEnum::WIDE_12_OF_16);
+        ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
 
         yield Field::new('id')
         ->onlyOnIndex();

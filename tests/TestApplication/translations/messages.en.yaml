@@ -1,0 +1,3 @@
+tests_adeliom_sylius_easy_crud_plugin:
+    ui:
+        tests_adeliom_sylius_easy_crud_plugin_entity_post: 'Posts'

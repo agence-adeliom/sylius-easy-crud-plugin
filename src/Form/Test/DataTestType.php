@@ -33,6 +33,7 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
                 'resource' => 'sylius.product',
                 'class' => Product::class,
                 'autocomplete' => true,
+                'persist_into_an_array' => true,
             ])
             ->add('products', ResourceChoiceType::class, [
                 'resource' => 'sylius.product',

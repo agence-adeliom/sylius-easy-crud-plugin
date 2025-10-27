@@ -66,9 +66,14 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                 $valueAsCollection = new ArrayCollection();
                                 if (is_string($tagsAsArray)) {
                                     // If you switch from non multiple value to multiple value, the value will be a string
-                                    $valueAsCollection->add($options['repository']->findOneBy([
-                                                                                                  $options['choice_value'] => $tagsAsArray,
-                                                                                              ]));
+                                    // If the tag have some separators, we need to split it
+                                    if (str_contains($tagsAsArray, ',')) {
+                                        $tagsAsArray = explode(',', $tagsAsArray);
+                                    } else {
+                                        $valueAsCollection->add($options['repository']->findOneBy([
+                                          $options['choice_value'] => $tagsAsArray,
+                                        ]));
+                                    }
                                 }
                                 if (is_array($tagsAsArray)) {
                                     foreach ($tagsAsArray as $key => $tag) {

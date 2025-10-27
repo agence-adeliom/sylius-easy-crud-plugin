@@ -191,7 +191,7 @@ class CrudAdminFactory
         MenuItem $menuItem,
         ?string $name = null,
         ?string $label = null,
-        ?ColumnSizeEnum $size = ColumnSizeEnum::WIDE_16_OF_16,
+        ?ColumnSizeEnum $size = ColumnSizeEnum::WIDE_12_OF_12,
         ?bool $newLine = true,
     ): array {
         return [
@@ -224,7 +224,7 @@ class CrudAdminFactory
            'id' => md5((string) rand()),
            'name' => 'default',
            'label' => null,
-           'size' => ColumnSizeEnum::WIDE_16_OF_16,
+           'size' => ColumnSizeEnum::WIDE_12_OF_12,
            'menuItem' => $this->menu->count() ?
                $this->menu->getFirstChild() :
                null,

@@ -43,6 +43,15 @@ class Post implements ResourceInterface, TranslatableInterface
     #[ORM\Column(nullable: true)]
     private ?string $icon = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?string $embed = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $image = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $data = null;
+
     #[ORM\ManyToOne(targetEntity: TaxonInterface::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'taxon_id', nullable: true, onDelete: 'set null')]
     private ?TaxonInterface $taxon = null;
@@ -194,5 +203,35 @@ class Post implements ResourceInterface, TranslatableInterface
     public function setCodeEditor(?string $codeEditor): void
     {
         $this->codeEditor = $codeEditor;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
+    public function setData(?array $data): void
+    {
+        $this->data = $data;
+    }
+
+    public function getEmbed(): ?string
+    {
+        return $this->embed;
+    }
+
+    public function setEmbed(?string $embed): void
+    {
+        $this->embed = $embed;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): void
+    {
+        $this->image = $image;
     }
 }

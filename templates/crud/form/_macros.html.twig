@@ -1,9 +1,12 @@
 {% macro start_column(size, newLine, label) %}
-{#    <div class="row">#}
+        <div class="col-md-{{ size.value }}{% if newLine %} mt-4{% endif %}">
+            {% if label is defined and label is not empty %}
+                <h4 class="mb-3">{{ label }}</h4>
+            {% endif %}
 {% endmacro %}
 
 {% macro end_column() %}
-{#    </div>#}
+    </div>
 {% endmacro %}
 
 {% macro form(firstMenuItem, menuItem, form, fields, view='update') %}
