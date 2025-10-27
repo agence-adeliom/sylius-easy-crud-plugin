@@ -25,27 +25,33 @@
 
 ✨ Transform Symfony entities / Sylius resources into fully functional admin interfaces in minutes!
 
+![Post CRUD example](docs/screens/easy_crud_posts.png "Post CRUD example")
+
 ```php
-<?php
-
-namespace App\Admin;
-
 class PostAdmin extends AbstractAdmin
 {
-    public function configureFields(string $pageName, ?string $context = null): iterable
-    {
-        yield TabField::new('general', 'General Information')
-            ->setHorizontal();
+    yield TabField::new('tab1', 'Tab 1');
 
-        yield Field::new('name');
-        
-        yield SlugField::new('slug');
-        
-        yield TextEditorField::new('description')
+        yield ColumnField::new('tab1_left')
+            ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
+
+        yield TranslationField::new('translations')
+            ->addField(
+                Field::new('name')
+                ->setDisabled(false)
+                ->setRequired(true)
+            )
             ->onlyOnForms();
-            
+
+        yield ColumnField::new('tab1_right')
+            ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
+
+        yield IconField::new('icon')
+            ->onlyOnForms();
+
+        yield CheckboxField::new('enabled');
+        
         ...
-    }
 }
 ```
 
@@ -163,51 +169,9 @@ This generates:
 ### Step 3: Configure Your CRUD
 
 Edit `src/Admin/PostAdmin.php`:
+Configure your fields in the `configureFields()` or your filters with `configureFilters()` method.
+
 [Discover available fields](./discover_fields.md)
-
-![Post CRUD example](docs/screens/easy_crud_posts.png "Post CRUD example")
-
-Configure your fields in the `configureFields()` or your filters with `configureFilters()` method:
-```php
-<?php
-
-namespace App\Admin;
-
-use ...
-
-class PostAdmin extends AbstractAdmin
-{
-    public function configureFilters(): iterable
-    {
-        yield BooleanFilter::create('enabled')
-            ->setLabel('Enabled');
-    }
-    
-    public function configureFields(string $pageName, ?string $context = null): iterable
-    {
-        yield TabField::new('tab1', 'Tab 1');
-
-        yield ColumnField::new('tab1_left')
-        ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
-
-        yield TranslationField::new('translations')
-            ->addField(
-                Field::new('name')
-                ->setDisabled(false)
-                ->setRequired(true)
-            )
-            ->onlyOnForms();
-
-        yield ColumnField::new('tab1_right')
-            ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
-
-        yield IconField::new('icon')
-            ->onlyOnForms();
-
-        yield CheckboxField::new('enabled');
-    }
-}
-```
 
 ### Step 4: Access Your CRUD
 
