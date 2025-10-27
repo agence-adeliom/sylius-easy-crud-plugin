@@ -12,7 +12,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Form\Test;
 use Adeliom\SyliusEasyCrudPlugin\Form\AdminFormTypeInterface;
 use Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType;
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
-use App\Entity\Product\Product;
+use Sylius\Component\Core\Model\Product;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -39,7 +39,7 @@ class DataTestType extends AbstractType implements FormTypeInterface, AdminFormT
                 'class' => Product::class,
                 'multiple' => true,
                 'autocomplete' => true,
-                'useResourceTransformers' => false,
+                'persist_into_an_array' => true,
             ])
             ->add('textList', SortableCollectionType::class, [
                 'label' => 'textList',

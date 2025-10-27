@@ -22,29 +22,16 @@ class <?= $class_name ?> extends AbstractTranslation implements ResourceInterfac
     private ?int $id = null;
 
     #[ORM\Column(type: Types::STRING, nullable: true)]
-    private ?string $name = null;
+    private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $description = null;
-
-    public function getName(): ?string
+    public function getTitle(): ?string
     {
-        return $this->name;
+        return $this->title;
     }
 
-    public function setName(?string $name): void
+    public function setTitle(?string $title): void
     {
-        $this->name = $name;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): void
-    {
-        $this->description = $description;
+        $this->title = $title;
     }
 
     public function getId(): int

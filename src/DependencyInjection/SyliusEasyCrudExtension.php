@@ -46,7 +46,7 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
         ;
 
         $container->registerForAutoconfiguration(AdminInterface::class)
-            ->addTag('sylius_easy_crud');
+            ->addTag('sylius_easy_crud_admin');
     }
 
     public function prepend(ContainerBuilder $container): void

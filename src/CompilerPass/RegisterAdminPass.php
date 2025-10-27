@@ -11,7 +11,9 @@ class RegisterAdminPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        foreach ($container->findTaggedServiceIds('sylius_easy_crud') as $id => $tags) {
+        // Register all services tagged with 'sylius_easy_crud_admin'
+        // As a Sylius Grid admin with autowiring and entity FQCN argument
+        foreach ($container->findTaggedServiceIds('sylius_easy_crud_admin') as $id => $tags) {
             $definition = $container->getDefinition((string) $id);
             $definition->addArgument($definition->getClass()::getEntityFqcn());
             $definition->addArgument([]);

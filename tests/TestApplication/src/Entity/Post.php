@@ -2,7 +2,12 @@
 
 namespace Tests\Adeliom\SyliusEasyCrudPlugin\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Model\TranslatableTrait;
@@ -32,13 +37,25 @@ class Post implements ResourceInterface, TranslatableInterface
     #[ORM\Column(nullable: true)]
     private ?string $state = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $codeEditor = null;
+
     #[ORM\Column(nullable: true)]
     private ?string $icon = null;
+
+    #[ORM\ManyToOne(targetEntity: TaxonInterface::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'taxon_id', nullable: true, onDelete: 'set null')]
+    private ?TaxonInterface $taxon = null;
+
+    /** @var Collection<int, ProductInterface> */
+    #[ORM\ManyToMany(targetEntity: ProductInterface::class)]
+    private Collection $products;
 
     public function __construct()
     {
         $this->initializeTranslationsCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->products = new ArrayCollection();
     }
 
     protected function createTranslation(): TranslationInterface
@@ -128,5 +145,54 @@ class Post implements ResourceInterface, TranslatableInterface
     public function setIcon(?string $icon): void
     {
         $this->icon = $icon;
+    }
+
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function setProducts(Collection $products): void
+    {
+        $this->products = $products;
+    }
+
+
+    public function addProduct(ProductInterface $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(ProductInterface $product): static
+    {
+        if ($this->products->contains($product)) {
+            $this->products->removeElement($product);
+        }
+
+        return $this;
+    }
+
+    public function getTaxon(): ?TaxonInterface
+    {
+        return $this->taxon;
+    }
+
+    public function setTaxon(?TaxonInterface $taxon): void
+    {
+        $this->taxon = $taxon;
+    }
+
+    public function getCodeEditor(): ?string
+    {
+        return $this->codeEditor;
+    }
+
+    public function setCodeEditor(?string $codeEditor): void
+    {
+        $this->codeEditor = $codeEditor;
     }
 }

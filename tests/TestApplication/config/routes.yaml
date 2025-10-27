@@ -1,9 +1,5 @@
-adeliom_sylius_easy_crud_admin:
-    resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
-
-adeliom_sylius_easy_crud_shop:
-    resource: "@SyliusEasyCrudPlugin/config/routes/shop.yaml"
-
+sylius_easy_crud:
+    resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 
 admin_tests_adeliom_sylius_easy_crud_plugin_entity_post:
     resource: |

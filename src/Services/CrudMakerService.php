@@ -96,7 +96,49 @@ class CrudMakerService
         ?string $templatePath = null,
         ?array $variables = [],
     ): ClassNameDetails {
-        return $this->generateFileFromTpm('Admin', $suffix, $className, $templatePath, $variables);
+        $adminDetails = $this->generateFileFromTpm('Admin', $suffix, $className, $templatePath, $variables);
+
+        // Register the Admin service with sylius_easy_crud tag
+        $this->registerAdminService($adminDetails->getFullName());
+
+        return $adminDetails;
+    }
+
+    /**
+     * Register an Admin service in services.yaml with sylius_easy_crud tag
+     */
+    protected function registerAdminService(string $adminFqcn): void
+    {
+        $filePath = $this->yamlServicesFile;
+        $absolutePath = $this->getAbsoluteConfigPath($filePath);
+
+        // Read existing content
+        $existingContent = '';
+        if (file_exists($filePath)) {
+            $existingContent = file_get_contents($absolutePath);
+        }
+
+        // Check if service is already registered
+        if (str_contains($existingContent, $adminFqcn)) {
+            return; // Already registered
+        }
+
+        // Build service definition
+        // Note: Do not add 'autowire: true' here, let RegisterAdminPass handle all configuration
+        $serviceId = $adminFqcn;
+        $yaml = [];
+        $yaml[$serviceId] = [
+            'class' => $adminFqcn,
+            'tags' => ['sylius_easy_crud_admin'],
+        ];
+
+        $content = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        // Append new content with proper indentation
+        $formattedContent = "\n    " . str_replace("\n", "\n    ", trim($content));
+        $combinedContent = $existingContent . $formattedContent;
+
+        file_put_contents($filePath, $combinedContent);
     }
 
     /**

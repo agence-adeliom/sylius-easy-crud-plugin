@@ -26,11 +26,12 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Form\Test\DataTestType;
-use App\Entity\Product\Product;
-use App\Entity\Taxonomy\Taxon;
+use Sylius\Component\Core\Model\Product;
+use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\Taxon;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Tests\Adeliom\SyliusEasyCrudPlugin\Admin\Demo;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Entity\Post;
 
 final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterface, AdminInterface
@@ -42,7 +43,7 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
 
     public static function getName(): string
     {
-        return 'admin_app_entity_post';
+        return 'admin_tests_adeliom_sylius_easy_crud_plugin_entity_post';
     }
 
     public static function getEntityFqcn(): string
@@ -60,6 +61,9 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
      */
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
+        yield Field::new('id')
+            ->onlyOnIndex();
+
         yield TabField::new('tab1', 'Tab 1');
 
         yield ColumnField::new('Title')
@@ -90,16 +94,18 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
             ->renderExpanded();
 
         yield CodeEditorField::new('codeEditor')
-            ->setLanguage('json')
-            ->setVirtual();
+            ->setLanguage('json');
 
         yield DateField::new('date1')
+            ->setHelp('is virtual')
             ->setVirtual();
 
         yield DateTimeField::new('date2')
+            ->setHelp('is virtual')
             ->setVirtual();
 
         yield TimeField::new('time1')
+            ->setHelp('is virtual')
             ->setVirtual();
 
         yield TabField::new('tab3', 'Tab 3');
@@ -115,39 +121,16 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         yield ResourceChoiceField::new('taxon')
         ->setVirtual()
         ->setLabel('Taxon')
-        ->hideOnIndex()
+            ->onlyOnForms()
         ->setEntityClass(Taxon::class)
         ->setResourceAlias('sylius.taxon');
 
-        yield ResourceChoiceField::new('product')
-        ->setVirtual()
-        ->setLabel('Product')
-        ->hideOnIndex()
-        ->setEntityClass(Product::class)
-        ->setResourceAlias('sylius.product');
-
         yield ResourceChoiceField::new('products')
-        ->setVirtual()
         ->setLabel('Products')
         ->hideOnIndex()
         ->setEntityClass(Product::class)
         ->setResourceAlias('sylius.product')
         ->setMultiple();
-
-        yield ResourceChoiceField::new('demo')
-        ->setVirtual()
-        ->setLabel('Demo')
-        ->hideOnIndex()
-        ->setEntityClass(Demo::class)
-        ->setResourceAlias('app.app_entity_demo');
-
-        // yield TabField::new('tabcol', 'Collections');
-
-        // yield SortableCollectionField::new('options')
-        //    ->setVirtual()
-        //     ->setEntryType(ProductCodeChoiceType::class)
-        //     ->setLabel('Options')
-        //     ->hideOnIndex();
 
         yield SortableCollectionField::new('data')
             ->setVirtual()

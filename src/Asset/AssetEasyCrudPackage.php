@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class AssetEasyCrudPackage implements PackageInterface
 {
-    public const PACKAGE_NAME = 'sylius.easy_crude';
+    public const PACKAGE_NAME = 'sylius.easy_crud';
 
     private PackageInterface $package;
 
@@ -29,7 +29,7 @@ final class AssetEasyCrudPackage implements PackageInterface
     {
         $this->package = new PathPackage(
             '/bundles/syliuseasycrudplugin',
-            new JsonManifestVersionStrategy(__DIR__ . '/../resources/public/manifest.json'),
+            new JsonManifestVersionStrategy(__DIR__ . '/../../resources/public/manifest.json'),
             new RequestStackContext($requestStack),
         );
     }

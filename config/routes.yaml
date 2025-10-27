@@ -1,7 +1,8 @@
 sylius_easy_crud.get_oembed:
-  controller: Adeliom\SyliusEasyCrudPlugin\Controller\OembedController::index
-  path: /admin/oembed/
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\OembedController::index
+    path: /admin/oembed/
 
 sylius_admin_ajax_resources:
-  controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController::autocompleteAction
-  path: /admin/autocomplete/
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController::autocompleteAction
+    path: /admin/autocomplete/
+
