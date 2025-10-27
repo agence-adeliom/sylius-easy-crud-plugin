@@ -89,11 +89,8 @@ final class CreateEasyCrud extends AbstractMaker
             $this->managerRegistry,
         );
 
-        $projectDir = $this->parameterBag->get('kernel.project_dir');
-
         try {
             $resourceConfigGenerator = new CrudMakerService(
-                is_string($projectDir) ? $projectDir : '',
                 $generator,
                 $namespace,
                 $entity,
@@ -106,7 +103,7 @@ final class CreateEasyCrud extends AbstractMaker
             $adminClassDetails = $generator->createClassNameDetails(
                 $entryShortClassName,
                 'Admin',
-                'Admin'
+                'Admin',
             );
             $adminFilePath = $generator->getRootDirectory() . '/' . $adminClassDetails->getRelativeName();
 

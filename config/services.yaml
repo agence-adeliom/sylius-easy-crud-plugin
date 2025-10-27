@@ -113,20 +113,6 @@ services:
         public: true
         alias: adeliom.sylius.crud.admin.factory
     
-    Adeliom\SyliusEasyCrudPlugin\Maker\CreateEasyCrud:
-        tags: [ 'maker.command' ]
-        public: true
-        arguments:
-            - "@doctrine"
-            - "@parameter_bag"
-    
-    Adeliom\SyliusEasyCrudPlugin\Maker\CreateEntity:
-        tags: [ 'maker.command' ]
-        public: true
-        arguments:
-            - "@doctrine"
-            - "@parameter_bag"
-    
     'assets._package_sylius.easy_crud':
         class: Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage
         arguments:

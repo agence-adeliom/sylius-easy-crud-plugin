@@ -66,11 +66,10 @@ final class CreateEntity extends AbstractMaker
             // Use the provided namespace
             $class = rtrim($customNamespace, '\\') . '\\Entity\\' . $className;
         } else {
-
             // Use Generator to automatically resolve the correct namespace based on Doctrine configuration
             $entityClassDetails = $generator->createClassNameDetails(
                 $className,
-                'Entity\\'
+                'Entity\\',
             );
             $class = $entityClassDetails->getFullName();
         }
@@ -92,11 +91,8 @@ final class CreateEntity extends AbstractMaker
 
             [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
 
-            $projectDir = $this->parameterBag->get('kernel.project_dir');
-
             try {
                 $resourceConfigGenerator = new CrudMakerService(
-                    is_string($projectDir) ? $projectDir : '',
                     $generator,
                     $namespace,
                     $entity,

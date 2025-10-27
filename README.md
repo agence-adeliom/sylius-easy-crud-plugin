@@ -83,6 +83,7 @@ Finally, alongside this plugin, we migrated our other EasyAdmin-based bundles â€
 
 ```bash
 composer require adeliom/sylius-easy-crud-plugin
+// Optionnal if you want to use the bundle maker commands
 composer require --dev symfony/maker-bundle
 ```
 
@@ -96,6 +97,9 @@ Add the plugin to `config/bundles.php`:
 return [
     // ...
     Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],
+    
+    // If have installed the maker bundle
+    Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true, 'test' => true],
 ];
 ```
 

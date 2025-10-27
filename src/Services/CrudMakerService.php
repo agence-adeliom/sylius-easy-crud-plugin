@@ -25,13 +25,20 @@ class CrudMakerService
     /** @var array<string, mixed> */
     protected array $namespaces;
 
+    protected string $yamlRoutesFile;
+
+    protected string $yamlResourceFile;
+
+    protected string $yamlServicesFile;
+
+    protected bool $isTestApplication;
+
     /**
      * @param \ReflectionClass<ResourceInterface>|null $entity
      * @param \ReflectionClass<RepositoryInterface>|null $repository
      * @param \ReflectionClass<ResourceInterface>|null $entityTranslation
      */
     public function __construct(
-        protected string $projectDir,
         protected Generator $generator,
         protected string $namespace,
         protected ?\ReflectionClass $entity,
@@ -41,6 +48,41 @@ class CrudMakerService
         $this->namespaces = [
             'entity' => $entity,
         ];
+
+        // Detect if we're in a test application context
+        $this->isTestApplication = $this->detectTestApplicationContext();
+
+        // Set config file paths based on context
+        if ($this->isTestApplication) {
+            $this->yamlRoutesFile = 'tests/TestApplication/config/routes.yaml';
+            $this->yamlResourceFile = 'tests/TestApplication/config/packages/sylius_resource.yaml';
+            $this->yamlServicesFile = 'tests/TestApplication/config/services.yaml';
+        } else {
+            $this->yamlRoutesFile = self::YAML_ROUTES_FILE;
+            $this->yamlResourceFile = self::YAML_RESOURCE_FILE;
+            $this->yamlServicesFile = self::YAML_SERVICES_FILE;
+        }
+    }
+
+    /**
+     * Detect if we're running in a Sylius plugin test application context
+     */
+    protected function detectTestApplicationContext(): bool
+    {
+        // Check if project dir contains indicators of test application
+        if (str_contains($this->generator->getRootDirectory(), 'vendor/sylius/test-application')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get absolute path for a config file
+     */
+    protected function getAbsoluteConfigPath(string $configFile): string
+    {
+        return $this->generator->getRootDirectory() . '/' . $configFile;
     }
 
     /**
@@ -81,6 +123,7 @@ class CrudMakerService
         // Check if entity already exists
         if (class_exists($className)) {
             $this->namespaces['entity'] = $className;
+
             return;
         }
 
@@ -125,6 +168,7 @@ class CrudMakerService
         // Check if translation entity already exists
         if (class_exists($translationClassName)) {
             $this->namespaces['entityTranslation'] = $translationClassName;
+
             return;
         }
 
@@ -212,7 +256,7 @@ class CrudMakerService
                 $menuListenerFqcn,
                 __DIR__ . '/../Resources/skeleton/AdminMenuListener.tpl.php',
                 [
-                    'route' => $this->namespace . '_admin_' . mb_strtolower(Str::asSnakeCase($className)),
+                    'route' => Str::asSnakeCase($this->namespace) . '_admin_' . mb_strtolower(Str::asSnakeCase($className)),
                     'menu_namespace' => $menuNamespace,
                 ],
             );
@@ -231,11 +275,22 @@ class CrudMakerService
                  ],
              ];
             $content = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-            file_put_contents(
-                self::YAML_SERVICES_FILE,
-                "\n    " . str_replace("\n", "\n    ", $content),
-                \FILE_APPEND,
-            );
+            $filePath = $this->yamlServicesFile;
+
+            // Read existing content if file exists
+            $existingContent = '';
+            if (file_exists($filePath)) {
+                $existingContent = file_get_contents($filePath);
+            }
+
+            // Append new content with proper indentation
+            $formattedContent = "\n    " . str_replace("\n", "\n    ", $content);
+            $combinedContent = $existingContent . $formattedContent;
+
+            // Use Generator's dumpFile for proper Docker volume handling
+            $this->generator->dumpFile($filePath, $combinedContent);
+            $this->generator->writeChanges();
+            file_put_contents($filePath, $combinedContent);
         }
     }
 
@@ -266,6 +321,7 @@ class CrudMakerService
         if (class_exists($fullClassName)) {
             // Don't generate if already exists, just return the class details
             $this->namespaces[strtolower($templateName)] = $file->getFullName();
+
             return $file;
         }
 
@@ -294,13 +350,19 @@ class CrudMakerService
             if (true === $returnContent) {
                 return Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
             }
-            file_put_contents(
-                self::YAML_ROUTES_FILE,
-                Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK),
-                \FILE_APPEND,
-            );
 
-            return self::YAML_ROUTES_FILE;
+            $filePath = $this->yamlRoutesFile;
+
+            // Read existing content if file exists
+            $existingContent = file_get_contents($filePath) ?: '';
+
+            // Append new content
+            $newContent = Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+            $combinedContent = $existingContent . "\n\n" . $newContent;
+
+            file_put_contents($filePath, $combinedContent);
+
+            return $this->yamlRoutesFile;
         } catch (\Exception $e) {
             return $e->getCode() . ' : ' . $e->getMessage();
         }
@@ -319,19 +381,30 @@ class CrudMakerService
                 return $yamlGenerator->getContents();
             }
 
-            $filePath = $this->projectDir . '/' . self::YAML_RESOURCE_FILE;
-            $filesystem = new Filesystem();
-            if (!$filesystem->exists($filePath)) {
-                $filesystem->touch($filePath);
-                $filesystem->appendToFile($filePath, "sylius_resource:\n  resources:");
+            $filePath = $this->yamlResourceFile;
+
+            if (!file_exists($filePath)) {
+                $filesystem = new Filesystem();
+                $filesystem->mkdir(dirname($filePath));
+                // Create the file if it doesn't exist
+                file_put_contents($filePath, "sylius_resource:\n  resources:");
             }
-            $yamlGenerator = new YamlSourceManipulator(file_get_contents($filePath) ?: '');
+
+            // Read existing content if file exists
+            $existingContent = file_get_contents($filePath) ?: '';
+
+            if (empty($existingContent)) {
+                $existingContent = "sylius_resource:\n  resources:";
+            }
+
+            $yamlGenerator = new YamlSourceManipulator($existingContent);
             $yaml = $yamlGenerator->getData();
             $this->appendResourceConfig($yaml, $entityName, $entityTranslationName);
             $yamlGenerator->setData($yaml);
+
             file_put_contents($filePath, $yamlGenerator->getContents());
 
-            return self::YAML_RESOURCE_FILE;
+            return $this->yamlResourceFile;
         } catch (\Exception $e) {
             return $e->getCode() . ' : ' . $e->getMessage();
         }
@@ -349,7 +422,7 @@ class CrudMakerService
             $icon = 'file';
         }
         $resourceDataBlock =
-            'alias: ' . mb_strtolower($this->namespace . '.' . Str::asSnakeCase($entityName)) . "\n"
+            'alias: ' . mb_strtolower(Str::asSnakeCase($this->namespace) . '.' . Str::asSnakeCase($entityName)) . "\n"
             . "section: admin\n"
             . "templates: \"@SyliusEasyCrudPlugin\\\\crud\"\n"
             . "redirect: update\n"
@@ -394,7 +467,7 @@ class CrudMakerService
      */
     private function appendResourceConfig(array &$data, string $entityName, ?string $entityTranslationName = null): void
     {
-        $alias = mb_strtolower($this->namespace . '.' . Str::asSnakeCase($entityName));
+        $alias = mb_strtolower(Str::asSnakeCase($this->namespace) . '.' . Str::asSnakeCase($entityName));
         if (!isset($data['sylius_resource'])) {
             $data['sylius_resource'] = [];
         }
