@@ -17,6 +17,7 @@ install:
 	@make database-init
 	@make load-fixtures
 	@make frontend-clear
+	echo "Setup completed! You can now access the application at http://localhost"
 
 # Run QA tools
 publish:
@@ -40,7 +41,6 @@ frontend-clear:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn install" || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn build" || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console assets:install
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php ls -la /srv/sylius/public/bundles/syliuseasycrudplugin
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php ln -sf /srv/sylius/public/bundles vendor/sylius/test-application/public
 
 

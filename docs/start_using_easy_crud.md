@@ -1,4 +1,4 @@
-## Create a custom CRUD
+## Creating a custom CRUD
 
 #### 1. Change Sylius default `doctrine.yaml` mapping type to `attribute`
 ```yaml
