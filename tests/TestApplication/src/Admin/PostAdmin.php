@@ -71,21 +71,18 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
 
         yield TabField::new('tab1', 'Tab 1');
 
-        yield ColumnField::new('Title')
+        yield ColumnField::new('tab1_left')
         ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
 
         yield TranslationField::new('translations')
-        ->addField(
-            Field::new('name')
-            ->setDisabled(false)
-            ->setRequired(true)
-            ->setFormTypeOption('constraints', [
-                new Length(['min' => 1]),
-            ]
+            ->addField(
+                Field::new('name')
+                ->setDisabled(false)
+                ->setRequired(true)
             )
-        )->onlyOnForms();
+            ->onlyOnForms();
 
-        yield ColumnField::new('data')
+        yield ColumnField::new('tab1_right')
         ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
 
         yield IconField::new('icon');

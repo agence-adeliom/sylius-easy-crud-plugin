@@ -160,74 +160,51 @@ This generates:
 - Updates `config/packages/sylius_resources.yaml` - Registers Sylius resource
 - Updates `src/Menu/AdminMenuListener.php` - Adds menu entry
 
-### Step 3: Configure Your Fields
+### Step 3: Configure Your CRUD
 
 Edit `src/Admin/PostAdmin.php`:
 [Discover available fields](./discover_fields.md)
 
+![Post CRUD example](docs/screens/easy_crud_posts.png "Post CRUD example")
+
+Configure your fields in the `configureFields()` or your filters with `configureFilters()` method:
 ```php
 <?php
 
 namespace App\Admin;
 
-use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\DateTimeField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\Field;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ImageField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\SlugField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TextEditorField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
-use Adeliom\SyliusEasyCrudPlugin\Enums\ColumnSizeEnum;
+use ...
 
 class PostAdmin extends AbstractAdmin
 {
+    public function configureFilters(): iterable
+    {
+        yield BooleanFilter::create('enabled')
+            ->setLabel('Enabled');
+    }
+    
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        // Main Information Tab
-        yield TabField::new('main', 'Main Information');
+        yield TabField::new('tab1', 'Tab 1');
 
-        yield ColumnField::new('_col1')
-            ->setSize(ColumnSizeEnum::WIDE_8_OF_12)
-            ->setLabel('Content');
-
-        yield Field::new('title')
-            ->setRequired(true)
-            ->setHelp('The post title (max 60 characters)');
-
-        yield SlugField::new('slug')
-            ->onlyOnForms()
-            ->setTargetFieldName('title')
-            ->setHelp('URL-friendly version of the title');
-
-        yield TextEditorField::new('content')
-            ->onlyOnForms()
-            ->setHelp('Post main content');
-
-        yield ColumnField::new('_col2')
-            ->setSize(ColumnSizeEnum::REGULAR_4_OF_12)
-            ->setLabel('Sidebar');
-
-        yield ImageField::new('featuredImage')
-            ->onlyOnForms()
-            ->setHelp('Post featured image');
-
-        yield CheckboxField::new('enabled')
-            ->setLabel('Published');
-
-        yield DateTimeField::new('publishedAt')
-            ->setHelp('Publication date and time');
-
-        // Translations Tab
-        yield TabField::new('translations', 'Translations');
+        yield ColumnField::new('tab1_left')
+        ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
 
         yield TranslationField::new('translations')
             ->addField(
-                Field::new('translatedTitle')->setRequired(true)
+                Field::new('name')
+                ->setDisabled(false)
+                ->setRequired(true)
             )
-            ->setRequired(false);
+            ->onlyOnForms();
+
+        yield ColumnField::new('tab1_right')
+            ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
+
+        yield IconField::new('icon')
+            ->onlyOnForms();
+
+        yield CheckboxField::new('enabled');
     }
 }
 ```
