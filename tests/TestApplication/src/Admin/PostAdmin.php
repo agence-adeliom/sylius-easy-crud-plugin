@@ -89,12 +89,18 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
 
         yield TabField::new('tab2', 'Tab 2');
 
+        yield ColumnField::new('tab2_left')
+            ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
+
         yield EnumField::new('state')
             ->setEnum(ThreeStateStatusEnum::class)
             ->renderExpanded();
 
         yield CodeEditorField::new('codeEditor')
             ->setLanguage('json');
+
+        yield ColumnField::new('tab2_right')
+            ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
         yield DateField::new('date1')
             ->setHelp('is virtual')

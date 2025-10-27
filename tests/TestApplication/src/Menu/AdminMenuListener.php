@@ -14,12 +14,12 @@ AdminMenuListener
         $newSubmenu = $menu
             ->addChild('custom')
             ->setLabel('Custom')
+            ->setLabelAttribute('icon', 'folder')
         ;
 
         $newSubmenu
             ->addChild('entity_test', ['route' => 'tests_adeliom_sylius_easy_crud_plugin_admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_index'])
-            ->setLabel('Entity test')
-            ->setLabelAttribute('icon', 'file')
+            ->setLabel('Posts')
         ;
 
         $children = $menu->getChildren();
