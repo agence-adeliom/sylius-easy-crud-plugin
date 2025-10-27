@@ -1,5 +1,7 @@
 imports:
     - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
+    - { resource: "packages/sylius_resource.yaml" }
+    - { resource: "services.yaml" }
     - { resource: "services_test.php" }
 
 twig:
@@ -8,6 +10,8 @@ twig:
 
 maker:
   root_namespace: 'Tests\Adeliom\SyliusEasyCrudPlugin'
+  generate_final_classes: true
+  generate_final_entities: false
 
 # Remove if you do not need to extend entities
 doctrine:

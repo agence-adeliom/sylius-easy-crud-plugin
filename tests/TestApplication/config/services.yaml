@@ -1,0 +1,5 @@
+services:
+    tests_adeliom_syliuseasycrudplugin_menu.admin.menu_builder:
+        class: Tests\Adeliom\SyliusEasyCrudPlugin\Menu\AdminMenuListener
+        tags: [{ name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }]
+    
