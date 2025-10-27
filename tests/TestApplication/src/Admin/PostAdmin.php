@@ -26,10 +26,9 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Form\Test\DataTestType;
+use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
 use Sylius\Component\Core\Model\Product;
-use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\Taxon;
-use Sylius\Component\Core\Model\TaxonInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Entity\Post;
@@ -44,6 +43,12 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
     public static function getName(): string
     {
         return 'admin_tests_adeliom_sylius_easy_crud_plugin_entity_post';
+    }
+
+    public function configureFilters(): iterable
+    {
+        yield BooleanFilter::create('enabled')
+            ->setLabel('Enabled');
     }
 
     public static function getEntityFqcn(): string
