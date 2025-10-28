@@ -60,9 +60,11 @@ make ecs
 # More help
 make help
 
-# Build bundles assets
+# Build bundles assets (use node 20+)
 yarn install
-yarn build
+make plugin-asset-watch
+#or
+make plugin-asset-build
 ```
 
 See [CLAUDE.md](./CLAUDE.md) for complete development setup instructions.
