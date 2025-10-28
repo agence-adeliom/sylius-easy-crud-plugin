@@ -9,7 +9,7 @@
 [![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
 [![Latest Version](https://img.shields.io/packagist/v/adeliom/sylius-easy-crud-plugin)](https://packagist.org/packages/adeliom/sylius-easy-crud-plugin)
 
-[Features](#features) • [Installation](#installation) • [Quick Start](#quick-start) • [Documentation](#documentation)
+[Overview](#overview) • [Installation](#installation) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Roadmap](#roadmap)
 
 </div>
 
@@ -32,26 +32,26 @@ class PostAdmin extends AbstractAdmin
 {
     yield TabField::new('tab1', 'Tab 1');
 
-        yield ColumnField::new('tab1_left')
-            ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
+    yield ColumnField::new('tab1_left')
+        ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
 
-        yield TranslationField::new('translations')
-            ->addField(
-                Field::new('name')
-                ->setDisabled(false)
-                ->setRequired(true)
-            )
-            ->onlyOnForms();
+    yield TranslationField::new('translations')
+        ->addField(
+            Field::new('name')
+            ->setDisabled(false)
+            ->setRequired(true)
+        )
+        ->onlyOnForms();
 
-        yield ColumnField::new('tab1_right')
-            ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
+    yield ColumnField::new('tab1_right')
+        ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
 
-        yield IconField::new('icon')
-            ->onlyOnForms();
+    yield IconField::new('icon')
+        ->onlyOnForms();
 
-        yield CheckboxField::new('enabled');
-        
-        ...
+    yield CheckboxField::new('enabled');
+    
+    ...
 }
 ```
 
@@ -63,33 +63,28 @@ class PostAdmin extends AbstractAdmin
 - **🧩 Highly Extensible**: Custom field configurators, actions, and form types
 - **😎 Centralized configuration**: CRUD configuration in a single Admin class per resource
 
-### Why we built this plugin?
+### Why we built this plugin
 
-From our previous Symfony projects, in [Adeliom](https://www.adeliom.com/), we were familiar with EasyAdminBundle. When migrating to Sylius, we looked for a fast and efficient way to reuse and build on our previous solutions ([several CMS bundles based on EasyAdmin](https://github.com/search?q=org%3Aagence-adeliom+easy-&type=repositories)), so we tried to integrate EasyAdmin's abstraction system directly into Sylius.
+In our previous Symfony projects we were familiar with EasyAdminBundle and developed [several bundles based on it](https://github.com/search?q=org%3Aagence-adeliom+easy-&type=repositories). When we migrated to Sylius, we looked for a fast and efficient way to reuse those bundles, so we tried to integrate the missing parts:
+- The EasyAdmin abstraction layer to allow building forms, lists and show pages in a single Admin class.
+- Our previous CMS features.
 
-The result works fine so we decided to put this work public.
+We have used this bundle in production on several projects and decided to share it with the community.
 
-We started this project in 2022 before learning about the Sylius Stack approach. As a result, it does not fully comply with Sylius guidelines, so please use this plugin with caution. We will continue improving it to ensure compatibility with future Sylius versions.
+It does not fully comply with Sylius guidelines, so please use this plugin with caution.
 
-### Easy CRUD and Happy CMS
+### A duo: Easy CRUD + Happy CMS
 
-Finally, alongside this plugin, we migrated our other EasyAdmin-based bundles — which provided content management (CMS) features — into a separate plugin called [Happy CMS](https://github.com/agence-adeliom/sylius-happy-cms-plugin). A possible alternative to build CMS features in Sylius.
+Alongside this plugin, we migrated our other EasyAdmin-based bundles — which provided content management (CMS) features — into a separate plugin called [Happy CMS](https://github.com/agence-adeliom/sylius-happy-cms-plugin). It is an alternative for building CMS features in Sylius.
 
 ---
 
 ## Installation
 
-### Requirements
-
-- PHP 8.2 or higher
-- Sylius 2.0 or higher
-- Symfony 6.4 or 7.1+
-
 ### 1. Install via Composer
 
 ```bash
 composer require adeliom/sylius-easy-crud-plugin
-// Optionnal if you want to use the bundle maker commands
 composer require --dev symfony/maker-bundle
 ```
 
@@ -103,8 +98,7 @@ Add the plugin to `config/bundles.php`:
 return [
     // ...
     Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],
-    
-    // If have installed the maker bundle
+   
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true, 'test' => true],
 ];
 ```
@@ -127,7 +121,7 @@ sylius_easy_crud:
     resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
-### 5. Install Assets (if needed)
+### 5. Install Assets
 
 ```bash
 php bin/console assets:install
@@ -209,7 +203,7 @@ This plugin is licensed under the **MIT License**. See [LICENSE](LICENSE) for de
 
 [Adeliom](https://www.adeliom.com/)
 
-**EasyAdminBundle** Core Team
+**EasyAdminBundle** Core Team for the initial abstraction layer and fields
 
 ---
 
