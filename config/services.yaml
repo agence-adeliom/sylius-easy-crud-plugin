@@ -131,3 +131,7 @@ services:
             - '@event_dispatcher'
             - '@webpack_encore.tag_renderer'
             - '@assets.packages'
+
+    adeliom.sylius.easy.crud.show.crud.context.factory:
+        public: true
+        class: Adeliom\SyliusEasyCrudPlugin\CrudFactory\ShowCrudContextFactory

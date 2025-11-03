@@ -2,20 +2,58 @@
 
 namespace Tests\Adeliom\SyliusEasyCrudPlugin\Entity;
 
+use Adeliom\SyliusEasyCrudPlugin\Twig\Context\Factory\ShowCrudContextFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
+use Sylius\Resource\Metadata\AsResource;
+use Sylius\Resource\Metadata\BulkDelete;
+use Sylius\Resource\Metadata\Create;
+use Sylius\Resource\Metadata\Delete;
+use Sylius\Resource\Metadata\Index;
+use Sylius\Resource\Metadata\Show;
+use Sylius\Resource\Metadata\Update;
 use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Model\TranslatableTrait;
 use Sylius\Resource\Model\TranslationInterface;
+use Tests\Adeliom\SyliusEasyCrudPlugin\Admin\PostAdmin;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Repository\PostRepository;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ORM\Table(name: 'post')]
+#[AsResource(
+    alias: 'tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post',
+    section: 'admin',
+    formType: PostAdmin::class,
+    templatesDir: '@SyliusEasyCrudPlugin/crud',
+    routePrefix: 'admin',
+    name: 'tests_adeliom_sylius_easy_crud_plugin_entity_post',
+    pluralName: 'tests_adeliom_sylius_easy_crud_plugin_entity_posts',
+    vars: [
+        'all' => [
+            'icon' => 'file',
+            'subheader' => 'sylius_easy_crud_plugin.admin.ui.default.subheader',
+            'breadcrumb' => 'sylius_easy_crud_plugin.admin.ui.default.index',
+            'templates' => [
+                'form' => '@SyliusEasyCrudPlugin\crud\form\_form.html.twig',
+            ],
+        ]
+    ],
+    operations: [
+        new Index(grid: PostAdmin::class),
+        new Create(),
+        new Show(
+            twigContextFactory: ShowCrudContextFactory::class
+        ),
+        new Update(redirectToRoute: 'tests_adeliom_sylius_easy_crud_plugin_admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_update'),
+        new Delete(),
+        new BulkDelete(),
+    ]
+)]
 class Post implements ResourceInterface, TranslatableInterface
 {
     use TranslatableTrait {

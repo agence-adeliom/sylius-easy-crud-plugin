@@ -119,6 +119,14 @@ In `config/routes.yaml`:
 ```yaml
 sylius_easy_crud:
     resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
+    
+sylius_crud_routes:
+    resource: 'sylius.routing.loader.crud_routes_attributes'
+    type: service
+    
+sylius_routes:
+    resource: 'sylius.routing.loader.routes_attributes'
+    type: service
 ```
 
 ### 5. Install Assets
