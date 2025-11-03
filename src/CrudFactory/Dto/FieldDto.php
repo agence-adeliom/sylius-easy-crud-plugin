@@ -136,7 +136,7 @@ final class FieldDto
         $this->fieldFqcn = $fieldFqcn;
     }
 
-    public function getProperty(): string
+    public function getProperty(): ?string
     {
         return $this->propertyName;
     }
@@ -400,11 +400,18 @@ final class FieldDto
     }
 
     /**
-     * @param array<string, array<string, string|Asset>> $assets
+     * @param array<string, array<string, string|Asset>|null> $assets
      */
     public function addAssets(array $assets): void
     {
-        if (isset($assets['js']) && is_array($assets['js'])) {
+        if (!isset($assets['js'])) {
+            $assets['js'] = null;
+        }
+        if (!isset($assets['css'])) {
+            $assets['css'] = null;
+        }
+
+        if (is_array($assets['js'])) {
             foreach ($assets['js'] as $asset) {
                 $found = false;
                 foreach ($this->assets->getJsAssets() as $assetDto) {
@@ -428,7 +435,7 @@ final class FieldDto
             }
         }
 
-        if (isset($assets['css']) && is_array($assets['css'])) {
+        if (is_array($assets['css'])) {
             foreach ($assets['css'] as $asset) {
                 $found = false;
                 foreach ($this->assets->getCssAssets() as $assetDto) {

@@ -18,7 +18,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SortableCollectionType extends CollectionType implements AdminFormTypeInterface
 {
     /**
-     * @inheritdoc
+     * @param array{
+     *     button_add_label: string,
+     *     allow_add: bool,
+     *     allow_delete: bool,
+     *     delete_empty: bool|callable,
+     *     required: bool,
+     *     entry_type: string,
+     *     prototype: string,
+     *     prototype_name: string,
+     *     entry_options: array,
+     *     prototype_data: array,
+     * } $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -32,7 +43,11 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
                 $prototypeOptions['data'] = $options['prototype_data'];
             }
 
-            $prototype = $builder->create($options['prototype_name'], $options['entry_type'], $prototypeOptions);
+            $prototype = $builder->create(
+                $options['prototype_name'],
+                $options['entry_type'],
+                $prototypeOptions
+            );
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -63,8 +78,8 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         $view->vars['button_delete_label'] = $options['button_delete_label'];
         $view->vars['button_move_label'] = $options['button_move_label'];
 
-        if ($form->getConfig()->hasAttribute('prototype')) {
-            $prototype = $form->getConfig()->getAttribute('prototype');
+        $prototype = $form->getConfig()->getAttribute('prototype');
+        if ($prototype && $prototype instanceof FormInterface) {
             $view->vars['prototype'] = $prototype->setParent($form)->createView($view);
         }
     }

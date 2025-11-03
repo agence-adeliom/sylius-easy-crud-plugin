@@ -8,7 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Sylius\Component\Registry\ServiceRegistryInterface;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Webmozart\Assert\Assert;
+use function PHPUnit\Framework\assertTrue;
 
 class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 {
@@ -49,8 +50,12 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                         },
                         function (?ResourceInterface $tagsAsResource) use ($options): string|int {
                             if (null !== $tagsAsResource) {
-                                if (method_exists($tagsAsResource, 'get' . ucfirst($options['choice_value']))) {
-                                    return call_user_func([$tagsAsResource, 'get' . ucfirst($options['choice_value'])]);
+                                $choiceValue = $options['choice_value'];
+                                if (is_string($choiceValue) && method_exists($tagsAsResource, 'get' . ucfirst($choiceValue))) {
+                                    /** @phpstan-ignore-next-line */
+                                    $return = call_user_func([$tagsAsResource, 'get' . ucfirst($choiceValue)]);
+                                    assertTrue(is_string($return) || is_int($return));
+                                    return $return;
                                 }
                             }
 
@@ -91,8 +96,12 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                             function (Collection $tagsAsCollection) use ($options): string {
                                 $valuesAsString = '';
                                 foreach ($tagsAsCollection as $key => $tag) {
-                                    if (is_object($tag) && method_exists($tag, 'get' . ucfirst($options['choice_value']))) {
-                                        $valuesAsString .= call_user_func([$tag, 'get' . ucfirst($options['choice_value'])]);
+                                    $choiceValue = $options['choice_value'];
+                                    if (is_string($choiceValue) && is_object($tag) && method_exists($tag, 'get' . ucfirst($choiceValue))) {
+                                        /** @phpstan-ignore-next-line */
+                                        $return = call_user_func([$tag, 'get' . ucfirst($choiceValue)]);
+                                        assertTrue(is_string($return) || is_int($return));
+                                        $valuesAsString .= $return;
                                     }
                                     $valuesAsString .= ',';
                                 }
@@ -133,6 +142,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                   if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
                                       Assert::isArray($options['repositoryArguments']);
 
+                                      /** @phpstan-ignore-next-line */
                                       return call_user_func([$repository, $options['repositoryMethod']], ...$options['repositoryArguments']);
                                   }
 

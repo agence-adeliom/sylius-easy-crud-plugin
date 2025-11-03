@@ -19,20 +19,21 @@ class ChoiceMaskType extends AbstractType
     {
         $sanitizedMap = [];
         $allFieldNames = [];
-        foreach ($options['map'] as $value => $fieldNames) {
-            if (is_iterable($fieldNames)) {
-                foreach ($fieldNames as $fieldName) {
-                    $sanitizedFieldName = str_replace(['__', '.'], ['____', '__'], (string) $fieldName);
-                    $sanitizedMap[$value][] = $sanitizedFieldName;
-                    $allFieldNames[] = $sanitizedFieldName;
+        if(is_array($options['map'])) {
+            foreach ($options['map'] as $value => $fieldNames) {
+                if (is_iterable($fieldNames)) {
+                    foreach ($fieldNames as $fieldName) {
+                        $sanitizedFieldName = str_replace(['__', '.'], ['____', '__'], (string) $fieldName);
+                        $sanitizedMap[$value][] = $sanitizedFieldName;
+                        $allFieldNames[] = $sanitizedFieldName;
+                    }
                 }
             }
+            $view->vars['all_fields'] = array_values(array_unique($allFieldNames));
+            $view->vars['map'] = $sanitizedMap;
+            $view->vars['is_translation'] = isset($options['isTranslation']) && $options['isTranslation'];
+            $options['expanded'] = false;
         }
-
-        $view->vars['all_fields'] = array_values(array_unique($allFieldNames));
-        $view->vars['map'] = $sanitizedMap;
-        $view->vars['is_translation'] = (bool) $options['isTranslation'] ?? false;
-        $options['expanded'] = false;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

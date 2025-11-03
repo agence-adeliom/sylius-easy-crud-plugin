@@ -12,6 +12,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use function PHPUnit\Framework\assertTrue;
 
 class ImageType extends AbstractType implements AdminFormTypeInterface
 {
@@ -29,6 +30,7 @@ class ImageType extends AbstractType implements AdminFormTypeInterface
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
+            assertTrue(is_null($data) || $data instanceof \SplFileInfo);
             $image = new Image();
             $image->setType('default');
             $image->setFile($data);

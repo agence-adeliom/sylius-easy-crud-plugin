@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Sylius\Component\Resource\Translation\Provider\TranslationLocaleProviderInterface;
 use Sylius\Resource\Model\TranslatableInterface;
+use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -99,7 +100,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            /** @var PersistentCollection<string, mixed>|ArrayCollection<string, mixed> $translations */
+            /** @var PersistentCollection<string, TranslationInterface|null>|ArrayCollection<string, TranslationInterface|null> $translations */
             $translations = $event->getData();
 
             if ($translations instanceof PersistentCollection) {
@@ -147,15 +148,20 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                                 ($types = $reflectionExtractor->getTypes($className, $property)) &&
                                 $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
                             ) {
-                                $objectClassName = $reflectionExtractor->getTypes($className, $property)[0]->getClassName();
-                                if (null !== $actualValue && method_exists($actualValue, 'normalizeFormData')) {
-                                    $value = $actualValue::normalizeFormData($value);
+                                $type = $reflectionExtractor->getTypes($className, $property);
+                                if (is_array($type)) {
+                                    $objectClassName = $type[0]->getClassName();
+                                    if (is_string($objectClassName)) {
+                                        if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
+                                            $value = $actualValue::normalizeFormData($value);
+                                        }
+                                        $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
+                                            AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
+                                            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
+                                        ]);
+                                        $this->propertyAccessor->setValue($translation, $property, $objectValue);
+                                    }
                                 }
-                                $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
-                                    AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                    AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
-                                ]);
-                                $this->propertyAccessor->setValue($translation, $property, $objectValue);
                             } elseif (
                                 $reflectionExtractor->isWritable($className, $property)
                             ) {

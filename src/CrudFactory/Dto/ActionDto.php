@@ -240,9 +240,6 @@ class ActionDto
         $this->routeParameters = $routeParameters;
     }
 
-    /**
-     * @return string|callable|null
-     */
     public function getUrl(): mixed
     {
         return $this->url;
@@ -288,6 +285,8 @@ class ActionDto
      */
     public function getAsConfigObject(): Action
     {
+        assert(is_string($this->name), 'The action name must be a string to create the Action config object.');
+
         $action = Action::new($this->name, $this->label, $this->icon);
         $this->setCssClass($this->cssClass);
         $this->setHtmlAttributes($this->htmlAttributes);
@@ -388,6 +387,9 @@ class ActionDto
             return $this->getSyliusAction();
         }
         if ([] !== $this->getSubActions()) {
+
+            assert(is_string($this->getName()), 'The action name must be a string to create the Action config object.');
+
             $subItemWrapper = SyliusAction::create(
                 $this->getName(),
                 'easy_crud_' . $this->getType() . '_sub_action',
@@ -432,9 +434,11 @@ class ActionDto
             $actionOptions,
         );
 
+        assert(is_string($this->getName()), 'The action name must be a string to create the Action config object.');
+
         return SyliusAction::create($this->getName(), 'easy_crud_' . $this->getType() . '_action')
             ->setLabel($this->getLabel())
-            ->setIcon($this->getIcon())
+            ->setIcon($this->getIcon() ?? '')
             ->setEnabled(true)
             ->setOptions($actionOptions);
     }
