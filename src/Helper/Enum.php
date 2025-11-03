@@ -25,14 +25,14 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Store existing constants in a static cache per object.
      *
-     * @var array<string, mixed>
+     * @var array<string, array>
      */
     protected static array $cache = [];
 
     /**
      * Cache of instances of the Enum class.
      *
-     * @var array<string, mixed>
+     * @var array<string, array>
      */
     protected static array $instances = [];
 
@@ -88,12 +88,8 @@ abstract class Enum implements \JsonSerializable, \Stringable
 
     public function __toString(): string
     {
-        if ((!is_object($this->value) && !is_array($this->value)) ||
-            method_exists($this->value, '__toString')) {
-            return (string) $this->value;
-        }
-
-        return '';
+        /** @phpstan-ignore-next-line */
+        return (string) $this->value;
     }
 
     /**
@@ -138,7 +134,7 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Returns all possible values as an array.
      *
-     * @return array<int, mixed> Constant name in key, constant value in value
+     * @return array Constant name in key, constant value in value
      */
     public static function toArray(): array
     {
@@ -176,7 +172,10 @@ abstract class Enum implements \JsonSerializable, \Stringable
     protected static function assertValidValueReturningKey(mixed $value): int|string
     {
         if (false === ($key = static::search($value))) {
-            throw new \UnexpectedValueException(sprintf("Value '%s' is not part of the enum ", $value) . static::class);
+            throw new \UnexpectedValueException(
+                sprintf("Value '%s' is not part of the enum ", (is_string($value) || is_int($value) ? $value : '')) .
+                static::class,
+            );
         }
 
         return $key;
