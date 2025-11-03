@@ -61,6 +61,9 @@ final class CreateEasyCrud extends AbstractMaker
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $entryClassName = $input->getArgument('entity');
+
+        assert(is_string($entryClassName), 'entity must be a string.');
+
         $entryTranslationClassName = $entryClassName . 'Translation';
 
         if (!class_exists($entryClassName)) {

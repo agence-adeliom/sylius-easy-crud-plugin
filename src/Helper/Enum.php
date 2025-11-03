@@ -88,7 +88,12 @@ abstract class Enum implements \JsonSerializable, \Stringable
 
     public function __toString(): string
     {
-        return (string) $this->value;
+        if ((!is_object($this->value) && !is_array($this->value)) ||
+            method_exists($this->value, '__toString')) {
+            return (string) $this->value;
+        }
+
+        return '';
     }
 
     /**

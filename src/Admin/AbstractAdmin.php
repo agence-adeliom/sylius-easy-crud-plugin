@@ -119,18 +119,16 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     protected function getResourceFieldValueInRequest(string $formName, string $fieldName, string $queryKey = 'id'): ?string
     {
-        if ($this->crudAdminFactory->requestStack) {
-            $request = $this->crudAdminFactory->requestStack?->getMainRequest();
+        $request = $this->crudAdminFactory->requestStack->getMainRequest();
 
-            if ($request) {
-                $resourceValue = $request->query->get($queryKey) ?? $request->request->get(sprintf('%s[%s]', $formName, $fieldName));
-                if ($resourceValue) {
-                    return $resourceValue;
-                }
-                $form = $request->request->all($formName);
-                if (isset($form[$fieldName]) && null !== $form[$fieldName]) {
-                    return $form[$fieldName];
-                }
+        if ($request) {
+            $resourceValue = $request->query->get($queryKey) ?? $request->request->get(sprintf('%s[%s]', $formName, $fieldName));
+            if (is_string($resourceValue)) {
+                return $resourceValue;
+            }
+            $form = $request->request->all($formName);
+            if (isset($form[$fieldName])) {
+                return $form[$fieldName];
             }
         }
 

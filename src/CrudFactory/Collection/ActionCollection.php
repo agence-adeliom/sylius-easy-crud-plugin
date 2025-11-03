@@ -60,7 +60,9 @@ final class ActionCollection implements CollectionInterface
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->actions[$offset] = $value;
+        if ($value instanceof ActionDto) {
+            $this->actions[$offset] = $value;
+        }
     }
 
     public function offsetUnset(mixed $offset): void

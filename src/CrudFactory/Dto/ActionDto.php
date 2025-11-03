@@ -42,7 +42,6 @@ class ActionDto
     /** @var array<string>|callable */
     private $routeParameters = [];
 
-    /* @var callable|string|null */
     private mixed $url = null;
 
     /** @var array<string, mixed> */
@@ -56,7 +55,7 @@ class ActionDto
 
     private ?ActionInterface $syliusAction = null;
 
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -86,7 +85,7 @@ class ActionDto
         return Action::TYPE_BATCH === $this->type;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -130,7 +129,7 @@ class ActionDto
         $this->cssClass = $cssClass;
     }
 
-    public function getHtmlElement(): string
+    public function getHtmlElement(): ?string
     {
         return $this->htmlElement;
     }
@@ -179,7 +178,7 @@ class ActionDto
         $this->templatePath = $templatePath;
     }
 
-    public function getLinkUrl(): string
+    public function getLinkUrl(): ?string
     {
         return $this->linkUrl;
     }
@@ -241,7 +240,10 @@ class ActionDto
         $this->routeParameters = $routeParameters;
     }
 
-    public function getUrl(): string|callable|null
+    /**
+     * @return string|callable|null
+     */
+    public function getUrl(): mixed
     {
         return $this->url;
     }

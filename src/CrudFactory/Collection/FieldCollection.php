@@ -110,7 +110,9 @@ final class FieldCollection implements CollectionInterface
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->fields[$offset] = $value;
+        if ($value instanceof FieldDto) {
+            $this->fields[$offset] = $value;
+        }
     }
 
     public function offsetUnset(mixed $offset): void

@@ -20,7 +20,7 @@ class AssetRenderer
     }
 
     /**
-     * @param array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $assets
+     * @param array{js: array<string|Asset|null>|null, css: array<string|Asset|null>|null, webpack: array<string|Asset|null>|null} $assets
      */
     public function renderAssets(array $assets, ?string $nonce = null): string
     {
@@ -45,7 +45,7 @@ class AssetRenderer
                     }
                 }
 
-                if (isset($attributes['href'])) {
+                if (!empty($attributes['href'])) {
                     $event = new RenderAssetTagEvent(
                         RenderAssetTagEvent::TYPE_LINK,
                         $attributes['href'],
@@ -76,10 +76,9 @@ class AssetRenderer
                     $attributes['src'] = $asset;
                 } elseif ($asset instanceof Asset) {
                     $attributes['src'] = $asset->getAsDto()->getValue();
-                }
-
-                if ($asset->getAsDto()->getPackageName()) {
-                    $attributes['src'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['src']);
+                    if ($asset->getAsDto()->getPackageName()) {
+                        $attributes['src'] = $this->packages->getPackage($asset->getAsDto()->getPackageName())->getUrl($attributes['src']);
+                    }
                 }
 
                 $event = new RenderAssetTagEvent(
@@ -125,7 +124,6 @@ class AssetRenderer
                                 [
                                     'nonce' => $nonce,
                                 ],
-                                true,
                             );
 
                         continue;
@@ -149,7 +147,6 @@ class AssetRenderer
                                 [
                                     'nonce' => $nonce,
                                 ],
-                                true,
                             );
                     }
                 } catch (\Exception $exception) {

@@ -59,11 +59,14 @@ final class CreateEntity extends AbstractMaker
     {
         $className = $input->getArgument('className');
 
+        assert(is_string($className), 'className must be a string.');
+
         // Allow custom namespace override via option
         $customNamespace = $input->getOption('namespace');
 
-        if ($customNamespace) {
+        if (is_string($customNamespace)) {
             // Use the provided namespace
+            /** @var class-string $class */
             $class = rtrim($customNamespace, '\\') . '\\Entity\\' . $className;
         } else {
             // Use Generator to automatically resolve the correct namespace based on Doctrine configuration
@@ -71,6 +74,7 @@ final class CreateEntity extends AbstractMaker
                 $className,
                 'Entity\\',
             );
+            /** @var class-string $class */
             $class = $entityClassDetails->getFullName();
         }
 
@@ -89,7 +93,11 @@ final class CreateEntity extends AbstractMaker
                 $namespace = \trim($generator->getRootNamespace(), '\\');
             }
 
-            [$entity, $entityTranslation, $repository] = $this->getEntity($class, $generator);
+            [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
+                $class,
+                $generator,
+                $this->managerRegistry,
+            );
 
             try {
                 $resourceConfigGenerator = new CrudMakerService(
@@ -133,35 +141,8 @@ final class CreateEntity extends AbstractMaker
                 $io->error($exception->getMessage());
             }
         } else {
-            $io->info(\sprintf('Entity "%s" already exists.', $input->getArgument('className')));
+            $io->info(\sprintf('Entity "%s" already exists.', $className));
         }
-    }
-
-    /**
-     * @return array<int, mixed>
-     */
-    protected function getEntity(string $class, Generator $generator): array
-    {
-        $entity = null;
-        $entityTranslation = null;
-        $repository = null;
-        if (\class_exists($class)) {
-            $entity = new \ReflectionClass($class);
-
-            $repository = new \ReflectionClass($this->managerRegistry->getRepository($entity->getName()));
-            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
-                // not using a custom repository
-            }
-
-            if (method_exists($entity, 'createTranslation')) {
-                $object = get_class($entity->createTranslation());
-                if (is_string($object)) {
-                    $entityTranslation = new \ReflectionClass($object);
-                }
-            }
-        }
-
-        return [$entity, $entityTranslation, $repository];
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

@@ -22,7 +22,7 @@ class CrudMakerService
 
     public const YAML_SERVICES_FILE = 'config/services.yaml';
 
-    /** @var array<string, mixed> */
+    /** @var array<string, \ReflectionClass<ResourceInterface>|\ReflectionClass<RepositoryInterface>|string|null> */
     protected array $namespaces;
 
     protected string $yamlRoutesFile;
@@ -47,6 +47,8 @@ class CrudMakerService
     ) {
         $this->namespaces = [
             'entity' => $entity,
+            'repository' => $repository,
+            'entityTranslation' => $entityTranslation,
         ];
 
         // Detect if we're in a test application context
@@ -115,7 +117,7 @@ class CrudMakerService
         // Read existing content
         $existingContent = '';
         if (file_exists($filePath)) {
-            $existingContent = file_get_contents($absolutePath);
+            $existingContent = file_get_contents($absolutePath) ?: '';
         }
 
         // Check if service is already registered
@@ -156,6 +158,7 @@ class CrudMakerService
     }
 
     /**
+     * @param class-string $className
      * @param array<string, mixed> $variables
      *
      * @throws \Exception
@@ -164,7 +167,11 @@ class CrudMakerService
     {
         // Check if entity already exists
         if (class_exists($className)) {
-            $this->namespaces['entity'] = $className;
+            /**
+             * @var \ReflectionClass<ResourceInterface> $instance
+             */
+            $instance = new \ReflectionClass($className);
+            $this->namespaces['entity'] = $instance;
 
             return;
         }
@@ -192,24 +199,37 @@ class CrudMakerService
             array_merge([
                 'entity_namespace' => $entityNamespace,
                 'repository_namespace' => $repositoryNamespace,
-            ], $variables),
+            ], $variables ?: []),
         );
         $this->generator->writeChanges();
-        $this->namespaces['entity'] = $className;
+
+        /**
+         * @var \ReflectionClass<ResourceInterface> $instance
+         */
+        $instance = new \ReflectionClass($className);
+        $this->namespaces['entity'] = $instance;
     }
 
     /**
+     * @param class-string $className
      * @param array<string, mixed> $variables
      *
      * @throws \Exception
      */
     public function generateEntityTranslation(string $className, ?string $template = null, ?array $variables = []): void
     {
+        /**
+         * @var class-string $translationClassName
+         */
         $translationClassName = $className . 'Translation';
 
         // Check if translation entity already exists
         if (class_exists($translationClassName)) {
-            $this->namespaces['entityTranslation'] = $translationClassName;
+            /**
+             * @var \ReflectionClass<ResourceInterface> $instance
+             */
+            $instance = new \ReflectionClass($translationClassName);
+            $this->namespaces['entityTranslation'] = $instance;
 
             return;
         }
@@ -224,13 +244,19 @@ class CrudMakerService
             (is_string($template) && file_exists($template)) ? $template : __DIR__ . '/../Resources/skeleton/Translation.tpl.php',
             array_merge([
                 'entity_namespace' => $entityNamespace,
-            ], $variables),
+            ], $variables ?: []),
         );
         $this->generator->writeChanges();
-        $this->namespaces['entityTranslation'] = $translationClassName;
+
+        /**
+         * @var \ReflectionClass<ResourceInterface> $instance
+         */
+        $instance = new \ReflectionClass($translationClassName);
+        $this->namespaces['entityTranslation'] = $instance;
     }
 
     /**
+     * @param class-string $className
      * @param array<string, mixed> $variables
      *
      * @throws \Exception
@@ -267,7 +293,7 @@ class CrudMakerService
                 'entity_name' => Str::getShortClassName($className),
                 'entity_namespace' => $entityNamespace,
                 'repository_namespace' => $repositoryNamespace,
-            ], $variables),
+            ], $variables ?: []),
         );
         $this->generator->writeChanges();
     }
@@ -352,12 +378,12 @@ class CrudMakerService
             $suffix = $templateName;
         }
         $file = $this->generator->createClassNameDetails(
-            $className ?? $this->entity->getShortName(),
+            $className ?? ($this->entity ? $this->entity->getShortName() : ''),
             $templateName,
             $suffix,
         );
 
-        $fullClassName = str_replace('Entity', $templateName, $className) . $templateName;
+        $fullClassName = str_replace('Entity', $templateName, $className ?: '') . $templateName;
 
         // Check if class already exists
         if (class_exists($fullClassName)) {
@@ -371,9 +397,9 @@ class CrudMakerService
             $fullClassName,
             (is_string($templatePath) && file_exists($templatePath)) ? $templatePath : __DIR__ . '/../Resources/skeleton/' . $templateName . '.tpl.php',
             array_merge([
-                            'entity' => $this->entity ? ($this->entity->getName() ?? $this->namespaces['entity']) : $this->namespaces['entity'],
+                            'entity' => $this->entity ? $this->entity->getName() : $this->namespaces['entity'],
                             'repository' => $this->repository,
-                        ], $variables),
+                        ], $variables ?: []),
         );
         $this->generator->writeChanges();
         $this->namespaces[strtolower($templateName)] = $file->getFullName();
@@ -386,7 +412,11 @@ class CrudMakerService
         try {
             $yaml = [];
             if (null === $entityName) {
-                $entityName = $this->namespaces['entity']->getShortName() ?? $this->entity->getShortName();
+                $entityName = is_object($this->namespaces['entity']) && method_exists($this->namespaces['entity'], 'getShortName') ?
+                    $this->namespaces['entity']->getShortName()
+                    :
+                    ($this->entity ? $this->entity->getShortName() : '')
+                ;
             }
             $this->appendRoutingConfig($yaml, $entityName);
             if (true === $returnContent) {
@@ -413,7 +443,13 @@ class CrudMakerService
     public function generateResource(bool $returnContent = false, ?string $entityName = null, ?string $entityTranslationName = null): string
     {
         try {
-            $entityName = $entityName ?? $this->namespaces['entity'] ?? $this->entity->getName();
+            if (null === $entityName) {
+                $entityName = is_object($this->namespaces['entity']) && method_exists($this->namespaces['entity'], 'getName') ?
+                    $this->namespaces['entity']->getName()
+                    :
+                    ($this->entity ? $this->entity->getName() : '')
+                ;
+            }
             if (true === $returnContent) {
                 $yamlGenerator = new YamlSourceManipulator("sylius_resource:\n  resources:");
                 $yaml = $yamlGenerator->getData();
@@ -505,7 +541,7 @@ class CrudMakerService
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<string, array> $data
      */
     private function appendResourceConfig(array &$data, string $entityName, ?string $entityTranslationName = null): void
     {
@@ -542,27 +578,30 @@ class CrudMakerService
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array{
+     *     0: \ReflectionClass<ResourceInterface>|null,
+     *     1: \ReflectionClass<ResourceInterface>|null,
+     *     2: \ReflectionClass<RepositoryInterface>|null
+     * }
      */
     public static function getEntity(string $class, Generator $generator, ManagerRegistry $managerRegistry): array
     {
         $entity = null;
         $entityTranslation = null;
         $repository = null;
-        /**
-         * @var class-string<object> $classTranslation
-         */
-        $classTranslation = $class . 'Translation';
         if (\class_exists($class)) {
+            /** @var \ReflectionClass<ResourceInterface> $entity */
             $entity = new \ReflectionClass($class);
 
+            /** @var \ReflectionClass<RepositoryInterface> $repository */
             $repository = new \ReflectionClass($managerRegistry->getRepository($entity->getName()));
-            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
-                // not using a custom repository
-            }
 
-            if (\class_exists($classTranslation)) {
-                $entityTranslation = new \ReflectionClass($classTranslation);
+            if (method_exists($entity, 'createTranslation')) {
+                $object = get_class($entity->createTranslation());
+                if (is_string($object)) {
+                    /** @var \ReflectionClass<ResourceInterface> $entityTranslation */
+                    $entityTranslation = new \ReflectionClass($object);
+                }
             }
         }
 
