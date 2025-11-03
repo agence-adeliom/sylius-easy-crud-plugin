@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractFormType;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use FOS\RestBundle\View\View;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
-use Sylius\Bundle\ResourceBundle\Grid\View\ResourceGridView;
-use Sylius\Component\Resource\ResourceActions;
+use Sylius\Resource\ResourceActions;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class SyliusCrudResourceController extends ResourceController
 {
@@ -85,7 +85,11 @@ class SyliusCrudResourceController extends ResourceController
             return $eventResponse;
         }
 
+        /** @var ?FormFactoryInterface $formFactory */
         $formFactory = $this->container->get('form.factory');
+
+        assert($formFactory instanceof FormFactoryInterface, 'form.factory service must be an instance of FormFactoryInterface');
+
         $form = $formFactory
             ->create(
                 $this->metadata->getParameters()['classes']['form'],
@@ -95,17 +99,20 @@ class SyliusCrudResourceController extends ResourceController
                 ],
             );
         $formType = $form->getConfig()->getType()->getInnerType();
-        $formType->resetBuild();
 
-        if (!($formType instanceof AbstractAdmin)) {
-            throw new NotFoundResourceException();
-        }
+        assert($formType instanceof AbstractFormType, 'Form type must be an instance of AbstractFormType');
+        assert($formType instanceof AbstractAdmin, 'Form type must be an instance of AbstractAdmin');
+
+        $formType->resetBuild();
 
         if ($configuration->isHtmlRequest()) {
             $formView = $form->createView();
 
+            /** @var string $template */
+            $template = $configuration->getTemplate(ResourceActions::SHOW . '.html');
+
             return $this->render(
-                $configuration->getTemplate(ResourceActions::SHOW . '.html'),
+                $template,
                 array_merge(
                     $formType->buildDetail($resource),
                     [
@@ -120,21 +127,6 @@ class SyliusCrudResourceController extends ResourceController
         }
 
         return $this->createRestView($configuration, $resource);
-    }
-
-    public function exportGridResourcesTestGroupAction(
-        RequestConfiguration $configuration,
-        ResourceGridView $resources,
-        Request $request,
-    ): Response {
-        $resources->getData()->setMaxPerPage(9999);
-        $exportableDatas = [];
-        foreach ($resources->getData() as $data) {
-            $exportableDatas[] = $data;
-        }
-        $request->setRequestFormat($request->get('format'));
-
-        return $this->createRestView($configuration, $exportableDatas, null, $request->get('groups'));
     }
 
     /**
@@ -159,19 +151,5 @@ class SyliusCrudResourceController extends ResourceController
         $view->setContext($context);
 
         return $this->viewHandler->handle($configuration, $view);
-    }
-
-    private function getAdminClass(): AbstractAdmin
-    {
-        $formFactory = $this->container->get('form.factory');
-        $form = $formFactory
-            ->create($this->metadata->getParameters()['classes']['form']);
-        $formType = $form->getConfig()->getType()->getInnerType();
-
-        if (!($formType instanceof AbstractAdmin)) {
-            throw new NotFoundResourceException();
-        }
-
-        return $formType;
     }
 }

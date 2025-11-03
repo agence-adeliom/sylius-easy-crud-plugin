@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
 use Adeliom\SyliusEasyCrudPlugin\Form\IconType;
@@ -77,7 +78,7 @@ final class IconField implements FieldInterface
     /**
      * Path to css compiled fonts
      *
-     * @param string|mixed[] $fonts
+     * @param string|Asset[] $fonts
      */
     public function setFonts(string|array $fonts = []): self
     {

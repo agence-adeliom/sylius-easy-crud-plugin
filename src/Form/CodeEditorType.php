@@ -52,7 +52,7 @@ class CodeEditorType extends AbstractType implements CodeEditorTypeInterface
     }
 
     /**
-     * @return array<string, array<int,string|Asset>>
+     * @return array<string, array<int, Asset|string>>
      */
     public static function configureAdminAssets(): array
     {

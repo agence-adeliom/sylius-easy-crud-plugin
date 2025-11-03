@@ -18,6 +18,7 @@ class OembedController extends AbstractController
 
         if (!$url) {
             try {
+                /** @var array $content */
                 $content = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
                 $url = $content['url'] ?? null;
             } catch (\Exception) {

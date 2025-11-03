@@ -15,9 +15,13 @@ class RegisterAdminPass implements CompilerPassInterface
         // As a Sylius Grid admin with autowiring and entity FQCN argument
         foreach ($container->findTaggedServiceIds('sylius_easy_crud_admin') as $id => $tags) {
             $definition = $container->getDefinition((string) $id);
-            $definition->addArgument($definition->getClass()::getEntityFqcn());
-            $definition->addArgument([]);
-            $definition->setAutowired(true);
+            /** @var class-string|null $class */
+            $class = $definition->getClass();
+            if ($class) {
+                $definition->addArgument($class::getEntityFqcn());
+                $definition->addArgument([]);
+                $definition->setAutowired(true);
+            }
         }
     }
 }

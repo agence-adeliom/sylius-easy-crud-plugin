@@ -46,7 +46,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             $prototype = $builder->create(
                 $options['prototype_name'],
                 $options['entry_type'],
-                $prototypeOptions
+                $prototypeOptions,
             );
             $builder->setAttribute('prototype', $prototype->getForm());
         }
@@ -163,7 +163,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
     }
 
     /**
-     * @return array<string, array<int,string|Asset>>
+     * @return array<string, array<int, Asset|string>>
      */
     public static function configureAdminAssets(): array
     {

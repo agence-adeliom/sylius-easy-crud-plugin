@@ -65,7 +65,12 @@ class CrudAdminFactory
         }
 
         foreach ($resources as $alias => $configuration) {
-            if ($configuration['classes']['model'] === $model) {
+            if (
+                $this->requestStack->getCurrentRequest() &&
+                is_array($configuration) &&
+                is_array($configuration['classes']) &&
+                $configuration['classes']['model'] === $model
+            ) {
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
                 $this->requestConfiguration = $this->requestConfigurationFactory
                     ->create(
@@ -108,7 +113,7 @@ class CrudAdminFactory
 
     public function getMenu(): MenuItem
     {
-        return $this->menu;
+        return $this->menu ?? new MenuItem('root', $this->menuFactory);
     }
 
     public function getMenuFactory(): FactoryInterface
@@ -170,14 +175,20 @@ class CrudAdminFactory
     /**
      * @return array<string, mixed>
      */
-    public function addColumn(MenuItem $menuItem, ?FieldDto $fieldDto): array
+    public function addColumn(MenuItem $menuItem, FieldDto $fieldDto): array
     {
+        /** @var ColumnSizeEnum|null $size */
+        $size = $fieldDto->getCustomOption('columnSize');
+
+        /** @var bool|null $newLine */
+        $newLine = $fieldDto->getCustomOption('newLine');
+
         $column = $this->newColumn(
             $menuItem,
             $fieldDto->getProperty(),
             $fieldDto->getLabel(),
-            $fieldDto->getCustomOption('columnSize'),
-            $fieldDto->getCustomOption('newLine'),
+            $size,
+            $newLine,
         );
         $this->columns[] = $column;
 
@@ -225,7 +236,7 @@ class CrudAdminFactory
            'name' => 'default',
            'label' => null,
            'size' => ColumnSizeEnum::WIDE_12_OF_12,
-           'menuItem' => $this->menu->count() ?
+           'menuItem' => $this->menu && $this->menu->count() ?
                $this->menu->getFirstChild() :
                null,
        ]];

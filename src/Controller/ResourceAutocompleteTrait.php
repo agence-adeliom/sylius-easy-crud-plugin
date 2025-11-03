@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Component\Resource\Metadata\Metadata;
+use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +34,7 @@ trait ResourceAutocompleteTrait
         }
 
         try {
-            /** @var array<mixed> $resources */
+            /** @var array<string, array> $resources */
             $resources = $this->getParameter('sylius.resources');
         } catch (InvalidArgumentException $exception) {
             throw new HttpException(Response::HTTP_FORBIDDEN, $exception->getMessage());
@@ -43,10 +45,17 @@ trait ResourceAutocompleteTrait
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
                 $syliusRepositoryService = str_replace('sylius.', 'sylius.repository.', $alias);
                 if ($this->container->has($syliusRepositoryService)) {
-                    $this->repository = $this->container->get($syliusRepositoryService);
+                    $containerRepository = $this->container->get($syliusRepositoryService);
+                    assert($containerRepository instanceof RepositoryInterface, 'Repository from container must implement RepositoryInterface');
+                    $this->repository = $containerRepository;
                 } else {
-                    $this->repository = $this->container->get('doctrine')
+                    $doctrine = $this->container->get('doctrine');
+                    assert($doctrine instanceof EntityManagerInterface, 'Doctrine service must implement EntityManagerInterface');
+                    /** @phpstan-ignore-next-line */
+                    $repository = $doctrine
                         ->getRepository($configuration['classes']['model']);
+                    /** @phpstan-ignore-next-line */
+                    $this->repository = $repository;
                 }
             }
         }

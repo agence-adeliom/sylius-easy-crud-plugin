@@ -178,6 +178,8 @@ final class Actions
      */
     private function createBuiltInAction(string $pageName, string $actionName): Action
     {
+        assert(null !== $this->metadata, 'Metadata must be set to create built-in actions.');
+
         if (Action::BATCH_DELETE === $actionName) {
             return Action::new(Action::BATCH_DELETE, '', null)
                 ->createAsBatchAction()
@@ -208,13 +210,12 @@ final class Actions
             )->setSyliusAction(ShowAction::create([]));
         }
 
-        if (Action::INDEX === $actionName) {
+        if (Action::INDEX === $actionName && $this->requestConfiguration) {
             $action = SyliusAction::create(Action::INDEX, 'easy_crud_main_action')
                 ->setLabel(\sprintf('%s.%s.admin.action.index', $this->metadata->getApplicationName(), $this->metadata->getName()))
                 ->setOptions([
                     'link' => [
                         'route' => $this->requestConfiguration->getRouteName('index'),
-                        //'parameters' =>
                     ],
                 ])
                 ->setIcon('tabler:list');

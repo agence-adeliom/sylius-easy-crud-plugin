@@ -19,7 +19,7 @@ class ChoiceMaskType extends AbstractType
     {
         $sanitizedMap = [];
         $allFieldNames = [];
-        if(is_array($options['map'])) {
+        if (is_array($options['map'])) {
             foreach ($options['map'] as $value => $fieldNames) {
                 if (is_iterable($fieldNames)) {
                     foreach ($fieldNames as $fieldName) {

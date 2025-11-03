@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Command;
 
-final class StubCreateEntity extends StubCommand
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'make:easy-crud:create-entity')]
+final class StubCreateTestEntity extends StubCommand
 {
-    protected static $defaultName = 'make:easy-crud:create-entity';
 }

@@ -57,7 +57,9 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
         // the 'entryIsComplex' setting tells if the collection item is so complex that needs a special
         // rendering not applied to simple collection items
         if (null === $field->getCustomOption(SortableCollectionField::OPTION_ENTRY_IS_COMPLEX)) {
-            $definesEntryType = null !== $entryTypeFqcn = $field->getCustomOption(SortableCollectionField::OPTION_ENTRY_TYPE);
+            /** @var ?string $entryTypeFqcn */
+            $entryTypeFqcn = $field->getCustomOption(SortableCollectionField::OPTION_ENTRY_TYPE);
+            $definesEntryType = null !== $entryTypeFqcn;
             $isSymfonyCoreFormType = null !== u($entryTypeFqcn ?? '')->indexOf('Symfony\Component\Form\Extension\Core\Type');
             $isComplexEntry = $definesEntryType && !$isSymfonyCoreFormType;
 
@@ -72,13 +74,19 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
             return $this->countNumElements($value);
         }
 
-        $collectionItemsAsText = [];
-        foreach ($value ?? [] as $item) {
-            if (!\is_string($item) && !(\is_object($item) && method_exists($item, '__toString'))) {
-                return $this->countNumElements($value);
-            }
+        if ($value) {
+            $value = [];
+        }
 
-            $collectionItemsAsText[] = (string) $item;
+        $collectionItemsAsText = [];
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (!\is_string($item) && !(\is_object($item) && method_exists($item, '__toString'))) {
+                    return $this->countNumElements($value);
+                }
+
+                $collectionItemsAsText[] = (string) $item;
+            }
         }
 
         // TODO

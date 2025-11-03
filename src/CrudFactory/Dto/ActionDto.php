@@ -85,8 +85,10 @@ class ActionDto
         return Action::TYPE_BATCH === $this->type;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
+        assert(is_string($this->name), 'The action name must be a string.');
+
         return $this->name;
     }
 
@@ -387,7 +389,6 @@ class ActionDto
             return $this->getSyliusAction();
         }
         if ([] !== $this->getSubActions()) {
-
             assert(is_string($this->getName()), 'The action name must be a string to create the Action config object.');
 
             $subItemWrapper = SyliusAction::create(

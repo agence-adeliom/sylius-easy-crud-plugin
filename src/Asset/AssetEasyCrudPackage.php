@@ -34,13 +34,13 @@ final class AssetEasyCrudPackage implements PackageInterface
         );
     }
 
-    public function getUrl(string $assetPath): string
+    public function getUrl(string $path): string
     {
-        return $this->package->getUrl($assetPath);
+        return $this->package->getUrl($path);
     }
 
-    public function getVersion(string $assetPath): string
+    public function getVersion(string $path): string
     {
-        return $this->package->getVersion($assetPath);
+        return $this->package->getVersion($path);
     }
 }

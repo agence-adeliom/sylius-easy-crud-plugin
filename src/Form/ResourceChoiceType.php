@@ -7,9 +7,10 @@ namespace Adeliom\SyliusEasyCrudPlugin\Form;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use function PHPUnit\Framework\assertTrue;
 use Sylius\Component\Registry\ServiceRegistryInterface;
-use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -19,7 +20,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Webmozart\Assert\Assert;
-use function PHPUnit\Framework\assertTrue;
 
 class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 {
@@ -55,6 +55,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                     /** @phpstan-ignore-next-line */
                                     $return = call_user_func([$tagsAsResource, 'get' . ucfirst($choiceValue)]);
                                     assertTrue(is_string($return) || is_int($return));
+
                                     return $return;
                                 }
                             }
@@ -172,7 +173,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, array<int,string|Asset>>
+     * @return array<string, array<int, Asset|string>>
      */
     public static function configureAdminAssets(): array
     {

@@ -66,7 +66,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
     }
 
     /**
-     * @return array<string, array<int,string|Asset>>
+     * @return array<string, array<int, Asset|string>>
      */
     public static function configureAdminAssets(): array
     {
