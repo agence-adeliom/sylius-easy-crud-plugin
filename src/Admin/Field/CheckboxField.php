@@ -17,6 +17,6 @@ final class CheckboxField implements FieldInterface
             ->setProperty($propertyName)
             ->setGridTemplatePath('@SyliusEasyCrudPlugin/field/yesno/grid.html.twig')
             ->setShowTemplatePath('@SyliusEasyCrudPlugin/field/yesno/show.html.twig')
-            ->setLabel($label);
+            ->setLabel($label ?? $propertyName);
     }
 }
