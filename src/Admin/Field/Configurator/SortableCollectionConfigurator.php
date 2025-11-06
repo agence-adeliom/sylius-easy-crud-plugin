@@ -16,9 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use function Symfony\Component\String\u;
 
-/**
- * * Inspired by EasyAdmin Symfony Bundle
- */
 final class SortableCollectionConfigurator implements FieldConfiguratorInterface
 {
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool
@@ -74,7 +71,7 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
             return $this->countNumElements($value);
         }
 
-        if ($value) {
+        if (!$value) {
             $value = [];
         }
 

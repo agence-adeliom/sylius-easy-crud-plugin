@@ -12,9 +12,6 @@ use function Symfony\Component\String\u;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class FieldDto
 {
     private ?string $fieldFqcn = null;
@@ -128,16 +125,17 @@ final class FieldDto
     }
 
     /**
-     * @internal Don't use this method yourself. EasyAdmin uses it internally
-     *           to set the field FQCN. It's OK to use getFieldFqcn() to get this value.
+     * @internal Don't use this method yourself. To set the field FQCN. It's OK to use getFieldFqcn() to get this value.
      */
     public function setFieldFqcn(string $fieldFqcn): void
     {
         $this->fieldFqcn = $fieldFqcn;
     }
 
-    public function getProperty(): ?string
+    public function getProperty(): string
     {
+        assert(is_string($this->propertyName), 'A field must have a property name defined.');
+
         return $this->propertyName;
     }
 

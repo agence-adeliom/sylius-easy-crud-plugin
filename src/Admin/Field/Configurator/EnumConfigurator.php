@@ -10,9 +10,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Adeliom\SyliusEasyCrudPlugin\Helper\Enum;
 use Sylius\Resource\Model\ResourceInterface;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class EnumConfigurator implements FieldConfiguratorInterface
 {
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool
@@ -25,7 +22,12 @@ final class EnumConfigurator implements FieldConfiguratorInterface
         $isExpanded = $field->getCustomOption(EnumField::OPTION_RENDER_EXPANDED);
         $isMultiple = $field->getCustomOption(EnumField::OPTION_ALLOW_MULTIPLE_CHOICES);
 
-        $choices = $this->getChoices($field->getCustomOption(EnumField::OPTION_ENUM), $field);
+        /** @var Enum|string|null $enum */
+        $enum = $field->getCustomOption(EnumField::OPTION_ENUM);
+
+        assert($enum instanceof Enum || is_string($enum), sprintf('The "%s" choice field\'s ENUM option must be an instance of "%s" or a string representing the Enum class name.', $field->getProperty(), Enum::class));
+
+        $choices = $this->getChoices($enum, $field);
 
         if (empty($choices)) {
             throw new \InvalidArgumentException(sprintf('The "%s" choice field must define its possible choices using the setEnum() method.', $field->getProperty()));

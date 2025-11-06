@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 class Crud
 {
     public const PAGE_DETAIL = 'show';

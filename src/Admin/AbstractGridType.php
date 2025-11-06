@@ -85,7 +85,14 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array{
+     *     type: string,
+     *     options?: array<string, mixed>,
+     *     icon?: string,
+     *     enabled?: bool,
+     *     position?: int,
+     *     label?: string
+     * } $data
      */
     protected function transformActionsAsGridDefinition(string $name, array $data): \Sylius\Component\Grid\Definition\Action
     {

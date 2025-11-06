@@ -10,9 +10,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use function Symfony\Component\String\u;
 
-/**
- * * Inspired by EasyAdmin Symfony Bundle
- */
 final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
 {
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool
@@ -117,8 +114,12 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         $badgeSelector = $field->getCustomOption(ChoiceMaskField::OPTION_RENDER_AS_BADGES);
         $isRenderedAsBadge = null !== $badgeSelector && false !== $badgeSelector;
 
+        $choices = $field->getFormTypeOption('choices');
+
+        assert(is_array($choices), 'The choices form option is not an array.');
+
         $selectedChoices = [];
-        $flippedChoices = array_flip($field->getFormTypeOption('choices'));
+        $flippedChoices = array_flip($choices);
         // $value is a scalar for single selections and an array for multiple selections
         foreach (array_values((array) $fieldValue) as $selectedValue) {
             if (null !== $selectedChoice = $flippedChoices[$selectedValue] ?? null) {

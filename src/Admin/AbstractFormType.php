@@ -46,9 +46,17 @@ abstract class AbstractFormType extends AbstractGridType
 
     public function getSyliusLocales(): array
     {
+        /** @var array<string, mixed> $resources */
         $resources = $this->parameterBag->get('sylius.resources');
 
-        return $this->entityManager->getRepository($resources['sylius.locale']['classes']['model'])->findAll();
+        assert(isset($resources['sylius.locale']) && is_array($resources['sylius.locale']), 'Sylius locale resource is not properly configured.');
+
+        /** @var class-string<ResourceInterface> $modelClass */
+        $modelClass = $resources['sylius.locale']['classes']['model'];
+
+        assert(class_exists($modelClass), 'Class "' . $modelClass . '" does not exist.');
+
+        return $this->entityManager->getRepository($modelClass)->findAll();
     }
 
     public function __construct(
@@ -76,6 +84,14 @@ abstract class AbstractFormType extends AbstractGridType
         $resolver->setDefault('page_name', ResourceActions::UPDATE);
     }
 
+    /**
+     * @param array{
+     *     context: string|null,
+     *     data_class: string|null,
+     *     data: ?ResourceInterface,
+     *     page_name: string
+     * } $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $context = $options['context'];
@@ -115,20 +131,25 @@ abstract class AbstractFormType extends AbstractGridType
                     $guessType = $this->crudAdminFactory
                         ->getDoctrineOrmTypeGuesser()
                         ->guessType($options['data_class'], $fieldDto->getProperty());
+
+                    assert(null !== $guessType, 'Could not guess the form type for the field ' . $fieldDto->getProperty() . '. Make sure the property exists and is mapped in Doctrine.');
+
                     $formFieldType = $guessType->getType();
                     $formFieldOptions = array_merge($guessType->getOptions(), $formFieldOptions);
                 }
 
                 if ($fieldDto->getFieldFqcn() === TabField::class) {
+                    $horizontalDisplay = $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY);
+                    assert(is_bool($horizontalDisplay) || null === $horizontalDisplay, 'The field option "horizontal_display" should be a boolean.');
                     [$menuItem, $column] = $this->crudAdminFactory
                         ->addTab(
                             name: $fieldDto->getProperty(),
                             label:  $fieldDto->getLabel(),
-                            horizontalDisplay:  $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY),
+                            horizontalDisplay:  $horizontalDisplay,
                         );
                 }
 
-                if ($fieldDto->getFieldFqcn() === ColumnField::class) {
+                if ($fieldDto->getFieldFqcn() === ColumnField::class && $menuItem) {
                     $column = $this->crudAdminFactory->addColumn($menuItem, $fieldDto);
                 }
 
@@ -139,8 +160,10 @@ abstract class AbstractFormType extends AbstractGridType
                     if (
                         $fieldDto->getFieldFqcn() === TranslationField::class
                     ) {
+                        /** @var iterable<FieldInterface> $fieldsDto */
+                        $fieldsDto = $fieldDto->getCustomOption('fieldsDto');
                         $subFieldsDto = FieldCollection::new(
-                            $fieldDto->getCustomOption('fieldsDto'),
+                            $fieldsDto,
                             $this->crudAdminFactory->getFieldConfiguratorCollection(),
                             $this->resource,
                         );
@@ -154,6 +177,9 @@ abstract class AbstractFormType extends AbstractGridType
                                 $guessType = $this->crudAdminFactory
                                     ->getDoctrineOrmTypeGuesser()
                                     ->guessType($options['data_class'], $subFieldDto->getProperty());
+
+                                assert(null !== $guessType, 'Could not guess the form type for the field ' . $subFieldDto->getProperty() . '. Make sure the property exists and is mapped in Doctrine.');
+
                                 $formSubFieldType = $guessType->getType();
                                 $formSubFieldOptions = array_merge($guessType->getOptions(), $formSubFieldOptions);
                             }
@@ -211,6 +237,8 @@ abstract class AbstractFormType extends AbstractGridType
 
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
+        assert(is_string($form->getConfig()->getOption('page_name')), 'The form option "page_name" should be a string.');
+
         $actions = $this->processDetailAndUpdateActions($form->getConfig()->getOption('page_name'));
 
         $view->vars = array_merge(
@@ -258,11 +286,14 @@ abstract class AbstractFormType extends AbstractGridType
                 }
 
                 if ($fieldDto->getFieldFqcn() === TabField::class) {
+                    $horizontalDisplay = $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY);
+                    assert(is_bool($horizontalDisplay) || null === $horizontalDisplay, 'The field option "horizontal_display" should be a boolean.');
+
                     [$menuItem, $column] = $this->crudAdminFactory->addTab(
                         name: $fieldDto->getProperty(),
                         label:  $fieldDto->getLabel(),
                         template: '@SyliusEasyCrudPlugin/crud/show/_tab.html.twig',
-                        horizontalDisplay:  $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY),
+                        horizontalDisplay: $horizontalDisplay,
                     );
                 }
 
@@ -314,7 +345,7 @@ abstract class AbstractFormType extends AbstractGridType
             ) {
                 $this->crudAdminFactory->manageFieldAssets($fieldDto);
 
-                if (method_exists($fieldDto->getFieldFqcn(), 'create')) {
+                if ($fieldDto->getFieldFqcn() && method_exists($fieldDto->getFieldFqcn(), 'create')) {
                     $field = $fieldDto->getFieldFqcn()::create($fieldDto->getProperty());
 
                     $field->setLabel($fieldDto->getLabel());

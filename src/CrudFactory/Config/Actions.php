@@ -15,9 +15,6 @@ use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Resource\Metadata\Metadata;
 use function Symfony\Component\Translation\t;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class Actions
 {
     private ActionConfigDto $dto;

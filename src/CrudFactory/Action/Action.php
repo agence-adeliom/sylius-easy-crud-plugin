@@ -8,9 +8,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\ActionDto;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 use function Symfony\Component\String\u;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 class Action
 {
     public const BATCH_DELETE = 'batchDelete';

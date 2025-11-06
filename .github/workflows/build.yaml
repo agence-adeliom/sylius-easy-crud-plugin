@@ -105,6 +105,10 @@ jobs:
                 run: vendor/bin/phpunit --colors=always --testsuite=unit
 
             -
+                name: Run phpstan tests
+                run: vendor/bin/phpstan analyse -c phpstan.neon
+
+            -
                 name: Get Yarn cache directory
                 id: yarn-cache
                 run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT

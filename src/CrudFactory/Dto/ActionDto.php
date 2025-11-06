@@ -8,9 +8,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Sylius\Bundle\GridBundle\Builder\Action\Action as SyliusAction;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 class ActionDto
 {
     private ?string $type = null;

@@ -8,9 +8,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\CollectionInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\ActionDto;
 use ArrayIterator;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class ActionCollection implements CollectionInterface
 {
     /**

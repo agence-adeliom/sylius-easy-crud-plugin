@@ -8,9 +8,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class ActionConfigDto
 {
     private string $pageName = '';

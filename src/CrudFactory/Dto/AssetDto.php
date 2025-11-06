@@ -6,9 +6,6 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\KeyValueStore;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class AssetDto
 {
     private string $value;

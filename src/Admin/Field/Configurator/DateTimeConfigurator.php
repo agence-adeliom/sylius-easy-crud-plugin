@@ -10,6 +10,7 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TimeField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Adeliom\SyliusEasyCrudPlugin\Intl\IntlFormatter;
+use DateTimeInterface;
 use Sylius\Resource\Model\ResourceInterface;
 
 final class DateTimeConfigurator implements FieldConfiguratorInterface
@@ -31,7 +32,7 @@ final class DateTimeConfigurator implements FieldConfiguratorInterface
         // we don't require this PHP extension in composer.json because it's not mandatory to display
         // date/time fields in backends, so this is not a hard dependency
         if (!\extension_loaded('intl')) {
-            throw new \LogicException('When using date/time fields in EasyAdmin backends, you must install and enable the PHP Intl extension, which is used to format date/time values.');
+            throw new \LogicException('When using date/time fields in backends, you must install and enable the PHP Intl extension, which is used to format date/time values.');
         }
 
         $widgetOption = $field->getCustomOption(DateTimeField::OPTION_WIDGET);
@@ -59,13 +60,21 @@ final class DateTimeConfigurator implements FieldConfiguratorInterface
     {
         $timezone = $field->getCustomOption(DateTimeField::OPTION_TIMEZONE) ?? null;
 
+        assert(
+            $timezone instanceof \DateTimeZone || null === $timezone || false === $timezone || is_string($timezone),
+            'The timezone option must be an instance of \DateTimeZone, string, null or false.',
+        );
+
         $dateFormat = null;
         $timeFormat = null;
         $icuDateTimePattern = '';
         $formattedValue = '';
 
+        assert($value instanceof DateTimeInterface || null === $value, 'The value to format is not a valid DateTimeInterface instance.');
+
         if (DateTimeField::class === $field->getFieldFqcn()) {
             [$defaultDatePattern, $defaultTimePattern] = ['medium', 'medium'];
+            /** @var string $datePattern */
             $datePattern = $field->getCustomOption(DateTimeField::OPTION_DATE_PATTERN) ?? $defaultDatePattern;
             $timePattern = $field->getCustomOption(DateTimeField::OPTION_TIME_PATTERN) ?? $defaultTimePattern;
             if (\in_array($datePattern, DateTimeField::VALID_DATE_FORMATS, true)) {
@@ -75,8 +84,11 @@ final class DateTimeConfigurator implements FieldConfiguratorInterface
                 $icuDateTimePattern = $datePattern;
             }
 
+            assert(is_string($timeFormat) || null === $timeFormat, 'Wrong format for $timeFormat.');
+
             $formattedValue = $this->intlFormatter->formatDateTime($value, $dateFormat, $timeFormat, $icuDateTimePattern, $timezone);
         } elseif (DateField::class === $field->getFieldFqcn()) {
+            /** @var string $dateFormatOrPattern */
             $dateFormatOrPattern = $field->getCustomOption(DateField::OPTION_DATE_PATTERN) ?? 'medium';
             if (\in_array($dateFormatOrPattern, DateTimeField::VALID_DATE_FORMATS, true)) {
                 $dateFormat = $dateFormatOrPattern;
@@ -86,6 +98,7 @@ final class DateTimeConfigurator implements FieldConfiguratorInterface
 
             $formattedValue = $this->intlFormatter->formatDate($value, $dateFormat, $icuDateTimePattern, $timezone);
         } elseif (TimeField::class === $field->getFieldFqcn()) {
+            /** @var string $timeFormatOrPattern */
             $timeFormatOrPattern = $field->getCustomOption(TimeField::OPTION_TIME_PATTERN) ?? 'medium';
             if (\in_array($timeFormatOrPattern, DateTimeField::VALID_DATE_FORMATS, true)) {
                 $timeFormat = $timeFormatOrPattern;

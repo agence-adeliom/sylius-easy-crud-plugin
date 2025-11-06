@@ -6,9 +6,6 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class AssetsDto
 {
     /** @var AssetDto[] */

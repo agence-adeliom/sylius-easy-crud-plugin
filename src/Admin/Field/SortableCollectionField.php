@@ -9,9 +9,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-/**
- * * Inspired by EasyAdmin Symfony Bundle
- */
 final class SortableCollectionField implements FieldInterface
 {
     use FieldTrait;
@@ -104,7 +101,7 @@ final class SortableCollectionField implements FieldInterface
 
     /**
      * Set this option to TRUE if the collection items are complex form types
-     * composed of several form fields (EasyAdmin applies a special rendering to make them look better).
+     * composed of several form fields (this plugin applies a special rendering to make them look better).
      */
     public function setEntryIsComplex(bool $isComplex): self
     {

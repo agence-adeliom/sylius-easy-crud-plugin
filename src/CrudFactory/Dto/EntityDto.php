@@ -6,9 +6,6 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Sylius\Resource\Model\ResourceInterface;
 
-/**
- * This class was copied from EasyAdmin Symfony bundle and adapted for this Sylius plugin
- */
 final class EntityDto
 {
     public function getInstance(): ?ResourceInterface
