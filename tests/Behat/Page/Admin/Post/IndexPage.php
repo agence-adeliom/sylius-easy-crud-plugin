@@ -89,8 +89,8 @@ class IndexPage extends SymfonyPage implements IndexPageInterface
         });
     }
 
-    protected function hasElement(string $selector): bool
+    protected function hasElement(string $name, ?array $parameters = []): bool
     {
-        return null !== $this->getDocument()->find('css', $selector);
+        return null !== $this->getDocument()->find('css', $name);
     }
 }

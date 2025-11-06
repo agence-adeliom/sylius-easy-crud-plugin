@@ -8,7 +8,7 @@ use Behat\Behat\Context\Context;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Core\Model\ProductInterface;
-use Sylius\Component\Core\Repository\ProductRepositoryInterface;
+use Sylius\Component\Product\Repository\ProductRepositoryInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Sylius\Component\Taxonomy\Repository\TaxonRepositoryInterface;
@@ -20,8 +20,10 @@ final class PostContext implements Context
         private FactoryInterface $postFactory,
         private RepositoryInterface $postRepository,
         private FactoryInterface $taxonFactory,
+        /** @var TaxonRepositoryInterface<TaxonInterface> $taxonRepository */
         private TaxonRepositoryInterface $taxonRepository,
         private FactoryInterface $productFactory,
+        /** @var ProductRepositoryInterface<ProductInterface> $productRepository */
         private ProductRepositoryInterface $productRepository,
         private EntityManagerInterface $entityManager,
     ) {

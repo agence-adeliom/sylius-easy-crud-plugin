@@ -27,7 +27,7 @@ class UpdatePage extends SymfonyPage implements UpdatePageInterface
             throw new ElementNotFoundException($this->getDriver(), 'name field');
         }
 
-        return $nameField->getValue();
+        return is_string($nameField->getValue()) ? $nameField->getValue() : '';
     }
 
     public function waitForNotification(string $message): void

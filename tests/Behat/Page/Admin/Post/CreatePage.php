@@ -68,9 +68,6 @@ class CreatePage extends SymfonyPage implements CreatePageInterface
         }
 
         $tab->click();
-        $this->getDocument()->waitFor(1, function () use ($tabName) {
-            return true; // Wait for tab to be active
-        });
     }
 
     public function selectState(string $state): void
@@ -156,10 +153,12 @@ class CreatePage extends SymfonyPage implements CreatePageInterface
     {
         // Similar to selectTaxon but for multiple selection
         foreach ($productNames as $productName) {
-            $this->getDocument()->find('css', 'input[name*="[products]"]')->setValue($productName);
-            $this->getDocument()->waitFor(1, function () {
-                return true;
-            });
+            if ($element = $this->getDocument()->find('css', sprintf('select[name*="[products][]"] option:contains("%s")', $productName))) {
+                $element->setValue($productName);
+                $this->getDocument()->waitFor(1, function () {
+                    return true;
+                });
+            }
         }
     }
 
