@@ -132,7 +132,7 @@ class SyliusCrudResourceController extends ResourceController
     /**
      * @param string[]|null $groups
      */
-    protected function createRestView(RequestConfiguration $configuration, $data, int $statusCode = null, ?array $groups = []): Response
+    protected function createRestView(RequestConfiguration $configuration, $data, ?int $statusCode = null, ?array $groups = []): Response
     {
         if (empty($groups)) {
             return parent::createRestView($configuration, $data, $statusCode);

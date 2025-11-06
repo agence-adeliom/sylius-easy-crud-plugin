@@ -94,7 +94,7 @@ class CrudRenderExtension extends AbstractExtension
      *
      * @return array<string, mixed>
      */
-    public function flattenArray(array $data, string $parentKey = null): array
+    public function flattenArray(array $data, ?string $parentKey = null): array
     {
         $result = [];
 
