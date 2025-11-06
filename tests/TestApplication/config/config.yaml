@@ -4,6 +4,15 @@ imports:
     - { resource: "services.yaml" }
     - { resource: "services_test.php" }
 
+framework:
+    secret: '%env(APP_SECRET)%'
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file
+
 twig:
     paths:
         '%kernel.project_dir%/../../../tests/TestApplication/templates': ~

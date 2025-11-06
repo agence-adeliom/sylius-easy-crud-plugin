@@ -39,7 +39,7 @@ final class ManagingPostsContext implements Context
      * @When I want to edit this post
      * @When I want to edit the post :name
      */
-    public function iWantToEditThisPost(string $name = null): void
+    public function iWantToEditThisPost(?string $name = null): void
     {
         if ($name) {
             $this->updatePage->open(['id' => $this->getPostIdByName($name)]);
