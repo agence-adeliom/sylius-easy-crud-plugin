@@ -95,9 +95,9 @@ class Post implements ResourceInterface, TranslatableInterface
         return $this->getTranslation()->getName();
     }
 
-    public function setName(?string $name): static
+    public function setName(?string $name, ?string $locale = null): static
     {
-        $this->getTranslation()->setName($name);
+        $this->getTranslation($locale)->setName($name);
 
         return $this;
     }

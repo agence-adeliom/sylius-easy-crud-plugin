@@ -87,11 +87,11 @@ final class PostContext implements Context
     {
         /** @var Post $post */
         $post = $this->postFactory->createNew();
-        $post->setName($name);
-        $post->setEnabled($enabled);
-        $post->setCreatedAt(new \DateTimeImmutable());
         $post->setCurrentLocale('en_US');
         $post->setFallbackLocale('en_US');
+        $post->setName($name, 'en_US');
+        $post->setEnabled($enabled);
+        $post->setCreatedAt(new \DateTimeImmutable());
 
         $this->postRepository->add($post);
         $this->entityManager->flush();

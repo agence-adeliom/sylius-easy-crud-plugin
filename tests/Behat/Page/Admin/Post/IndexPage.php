@@ -11,7 +11,7 @@ class IndexPage extends SymfonyPage implements IndexPageInterface
 {
     public function getRouteName(): string
     {
-        return 'admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_index';
+        return 'tests_adeliom_sylius_easy_crud_plugin_admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_index';
     }
 
     public function countItems(): int
@@ -47,7 +47,7 @@ class IndexPage extends SymfonyPage implements IndexPageInterface
             throw new ElementNotFoundException($this->getDriver(), 'post row', 'css', $name);
         }
 
-        $deleteButton = $row->find('css', 'button.sylius-delete-resource-button, a[data-action="delete"]');
+        $deleteButton = $row->find('css', '[data-test-modal] button');
 
         if (null === $deleteButton) {
             throw new ElementNotFoundException($this->getDriver(), 'delete button');
@@ -55,10 +55,10 @@ class IndexPage extends SymfonyPage implements IndexPageInterface
 
         $deleteButton->click();
         $this->getDocument()->waitFor(1, function () {
-            return $this->hasElement('.confirmation-modal, .swal2-popup');
+            return $this->hasElement('[data-test-confirm-button]');
         });
 
-        $confirmButton = $this->getDocument()->find('css', '.confirmation-modal .confirm-button, .swal2-confirm');
+        $confirmButton = $this->getDocument()->find('css', '[data-test-confirm-button]');
         if (null !== $confirmButton) {
             $confirmButton->click();
         }

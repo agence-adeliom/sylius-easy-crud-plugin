@@ -11,12 +11,12 @@ class CreatePage extends SymfonyPage implements CreatePageInterface
 {
     public function getRouteName(): string
     {
-        return 'admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_create';
+        return 'tests_adeliom_sylius_easy_crud_plugin_admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_create';
     }
 
     public function specifyName(string $name): void
     {
-        $this->getDocument()->fillField('Name', $name);
+        $this->getDocument()->fillField('name', $name);
     }
 
     public function specifyTranslatedName(string $name, string $locale): void

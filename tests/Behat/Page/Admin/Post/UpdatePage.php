@@ -11,7 +11,7 @@ class UpdatePage extends SymfonyPage implements UpdatePageInterface
 {
     public function getRouteName(): string
     {
-        return 'admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_update';
+        return 'tests_adeliom_sylius_easy_crud_plugin_admin_tests_adeliom_sylius_easy_crud_plugin_entity_post_update';
     }
 
     public function saveChanges(): void

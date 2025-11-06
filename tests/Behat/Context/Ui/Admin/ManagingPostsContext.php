@@ -210,30 +210,6 @@ final class ManagingPostsContext implements Context
     }
 
     /**
-     * @Then I should be notified that it has been successfully created
-     */
-    public function iShouldBeNotifiedThatItHasBeenSuccessfullyCreated(): void
-    {
-        $this->indexPage->waitForNotification('has been successfully created');
-    }
-
-    /**
-     * @Then I should be notified that it has been successfully updated
-     */
-    public function iShouldBeNotifiedThatItHasBeenSuccessfullyUpdated(): void
-    {
-        $this->updatePage->waitForNotification('has been successfully updated');
-    }
-
-    /**
-     * @Then I should be notified that it has been successfully deleted
-     */
-    public function iShouldBeNotifiedThatItHasBeenSuccessfullyDeleted(): void
-    {
-        $this->indexPage->waitForNotification('has been successfully deleted');
-    }
-
-    /**
      * @Then the post :name should appear in the list
      */
     public function thePostShouldAppearInTheList(string $name): void

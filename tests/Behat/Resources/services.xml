@@ -4,7 +4,6 @@
     <services>
         <defaults public="true" autowire="true" autoconfigure="false" />
 
-        <!-- Contexts -->
         <service id="tests.adeliom.sylius_easy_crud_plugin.behat.context.setup.post" class="Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Setup\PostContext">
             <argument type="service" id="tests_adeliom_sylius_easy_crud_plugin.factory.tests_adeliom_sylius_easy_crud_plugin_entity_post" />
             <argument type="service" id="tests_adeliom_sylius_easy_crud_plugin.repository.tests_adeliom_sylius_easy_crud_plugin_entity_post" />

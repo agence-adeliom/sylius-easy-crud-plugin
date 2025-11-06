@@ -69,6 +69,9 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         yield Field::new('id')
             ->onlyOnIndex();
 
+        yield Field::new('name')
+            ->onlyOnIndex();
+
         yield TabField::new('tab1', 'Tab 1');
 
         yield ColumnField::new('tab1_left')
@@ -85,7 +88,8 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         yield ColumnField::new('tab1_right')
         ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
 
-        yield IconField::new('icon');
+        yield IconField::new('icon')
+            ->onlyOnForms();
 
         yield CheckboxField::new('enabled');
 
