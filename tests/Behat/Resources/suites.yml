@@ -1,1 +1,11 @@
-# Put your Behat suites definitions here
+default:
+    suites:
+        admin_post:
+            contexts:
+                - sylius.behat.context.hook.doctrine_orm
+                - sylius.behat.context.setup.admin_security
+                - tests.adeliom.sylius_easy_crud_plugin.behat.context.setup.post
+                - tests.adeliom.sylius_easy_crud_plugin.behat.context.ui.admin.managing_posts
+                - sylius.behat.context.ui.admin.notification
+            filters:
+                tags: "@managing_posts && @ui"

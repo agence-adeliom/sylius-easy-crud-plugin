@@ -2,7 +2,28 @@
 
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <defaults public="true" />
-        <!-- Put your Behat services here -->
+        <defaults public="true" autowire="true" autoconfigure="false" />
+
+        <!-- Contexts -->
+        <service id="tests.adeliom.sylius_easy_crud_plugin.behat.context.setup.post" class="Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Setup\PostContext">
+            <argument type="service" id="tests_adeliom_sylius_easy_crud_plugin.factory.tests_adeliom_sylius_easy_crud_plugin_entity_post" />
+            <argument type="service" id="tests_adeliom_sylius_easy_crud_plugin.repository.tests_adeliom_sylius_easy_crud_plugin_entity_post" />
+            <argument type="service" id="sylius.factory.taxon" />
+            <argument type="service" id="sylius.repository.taxon" />
+            <argument type="service" id="sylius.factory.product" />
+            <argument type="service" id="sylius.repository.product" />
+            <argument type="service" id="doctrine.orm.entity_manager" />
+        </service>
+
+        <service id="tests.adeliom.sylius_easy_crud_plugin.behat.context.ui.admin.managing_posts" class="Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Ui\Admin\ManagingPostsContext">
+            <argument type="service" id="tests.adeliom.sylius_easy_crud_plugin.behat.page.admin.post.index" />
+            <argument type="service" id="tests.adeliom.sylius_easy_crud_plugin.behat.page.admin.post.create" />
+            <argument type="service" id="tests.adeliom.sylius_easy_crud_plugin.behat.page.admin.post.update" />
+        </service>
+
+        <!-- Pages -->
+        <service id="tests.adeliom.sylius_easy_crud_plugin.behat.page.admin.post.index" class="Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Page\Admin\Post\IndexPage" parent="sylius.behat.symfony_page" />
+        <service id="tests.adeliom.sylius_easy_crud_plugin.behat.page.admin.post.create" class="Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Page\Admin\Post\CreatePage" parent="sylius.behat.symfony_page" />
+        <service id="tests.adeliom.sylius_easy_crud_plugin.behat.page.admin.post.update" class="Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Page\Admin\Post\UpdatePage" parent="sylius.behat.symfony_page" />
     </services>
 </container>
