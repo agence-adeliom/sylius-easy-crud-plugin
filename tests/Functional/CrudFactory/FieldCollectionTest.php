@@ -22,7 +22,7 @@ final class FieldCollectionTest extends KernelTestCase
     public function testFieldCollectionCanBeCreated(): void
     {
         $container = static::getContainer();
-        $configuratorCollection = $container->get('adeliom.sylius_easy_crud.crud_factory.field_configurator_collection');
+        $configuratorCollection = $container->get('adeliom.sylius.field.configurator.collection');
 
         $fields = [
             Field::new('id'),
@@ -43,7 +43,7 @@ final class FieldCollectionTest extends KernelTestCase
     public function testFieldCollectionCanBeIterated(): void
     {
         $container = static::getContainer();
-        $configuratorCollection = $container->get('adeliom.sylius_easy_crud.crud_factory.field_configurator_collection');
+        $configuratorCollection = $container->get('adeliom.sylius.field.configurator.collection');
 
         $fields = [
             Field::new('id'),
@@ -71,7 +71,7 @@ final class FieldCollectionTest extends KernelTestCase
     public function testFieldCollectionWithResource(): void
     {
         $container = static::getContainer();
-        $configuratorCollection = $container->get('adeliom.sylius_easy_crud.crud_factory.field_configurator_collection');
+        $configuratorCollection = $container->get('adeliom.sylius.field.configurator.collection');
 
         $post = new Post();
         $post->setName('Test Post');
@@ -95,7 +95,7 @@ final class FieldCollectionTest extends KernelTestCase
     public function testFieldCollectionAppliesConfigurators(): void
     {
         $container = static::getContainer();
-        $configuratorCollection = $container->get('adeliom.sylius_easy_crud.crud_factory.field_configurator_collection');
+        $configuratorCollection = $container->get('adeliom.sylius.field.configurator.collection');
 
         $fields = [
             DateField::new('createdAt')->setTimezone('Europe/Paris'),
