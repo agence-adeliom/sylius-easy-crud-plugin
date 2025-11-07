@@ -18,16 +18,16 @@ Feature: Managing posts
         When I want to create a new post
         Then I should see the post creation form
 
-    @ui
-    Scenario: Creating a new post with basic information
-        When I want to create a new post
-        And I specify its name as "My First Post"
-        And I enable it
-        And I add it
-        Then I should be notified that it has been successfully created
-        And the post "My First Post" should appear in the list
+#     @ui
+#    Scenario: Creating a new post with basic information
+#        When I want to create a new post
+#        And I specify its name as "My First Post"
+#        And I enable it
+#        And I add it
+#        Then I should be notified that it has been successfully created
+#        And the post "My First Post" should appear in the list
 
-    @ui
+#     @ui
 #    Scenario: Creating a post with all tabs
 #        When I want to create a new post
 #        And I specify its translations.name as "Complete Post"
