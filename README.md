@@ -15,6 +15,10 @@
 
 ---
 
+![Easy crud banner](docs/screens/easy_crud.jpg "Easy crud banner")
+
+---
+
 ## Overview
 
 #### **Sylius Easy CRUD Plugin** is an abstraction layer that helps building CRUD interfaces in Sylius e-commerce.
