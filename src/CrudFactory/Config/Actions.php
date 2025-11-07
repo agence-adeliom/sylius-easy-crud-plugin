@@ -175,8 +175,6 @@ final class Actions
      */
     private function createBuiltInAction(string $pageName, string $actionName): Action
     {
-        assert(null !== $this->metadata, 'Metadata must be set to create built-in actions.');
-
         $applicationName = $this->metadata ? $this->metadata->getApplicationName() : 'app';
         $name = $this->metadata ? $this->metadata->getName() : 'resource';
 
