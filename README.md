@@ -72,7 +72,7 @@ In our previous Symfony projects we were familiar with EasyAdminBundle and devel
 
 We have used this bundle in production on several projects and decided to share it with the community.
 
-It does not fully comply with Sylius guidelines, so please use this plugin with caution.
+It does not fully comply (yet) with last Sylius guidelines, so please use this plugin with caution.
 
 ### A duo: Easy CRUD + Happy CMS
 
