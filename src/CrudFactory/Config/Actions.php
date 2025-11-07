@@ -177,6 +177,9 @@ final class Actions
     {
         assert(null !== $this->metadata, 'Metadata must be set to create built-in actions.');
 
+        $applicationName = $this->metadata->getApplicationName() ?? 'app';
+        $name = $this->metadata->getName() ?? 'resource';
+
         if (Action::BATCH_DELETE === $actionName) {
             return Action::new(Action::BATCH_DELETE, '', null)
                 ->createAsBatchAction()
@@ -194,7 +197,7 @@ final class Actions
 
             return Action::new(
                 Action::EDIT,
-                \sprintf('%s.%s.admin.action.edit', $this->metadata->getApplicationName(), $this->metadata->getName()),
+                \sprintf('%s.%s.admin.action.edit', $applicationName, $name),
                 null,
             )->setSyliusAction($action);
         }
@@ -202,14 +205,14 @@ final class Actions
         if (Action::DETAIL === $actionName) {
             return Action::new(
                 Action::DETAIL,
-                \sprintf('%s.%s.admin.action.show', $this->metadata->getApplicationName(), $this->metadata->getName()),
+                \sprintf('%s.%s.admin.action.show', $applicationName, $name),
                 'tabler:eye',
             )->setSyliusAction(ShowAction::create([]));
         }
 
         if (Action::INDEX === $actionName && $this->requestConfiguration) {
             $action = SyliusAction::create(Action::INDEX, 'easy_crud_main_action')
-                ->setLabel(\sprintf('%s.%s.admin.action.index', $this->metadata->getApplicationName(), $this->metadata->getName()))
+                ->setLabel(\sprintf('%s.%s.admin.action.index', $applicationName, $name))
                 ->setOptions([
                     'link' => [
                         'route' => $this->requestConfiguration->getRouteName('index'),
@@ -219,7 +222,7 @@ final class Actions
 
             return Action::new(
                 Action::INDEX,
-                \sprintf('%s.%s.admin.action.index', $this->metadata->getApplicationName(), $this->metadata->getName()),
+                \sprintf('%s.%s.admin.action.index', $applicationName, $name),
                 'null',
             )->setSyliusAction($action);
         }
