@@ -29,5 +29,34 @@ class <?= $class_name ?> implements ResourceInterface, TranslatableInterface
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    public function __construct()
+    {
+        $this->initializeTranslationsCollection();
+    }
+
+    protected function createTranslation(): TranslationInterface
+    {
+        return new <?= $class_name ?>Translation();
+    }
+
+    public static function getTranslationClass(): string
+    {
+        return <?= $class_name ?>Translation::class;
+    }
+
+    public function getTranslation(?string $locale = null): <?= $class_name ?>Translation
+    {
+        /** @var <?= $class_name ?>Translation $translation */
+        $translation = $this->doGetTranslation($locale);
+
+        return $translation;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
 }
 <?php } ?>

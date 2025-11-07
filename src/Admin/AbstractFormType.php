@@ -54,9 +54,12 @@ abstract class AbstractFormType extends AbstractGridType
         /** @var class-string<ResourceInterface> $modelClass */
         $modelClass = $resources['sylius.locale']['classes']['model'];
 
-        assert(class_exists($modelClass), 'Class "' . $modelClass . '" does not exist.');
+        if (class_exists($modelClass)) {
 
-        return $this->entityManager->getRepository($modelClass)->findAll();
+            return $this->entityManager->getRepository($modelClass)->findAll();
+        }
+
+        return [];
     }
 
     public function __construct(
