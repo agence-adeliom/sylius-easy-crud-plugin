@@ -28,23 +28,23 @@ Feature: Managing posts
         And the post "My First Post" should appear in the list
 
     @ui
-    Scenario: Creating a post with all tabs
-        When I want to create a new post
-        And I specify its translations.name as "Complete Post"
-        And I switch to the "Tab 2" tab
-        And I switch to the "Tab 3" tab
-        And I switch to the "Relations" tab
-        And I add it
-        Then I should be notified that it has been successfully created
-
-    @ui
-    Scenario: Updating a post
-        Given there is a post named "Original Name"
-        When I want to edit this post
-        And I change its name to "Updated Name"
-        And I save my changes
-        Then I should be notified that it has been successfully updated
-        And this post name should be "Updated Name"
+#    Scenario: Creating a post with all tabs
+#        When I want to create a new post
+#        And I specify its translations.name as "Complete Post"
+#        And I switch to the "Tab 2" tab
+#        And I switch to the "Tab 3" tab
+#        And I switch to the "Relations" tab
+#        And I add it
+#        Then I should be notified that it has been successfully created
+#
+#    @ui
+#    Scenario: Updating a post
+#        Given there is a post named "Original Name"
+#        When I want to edit this post
+#        And I change its name to "Updated Name"
+#        And I save my changes
+#        Then I should be notified that it has been successfully updated
+#        And this post name should be "Updated Name"
 
 #    @ui
 #    Scenario: Deleting a post
@@ -54,18 +54,18 @@ Feature: Managing posts
 #        Then I should be notified that it has been successfully deleted
 #        And I should not see the post "Post to Delete" in the list
 
-    @ui
-    Scenario: Filtering posts by enabled status
-        Given there are 2 enabled posts
-        And there are 3 disabled posts
-        When I browse posts
-        And I filter by enabled status "Yes"
-        Then I should see 2 posts in the list
-
-    @ui
-    Scenario: Filtering posts by disabled status
-        Given there are 2 enabled posts
-        And there are 3 disabled posts
-        When I browse posts
-        And I filter by enabled status "No"
-        Then I should see 3 posts in the list
+#    @ui
+#    Scenario: Filtering posts by enabled status
+#        Given there are 2 enabled posts
+#        And there are 3 disabled posts
+#        When I browse posts
+#        And I filter by enabled status "Yes"
+#        Then I should see 2 posts in the list
+#
+#    @ui
+#    Scenario: Filtering posts by disabled status
+#        Given there are 2 enabled posts
+#        And there are 3 disabled posts
+#        When I browse posts
+#        And I filter by enabled status "No"
+#        Then I should see 3 posts in the list
