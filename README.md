@@ -2,20 +2,17 @@
 
 # Sylius Easy CRUD Plugin
 
-**Rapidly build admin CRUD interfaces in Sylius with ease**
-
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://php.net)
-[![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
-[![Latest Version](https://img.shields.io/packagist/v/adeliom/sylius-easy-crud-plugin)](https://packagist.org/packages/adeliom/sylius-easy-crud-plugin)
-
-[Overview](#overview) • [Installation](#installation) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Roadmap](#roadmap)
 
 </div>
 
----
 
 ![Easy crud banner](docs/screens/easy_crud.jpg "Easy crud banner")
+
+<div align="center">
+
+[Overview](#overview) • [Installation](#installation) • [Quick Start](#quick-start) • [Documentation](#documentation)
+
+</div>
 
 ---
 
@@ -185,44 +182,18 @@ Navigate to your Sylius admin panel and find your new "Posts" menu entry. You no
 
 ---
 
-## Roadmap
-
-### Planned Features
-
-- [ ] Improved maker commands with interactive mode and based on new Sylius Stack recommendations
-- [ ] Tests coverage
-- [ ] More field types
-- [ ] Integrate an default Export functionality (CSV, Excel, PDF)
-- [ ] Integrate a default Clone functionality
-
----
-
-## License
-
-This plugin is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
-
----
-
-## Credits
-
-[Adeliom](https://www.adeliom.com/)
-
-**EasyAdminBundle** Core Team for the initial abstraction layer and fields
-
----
-
-## Support
-
-- **Issues**: [GitHub Issues](https://github.com/agence-adeliom/sylius-easy-crud-plugin/issues)
-- **Documentation**: [docs/](./docs/)
-- **Discussions**: [GitHub Discussions](https://github.com/agence-adeliom/sylius-easy-crud-plugin/discussions)
-
----
-
 <div align="center">
 
 **If this plugin helped you, please consider giving it a ⭐ on GitHub!**
 
 Made with ❤️ by [Adeliom](https://www.adeliom.com/)
+
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://php.net)
+[![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
+
+[//]: # ([![Latest Version]&#40;https://img.shields.io/packagist/v/adeliom/sylius-easy-crud-plugin&#41;]&#40;https://packagist.org/packages/adeliom/sylius-easy-crud-plugin&#41;)
+
 
 </div>
