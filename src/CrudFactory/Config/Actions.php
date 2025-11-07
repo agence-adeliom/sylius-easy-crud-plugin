@@ -177,8 +177,8 @@ final class Actions
     {
         assert(null !== $this->metadata, 'Metadata must be set to create built-in actions.');
 
-        $applicationName = $this->metadata->getApplicationName() ?? 'app';
-        $name = $this->metadata->getName() ?? 'resource';
+        $applicationName = $this->metadata ? $this->metadata->getApplicationName() : 'app';
+        $name = $this->metadata ? $this->metadata->getName() : 'resource';
 
         if (Action::BATCH_DELETE === $actionName) {
             return Action::new(Action::BATCH_DELETE, '', null)
