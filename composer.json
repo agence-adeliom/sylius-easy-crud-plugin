@@ -1,5 +1,5 @@
 {
-    "name": "adeliom/sylius-easy-crud-plugin",
+    "name": "agence-adeliom/sylius-easy-crud-plugin",
     "type": "sylius-plugin",
     "description": "Easy CRUD plugin for Sylius.",
     "keywords": [
