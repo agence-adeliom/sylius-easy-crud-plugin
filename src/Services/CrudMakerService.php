@@ -101,7 +101,9 @@ class CrudMakerService
         $adminDetails = $this->generateFileFromTpm('Admin', $suffix, $className, $templatePath, $variables);
 
         // Register the Admin service with sylius_easy_crud tag
-        $this->registerAdminService($adminDetails->getFullName());
+        $this->registerAdminService(
+            str_replace('Entity', 'Admin', $adminDetails->getRelativeName())
+        );
 
         return $adminDetails;
     }
@@ -112,12 +114,11 @@ class CrudMakerService
     protected function registerAdminService(string $adminFqcn): void
     {
         $filePath = $this->yamlServicesFile;
-        $absolutePath = $this->getAbsoluteConfigPath($filePath);
 
         // Read existing content
         $existingContent = '';
         if (file_exists($filePath)) {
-            $existingContent = file_get_contents($absolutePath) ?: '';
+            $existingContent = file_get_contents($filePath) ?: '';
         }
 
         // Check if service is already registered
@@ -203,11 +204,7 @@ class CrudMakerService
         );
         $this->generator->writeChanges();
 
-        /**
-         * @var \ReflectionClass<ResourceInterface> $instance
-         */
-        $instance = new \ReflectionClass($className);
-        $this->namespaces['entity'] = $instance;
+        $this->namespaces['entity'] = $className;
     }
 
     /**
@@ -248,11 +245,7 @@ class CrudMakerService
         );
         $this->generator->writeChanges();
 
-        /**
-         * @var \ReflectionClass<ResourceInterface> $instance
-         */
-        $instance = new \ReflectionClass($translationClassName);
-        $this->namespaces['entityTranslation'] = $instance;
+        $this->namespaces['entityTranslation'] = $translationClassName;
     }
 
     /**
