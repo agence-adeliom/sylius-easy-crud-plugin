@@ -21,26 +21,44 @@ Welcome to the complete documentation for Sylius Easy CRUD Plugin. This guide wi
     - Collections (sortable, standard)
 
 
-4. **[How to create action for your CRUD](./actions.md)** - Customize buttons, links, and workflows
-    - Built-in actions
-    - Custom actions
-    - Batch actions
-    - Action permissions
+[//]: # (4. **[How to create action for your CRUD]&#40;./actions.md&#41;** - Customize buttons, links, and workflows)
 
+[//]: # (    - Built-in actions)
 
-5. **[Create a custom field](./create_your_own_fields.md)** - For specific needs you can create your own field types
+[//]: # (    - Custom actions)
 
-## Optional
+[//]: # (    - Batch actions)
 
-1. **[Discover available Traits](./entity_traits.md)** - Ready-to-use traits for common entity features
-    - ID and naming traits
-    - Status and publishable traits
-    - Timestamp and soft delete traits
-    - Sortable and translation traits
+[//]: # (    - Action permissions)
 
-## Development
+[//]: # ()
+[//]: # ()
+[//]: # (5. **[Create a custom field]&#40;./create_your_own_fields.md&#41;** - For specific needs you can create your own field types)
 
-### Docker Environment
+[//]: # (## Optional)
+
+[//]: # ()
+[//]: # (1. **[Discover available Traits]&#40;./entity_traits.md&#41;** - Ready-to-use traits for common entity features)
+
+[//]: # (    - ID and naming traits)
+
+[//]: # (    - Status and publishable traits)
+
+[//]: # (    - Timestamp and soft delete traits)
+
+[//]: # (    - Sortable and translation traits)
+
+## Contributing
+
+### How to Contribute
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Install the development environment:
 
 ```bash
 # Install environment
@@ -51,7 +69,6 @@ make frontend-clear
 
 # Run tests
 make phpunit
-make behat
 
 # Code quality
 make phpstan
@@ -67,26 +84,4 @@ make plugin-asset-watch
 make plugin-asset-build
 ```
 
-See [CLAUDE.md](./CLAUDE.md) for complete development setup instructions.
-
 ---
-
-## Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](./docs/contribution.md) for details.
-
-### How to Contribute
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
-
-We follow Sylius coding standards. Run ECS before submitting:
-
-```bash
-vendor/bin/ecs check --fix
-```

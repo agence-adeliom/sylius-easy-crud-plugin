@@ -166,7 +166,7 @@ This generates:
 Edit `src/Admin/PostAdmin.php`:
 Configure your fields in the `configureFields()` or your filters with `configureFilters()` method.
 
-[Discover available fields](./discover_fields.md)
+[Discover available fields](./docs/discover_fields.md)
 
 ### Step 4: Access Your CRUD
 
@@ -192,8 +192,6 @@ Made with ❤️ by [Adeliom](https://www.adeliom.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://php.net)
 [![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
-
-[//]: # ([![Latest Version]&#40;https://img.shields.io/packagist/v/adeliom/sylius-easy-crud-plugin&#41;]&#40;https://packagist.org/packages/adeliom/sylius-easy-crud-plugin&#41;)
-
+[![Latest Version](https://img.shields.io/packagist/v/agence-adeliom/sylius-easy-crud-plugin)](https://packagist.org/packages/agence-adeliom/sylius-easy-crud-plugin)
 
 </div>

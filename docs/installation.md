@@ -1,17 +1,4 @@
-# Installation Guide
-
-This guide provides detailed installation instructions for the Sylius Easy CRUD Plugin.
-
-## Table of Contents
-
-- [Installation Steps](#installation-steps)
-- [Configuration](#configuration)
-- [Verification](#verification)
-- [Troubleshooting](#troubleshooting)
-
----
-
-## Installation Steps
+# Installation Steps
 
 ### Step 1: Install via Composer
 
