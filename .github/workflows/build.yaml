@@ -176,3 +176,11 @@ jobs:
                     if-no-files-found: ignore
                     compression-level: 6
                     overwrite: true
+
+            -
+                name: Test CRUD entity operations
+                run: vendor/bin/console make:easy-crud:create-entity PostDemo
+                
+            -
+                name: Test CRUD admin operations
+                run: vendor/bin/console make:easy-crud:create-crud PostDemo
