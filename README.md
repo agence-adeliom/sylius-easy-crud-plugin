@@ -31,28 +31,51 @@
 ```php
 class PostAdmin extends AbstractAdmin
 {
-    yield TabField::new('tab1', 'Tab 1');
+    /**
+     * @return iterable<FieldInterface>
+     */
+    public function configureFields(string $pageName, ?string $context = null): iterable
+    {
 
-    yield ColumnField::new('tab1_left')
-        ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
-
-    yield TranslationField::new('translations')
-        ->addField(
-            Field::new('name')
-            ->setDisabled(false)
-            ->setRequired(true)
-        )
-        ->onlyOnForms();
-
-    yield ColumnField::new('tab1_right')
-        ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
-
-    yield IconField::new('icon')
-        ->onlyOnForms();
-
-    yield CheckboxField::new('enabled');
+        yield TabField::new('tab1', 'Tab 1');
     
-    ...
+        yield ColumnField::new('tab1_left')
+            ->setSize(ColumnSizeEnum::WIDE_8_OF_12);
+    
+        yield TranslationField::new('translations')
+            ->addField(
+                Field::new('name')
+                ->setDisabled(false)
+                ->setRequired(true)
+            )
+            ->onlyOnForms();
+    
+        yield ColumnField::new('tab1_right')
+            ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
+    
+        yield IconField::new('icon')
+            ->onlyOnForms();
+    
+        yield CheckboxField::new('enabled');
+    
+        ...
+    
+    }
+    
+    /**
+     * @return iterable<FilterInterface>
+     */
+    public function configureFilters(): iterable
+    {
+        yield BooleanFilter::create('enabled')
+            ->setLabel('Enabled');
+    }
+    
+    public function configureActions(string $pageName): Actions
+    {
+        return parent::configureActions($pageName)
+            ->remove(Crud::PAGE_EDIT, Action::DELETE);
+    }
 }
 ```
 
