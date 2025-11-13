@@ -12,6 +12,9 @@ services:
     Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\SortableCollectionConfigurator:
         public: true
     
+    Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\ResourceChoiceFieldConfigurator:
+        public: true
+    
     #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\AssociationConfigurator:
     #    public: true
     
