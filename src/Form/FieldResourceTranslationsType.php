@@ -100,7 +100,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            /** @var PersistentCollection<string, TranslationInterface|null>|ArrayCollection<string, TranslationInterface|null> $translations */
+            /** @var PersistentCollection<string, TranslationInterface|null>|array|ArrayCollection<string, TranslationInterface|null> $translations */
             $translations = $event->getData();
 
             if ($translations instanceof PersistentCollection) {
@@ -120,7 +120,9 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
             /** @var TranslatableInterface $translatable */
             $translatable = $parentForm->getData();
 
-            if ($translations->count()) {
+            $count = is_array($translations) ? count($translations) : $translations->count();
+
+            if ($count) {
                 foreach ($translations as $localeCode => $translation) {
                     if (null === $translation) {
                         if (isset($translationsObjectsByLocale[$localeCode])) {
