@@ -119,7 +119,9 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
             /** @var TranslatableInterface $translatable */
             $translatable = $parentForm->getData();
 
-            if ($translations->count()) {
+            $count = is_array($translations) ? count($translations) : $translations->count();
+
+            if ($count) {
                 foreach ($translations as $localeCode => $translation) {
                     if (null === $translation) {
                         if (isset($translationsObjectsByLocale[$localeCode])) {
