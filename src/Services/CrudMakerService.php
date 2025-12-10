@@ -102,7 +102,7 @@ class CrudMakerService
 
         // Register the Admin service with sylius_easy_crud tag
         $this->registerAdminService(
-            str_replace('Entity', 'Admin', $adminDetails->getRelativeName())
+            str_replace('Entity', 'Admin', $adminDetails->getRelativeName()),
         );
 
         return $adminDetails;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field;
 
+use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldTrait;
 use Adeliom\SyliusEasyCrudPlugin\Form\ChoiceMaskType;
@@ -83,7 +85,12 @@ final class ChoiceMaskField implements FieldInterface
             ->setCustomOption(self::OPTION_RENDER_EXPANDED, false)
             ->setCustomOption(self::OPTION_WIDGET, self::WIDGET_NATIVE)
             ->setCustomOption(self::OPTION_ESCAPE_HTML_CONTENTS, true)
-            ->setCustomOption(self::OPTION_IS_TRANSLATION, self::OPTION_IS_TRANSLATION);
+            ->setCustomOption(self::OPTION_IS_TRANSLATION, self::OPTION_IS_TRANSLATION)
+            ->addAssets([
+                            'js' => [
+                                (Asset::new('field-choice-mask.js'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
+                            ],
+                        ]);
     }
 
     /**

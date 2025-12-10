@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceChoiceField;
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
-use Sylius\Component\Resource\Translation\Provider\TranslationLocaleProviderInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 

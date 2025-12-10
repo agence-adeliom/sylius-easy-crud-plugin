@@ -116,6 +116,10 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
             ->setHelp('is virtual')
             ->setVirtual();
 
+        yield Field::new('virtual1')
+            ->setLabel('virtual1')
+            ->setVirtual();
+
         yield TimeField::new('time1')
             ->setHelp('is virtual')
             ->setVirtual();
@@ -161,10 +165,6 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
                 'virtual1' => ['virtual1'],
                 'virtual2' => ['virtual2'],
             ]);
-
-        yield Field::new('virtual1')
-        ->setLabel('virtual1')
-        ->setVirtual();
 
         yield Field::new('virtual2')
         ->setLabel('virtual2')

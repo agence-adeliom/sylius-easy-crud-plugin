@@ -171,8 +171,10 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                             }
                         }
 
-                        $translation->setLocale($localeCode);
-                        $translation->setTranslatable($translatable);
+                        if ($translation instanceof TranslationInterface) {
+                            $translation->setLocale($localeCode);
+                            $translation->setTranslatable($translatable);
+                        }
                         if (!isset($translationsObjectsByLocale[$localeCode])) {
                             $translationsObjectsByLocale[$localeCode] = $translation;
                         }
