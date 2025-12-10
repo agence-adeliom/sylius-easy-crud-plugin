@@ -20,6 +20,7 @@ Encore
   .addEntry('field-code-editor', './assets/admin/js/field-code-editor.js')
   .addEntry('field-slug', './assets/admin/js/field-slug.js')
   .addEntry('field-image', './assets/admin/js/field-image.js')
+  .addEntry('field-choice-mask', './assets/admin/js/field-choice-mask.js')
   .addEntry('text-editor', './assets/admin/js/text-editor.js')
 ;
 

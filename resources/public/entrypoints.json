@@ -28,6 +28,11 @@
         "/bundles/syliuseasycrudplugin/field-image.18982b12.js"
       ]
     },
+    "field-choice-mask": {
+      "js": [
+        "/bundles/syliuseasycrudplugin/field-choice-mask.44edfc1d.js"
+      ]
+    },
     "text-editor": {
       "css": [
         "/bundles/syliuseasycrudplugin/text-editor.1830acff.css"

@@ -55,7 +55,6 @@ abstract class AbstractFormType extends AbstractGridType
         $modelClass = $resources['sylius.locale']['classes']['model'];
 
         if (class_exists($modelClass)) {
-
             return $this->entityManager->getRepository($modelClass)->findAll();
         }
 

@@ -159,7 +159,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                                         }
                                         $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
                                             AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE,
+                                            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
                                         ]);
                                         $this->propertyAccessor->setValue($translation, $property, $objectValue);
                                     }
@@ -171,8 +171,10 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                             }
                         }
 
-                        $translation->setLocale($localeCode);
-                        $translation->setTranslatable($translatable);
+                        if ($translation instanceof TranslationInterface) {
+                            $translation->setLocale($localeCode);
+                            $translation->setTranslatable($translatable);
+                        }
                         if (!isset($translationsObjectsByLocale[$localeCode])) {
                             $translationsObjectsByLocale[$localeCode] = $translation;
                         }
