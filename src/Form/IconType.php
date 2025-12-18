@@ -18,7 +18,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
         // this defines the available options and their default values when
         // they are not configured explicitly when using the form type
         $resolver->setDefaults([
-            'json_url' => 'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/iconpicker-1.5.0.json',
+            'json_url' => '/bundles/syliuseasycrudplugin/iconpicker/bootstrap-icons-1.11.3.json',
             'search_placeholder' => 'Search Icon',
             'select_button' => 'Select Icon',
             'show_all_button' => 'Show All',
@@ -27,7 +27,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
             'delete_label' => 'Delete',
             'border_radius' => '5px',
             'fonts' => [
-                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
+                'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
             ],
         ]);
 
@@ -72,7 +72,7 @@ class IconType extends AbstractType implements AdminFormTypeInterface
     {
         return [
             'css' => [
-                'https://cdn.cbd.int/@furcan/iconpicker@1.5.0/dist/fontawesome-5.11.2/css/all.min.css',
+                'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
             ],
         ];
     }
