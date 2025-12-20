@@ -31,10 +31,16 @@ use Webmozart\Assert\Assert;
 abstract class AbstractFormType extends AbstractGridType
 {
     private ?object $resource = null;
+    private ?string $resourceAlias = null;
 
     public function getResource(): ?object
     {
         return $this->resource;
+    }
+
+    public function getResourceAlias(): ?string
+    {
+        return $this->resourceAlias;
     }
 
     private ?UserInterface $user = null;
@@ -76,7 +82,7 @@ abstract class AbstractFormType extends AbstractGridType
             $validationGroups,
         );
         $this->user = $security->getUser();
-        $this->crudAdminFactory->initContext($this->getResourceClass());
+        $this->resourceAlias = $this->crudAdminFactory->initContext($this->getResourceClass());
     }
 
     public function configureOptions(OptionsResolver $resolver): void

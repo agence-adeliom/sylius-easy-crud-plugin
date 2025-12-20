@@ -55,13 +55,13 @@ class CrudAdminFactory
         $this->initMenu();
     }
 
-    public function initContext(string $model): void
+    public function initContext(string $model): ?string
     {
         try {
             /** @var array<mixed> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
         } catch (InvalidArgumentException $exception) {
-            return;
+            return null;
         }
 
         foreach ($resources as $alias => $configuration) {
@@ -77,8 +77,10 @@ class CrudAdminFactory
                         $this->metadata,
                         $this->requestStack->getCurrentRequest(),
                     );
+                return $alias;
             }
         }
+        return null;
     }
 
     public function getMetadata(): ?Metadata
