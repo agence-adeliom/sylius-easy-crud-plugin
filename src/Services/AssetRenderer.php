@@ -32,7 +32,7 @@ class AssetRenderer
                     continue;
                 }
                 $attributes = [
-                    'nonce' => $nonce,
+                    'nonce' => $nonce ?: '',
                 ];
                 $attributes['rel'] = 'stylesheet';
                 if (is_string($asset)) {
@@ -70,7 +70,7 @@ class AssetRenderer
                     continue;
                 }
                 $attributes = [
-                    'nonce' => $nonce,
+                    'nonce' => $nonce ?: '',
                 ];
                 if (is_string($asset)) {
                     $attributes['src'] = $asset;
@@ -112,7 +112,7 @@ class AssetRenderer
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
                                 [
-                                    'nonce' => $nonce,
+                                    'nonce' => $nonce ?: '',
                                 ],
                                 true,
                             );
@@ -122,7 +122,7 @@ class AssetRenderer
                                 $webpackAsset->getAsDto()->getPackageName(),
                                 $webpackAsset->getAsDto()->getWebpackEntrypointName(),
                                 [
-                                    'nonce' => $nonce,
+                                    'nonce' => $nonce ?: '',
                                 ],
                             );
 
@@ -135,7 +135,7 @@ class AssetRenderer
                                 null,
                                 null,
                                 [
-                                    'nonce' => $nonce,
+                                    'nonce' => $nonce ?: '',
                                 ],
                                 true,
                             );
@@ -145,7 +145,7 @@ class AssetRenderer
                                 null,
                                 null,
                                 [
-                                    'nonce' => $nonce,
+                                    'nonce' => $nonce ?: '',
                                 ],
                             );
                     }
