@@ -127,7 +127,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
                 return $resourceValue;
             }
             $form = $request->request->all($formName);
-            if (isset($form[$fieldName])) {
+            if (isset($form[$fieldName]) && is_string($form[$fieldName])) {
                 return $form[$fieldName];
             }
         }

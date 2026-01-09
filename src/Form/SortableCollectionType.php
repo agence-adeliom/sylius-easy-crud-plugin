@@ -11,9 +11,11 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Webmozart\Assert\Assert;
 
 class SortableCollectionType extends CollectionType implements AdminFormTypeInterface
 {
@@ -42,6 +44,8 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             if (null !== $options['prototype_data']) {
                 $prototypeOptions['data'] = $options['prototype_data'];
             }
+
+            Assert::true(class_exists($options['entry_type']) && $options['entry_type'] instanceof FormTypeInterface);
 
             $prototype = $builder->create(
                 $options['prototype_name'],

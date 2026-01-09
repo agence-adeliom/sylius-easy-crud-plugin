@@ -15,6 +15,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Webmozart\Assert\Assert;
@@ -42,6 +43,7 @@ final class FieldCollectionType extends AbstractType
             if ($entryType !== FormType::class) {
                 Assert::isCallable($options['entry_type']);
 
+                Assert::true(class_exists($entryName) && $entryName instanceof FormTypeInterface);
                 $builder->add($entryName, $entryType, array_replace([
                     'property_path' => '[' . $entryName . ']',
                     'block_name' => 'entry',
@@ -68,6 +70,7 @@ final class FieldCollectionType extends AbstractType
                         ? $field['options']
                         : array_merge($field['options'], $field['customOptions'] ?? []);
 
+                    Assert::true(class_exists($field['name']) && $field['name'] instanceof FormTypeInterface);
                     $formField->add(
                         $field['name'],
                         $field['type'],
