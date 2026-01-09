@@ -24,9 +24,6 @@ final class FieldCollectionType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
-     * @param array{
-     *      entry_type: class-string<FormTypeInterface>,
-     * } $options
      * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -39,6 +36,7 @@ final class FieldCollectionType extends AbstractType
             Assert::isCallable($options['entry_name']);
             Assert::isCallable($options['entry_options']);
 
+            /** @var class-string<FormTypeInterface> $entryName */
             $entryName = $options['entry_name']($entry);
             $entryOptions = $options['entry_options']($entry);
             $entryType = $options['entry_type']($entry);
@@ -71,7 +69,7 @@ final class FieldCollectionType extends AbstractType
                         ], $entryOptions),
                     );
 
-                /** @var array{name: string, type: string, options: array<string, mixed>, customOptions?: array<string, mixed>} $field */
+                /** @var array{name: string, type: class-string<FormTypeInterface>, options: array<string, mixed>, customOptions?: array<string, mixed>} $field */
                 foreach ($options['fields'] as $field) {
                     $fieldOptions = !is_subclass_of($field['type'], CodeEditorTypeInterface::class)
                         ? $field['options']
