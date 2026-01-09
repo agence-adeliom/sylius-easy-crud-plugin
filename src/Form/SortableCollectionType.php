@@ -26,7 +26,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
      *     allow_delete: bool,
      *     delete_empty: bool|callable,
      *     required: bool,
-     *     entry_type: string,
+     *     entry_type: class-string<FormTypeInterface>,
      *     prototype: string,
      *     prototype_name: string,
      *     entry_options: array,

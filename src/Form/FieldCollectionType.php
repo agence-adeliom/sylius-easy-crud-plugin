@@ -22,6 +22,13 @@ use Webmozart\Assert\Assert;
 
 final class FieldCollectionType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array{
+     *      entry_type: class-string<FormTypeInterface>,
+     * } $options
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         Assert::isIterable($options['entries']);
@@ -43,7 +50,7 @@ final class FieldCollectionType extends AbstractType
             if ($entryType !== FormType::class) {
                 Assert::isCallable($options['entry_type']);
 
-                Assert::true(class_exists($entryName));
+                Assert::true(class_exists($entryName) && $entryName instanceof FormTypeInterface);
                 $builder->add($entryName, $entryType, array_replace([
                     'property_path' => '[' . $entryName . ']',
                     'block_name' => 'entry',
@@ -64,13 +71,13 @@ final class FieldCollectionType extends AbstractType
                         ], $entryOptions),
                     );
 
-                /** @var array{name: string, type: class-string, options: array<string, mixed>, customOptions?: array<string, mixed>} $field */
+                /** @var array{name: string, type: string, options: array<string, mixed>, customOptions?: array<string, mixed>} $field */
                 foreach ($options['fields'] as $field) {
                     $fieldOptions = !is_subclass_of($field['type'], CodeEditorTypeInterface::class)
                         ? $field['options']
                         : array_merge($field['options'], $field['customOptions'] ?? []);
 
-                    Assert::true(class_exists($field['name']));
+                    Assert::true(is_string($field['type']));
                     $formField->add(
                         $field['name'],
                         $field['type'],
