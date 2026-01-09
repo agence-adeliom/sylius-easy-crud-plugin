@@ -45,7 +45,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
                 $prototypeOptions['data'] = $options['prototype_data'];
             }
 
-            Assert::true(class_exists($options['entry_type']) && $options['entry_type'] instanceof FormTypeInterface);
+            Assert::true(class_exists($options['entry_type']));
 
             $prototype = $builder->create(
                 $options['prototype_name'],
