@@ -2,6 +2,7 @@
 
 namespace Tests\Adeliom\SyliusEasyCrudPlugin\Entity;
 
+use App\Entity\HappyCMS\ProductTag\ProductTag;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -60,11 +61,19 @@ class Post implements ResourceInterface, TranslatableInterface
     #[ORM\ManyToMany(targetEntity: ProductInterface::class)]
     private Collection $products;
 
+    /** @var Collection<int, Post> */
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'postRelated', cascade: ['all'])]
+    private Collection $relatedPosts;
+
+    #[ORM\ManyToOne(inversedBy: 'relatedPosts')]
+    private ?Post $postRelated = null;
+
     public function __construct()
     {
         $this->initializeTranslationsCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->products = new ArrayCollection();
+        $this->relatedPosts = new ArrayCollection();
     }
 
     protected function createTranslation(): TranslationInterface
@@ -156,6 +165,38 @@ class Post implements ResourceInterface, TranslatableInterface
         $this->icon = $icon;
     }
 
+    public function getRelatedPosts(): Collection
+    {
+        return $this->relatedPosts;
+    }
+
+    public function setRelatedPosts(Collection $posts): void
+    {
+        $this->relatedPosts = $posts;
+    }
+
+
+    public function addRelatedPost(Post $post): static
+    {
+        if (!$this->relatedPosts->contains($post)) {
+            $this->relatedPosts->add($post);
+            $post->setPostRelated($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRelatedPost(Post $post): static
+    {
+        if ($this->relatedPosts->removeElement($post)) {
+            if ($post->getPostRelated() === $this) {
+                $post->setPostRelated(null);
+            }
+        }
+
+        return $this;
+    }
+
     public function getProducts(): Collection
     {
         return $this->products;
@@ -233,5 +274,15 @@ class Post implements ResourceInterface, TranslatableInterface
     public function setImage(?string $image): void
     {
         $this->image = $image;
+    }
+
+    public function getPostRelated(): ?Post
+    {
+        return $this->postRelated;
+    }
+
+    public function setPostRelated(?Post $postRelated): void
+    {
+        $this->postRelated = $postRelated;
     }
 }

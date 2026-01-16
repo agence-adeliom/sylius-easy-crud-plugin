@@ -142,8 +142,13 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         yield ResourceChoiceField::new('products')
             ->setLabel('Products')
             ->hideOnIndex()
-            ->setEntityClass(Product::class)
             ->setResourceAlias('sylius.product')
+            ->setMultiple();
+
+        yield ResourceChoiceField::new('relatedPosts')
+            ->setLabel('Related posts')
+            ->hideOnIndex()
+            ->setResourceAlias('tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post')
             ->setMultiple();
 
         yield SortableCollectionField::new('data')
