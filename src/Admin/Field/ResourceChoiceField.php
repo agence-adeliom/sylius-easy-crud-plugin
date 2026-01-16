@@ -56,6 +56,11 @@ final class ResourceChoiceField implements FieldInterface
     public function setMultiple(bool $multiple = true): self
     {
         $this->setFormTypeOption('multiple', $multiple);
+        if ($multiple) {
+            // When multiple is true, set by_reference to false
+            // to ensure addXxx/removeXxx methods are called on the entity
+            $this->setFormTypeOption('by_reference', false);
+        }
 
         return $this;
     }

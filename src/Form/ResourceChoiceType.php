@@ -132,6 +132,11 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                               'persist_into_an_array' => false,
                               'multiple' => false,
                               'error_bubbling' => false,
+                              'by_reference' => function (Options $options) {
+                                  // When multiple is true, set by_reference to false
+                                  // to ensure addXxx/removeXxx methods are called on the entity
+                                  return !$options['multiple'];
+                              },
                               'placeholder' => '',
                               'choice_value' => 'id',
                               'choice_label' => 'name',
