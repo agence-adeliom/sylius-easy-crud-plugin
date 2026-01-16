@@ -57,6 +57,9 @@ class Post implements ResourceInterface, TranslatableInterface
     #[ORM\JoinColumn(name: 'taxon_id', nullable: true, onDelete: 'set null')]
     private ?TaxonInterface $taxon = null;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private string $productsAsJson;
+
     /** @var Collection<int, ProductInterface> */
     #[ORM\ManyToMany(targetEntity: ProductInterface::class)]
     private Collection $products;
@@ -285,4 +288,15 @@ class Post implements ResourceInterface, TranslatableInterface
     {
         $this->postRelated = $postRelated;
     }
+
+    public function getProductsAsJson(): string
+    {
+        return $this->productsAsJson;
+    }
+
+    public function setProductsAsJson(string $productsAsJson): void
+    {
+        $this->productsAsJson = $productsAsJson;
+    }
+
 }

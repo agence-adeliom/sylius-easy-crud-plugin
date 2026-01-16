@@ -151,6 +151,13 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
             ->setResourceAlias('tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post')
             ->setMultiple();
 
+        yield ResourceChoiceField::new('productsAsJson')
+            ->setLabel('Products json encoded')
+            ->valueIsPersistedIntoAnArray()
+            ->hideOnIndex()
+            ->setResourceAlias('sylius.product')
+            ->setMultiple();
+
         yield SortableCollectionField::new('data')
             ->setEntryType(DataTestType::class)
             ->hideOnIndex();
