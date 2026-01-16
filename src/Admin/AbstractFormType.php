@@ -31,6 +31,7 @@ use Webmozart\Assert\Assert;
 abstract class AbstractFormType extends AbstractGridType
 {
     private ?object $resource = null;
+
     private ?string $resourceAlias = null;
 
     public function getResource(): ?object

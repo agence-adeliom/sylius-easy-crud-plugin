@@ -77,9 +77,11 @@ class CrudAdminFactory
                         $this->metadata,
                         $this->requestStack->getCurrentRequest(),
                     );
+
                 return $alias;
             }
         }
+
         return null;
     }
 
