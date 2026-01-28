@@ -4,7 +4,7 @@
             {{ 'sylius.ui.translations'|trans }}
         </div>
     </div>
-    <div class="accordion accordion-flush" id="product-translations">
+    <div class="accordion accordion-flush" id="{{ field_column_id | default('accordion-translations') }}">
         {% for locale in field.getCustomOption('definedLocalesCodes') %}
             {% set first_loop = loop %}
             {% for locale_value in field.getValue() %}
@@ -16,7 +16,7 @@
                                 {{ locale|sylius_locale_name }}
                             </button>
                         </h2>
-                        <div id="translation-{{ locale }}" class="accordion-collapse collapse" data-bs-parent="#product-translations">
+                        <div id="translation-{{ locale }}" class="accordion-collapse collapse" data-bs-parent="#{{ field_column_id | default('accordion-translations') }}">
                             <div class="accordion-body bg-gray-400">
                                 <div class="card mb-3 mx-md-5">
                                     <div class="card-header">

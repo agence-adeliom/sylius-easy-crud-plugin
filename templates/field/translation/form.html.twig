@@ -2,7 +2,7 @@
 
 {% block sylius_translations_row %}
     {% import '@SyliusAdmin/shared/helper/translations.html.twig' as translations %}
-    <div class="tab-pane {% if hookable_metadata.configuration.active|default(false) %}show active{% endif %}" id="product-translations" role="tabpanel" tabindex="0">
+    <div class="tab-pane {% if hookable_metadata.configuration.active|default(false) %}show active{% endif %}" id="{{ form.vars.id }}" role="tabpanel" tabindex="0">
         <div class="card mb-3">
             <div class="card-header">
                 <h2 class="card-title">
@@ -10,7 +10,7 @@
                 </h2>
             </div>
             <div>
-                {{ translations.default(form.children, null, {accordion_id: 'product-translations', accordion_flush: true}) }}
+                {{ translations.default(form.children, null, {accordion_id: form.vars.id, accordion_flush: true}) }}
             </div>
         </div>
     </div>

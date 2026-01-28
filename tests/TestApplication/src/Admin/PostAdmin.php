@@ -83,7 +83,7 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
                 ->setDisabled(false)
                 ->setRequired(true)
             )
-            ->onlyOnForms();
+            ->hideOnIndex();
 
         yield ColumnField::new('tab1_right')
         ->setSize(ColumnSizeEnum::WIDE_4_OF_12);

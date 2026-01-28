@@ -299,4 +299,10 @@ class Post implements ResourceInterface, TranslatableInterface
         $this->productsAsJson = $productsAsJson;
     }
 
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
+
+
 }
