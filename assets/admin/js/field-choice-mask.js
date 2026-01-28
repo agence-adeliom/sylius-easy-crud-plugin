@@ -6,13 +6,23 @@ const EasyCrudChoiceMaskHandler = function () {
   self.handleChoiceMaskChange = function(choiceMaskMap, formWrapper, allMaskElements, value) {
     // Hide all mask elements initially
     allMaskElements.forEach((maskElement) => {
-      const elementToHide = formWrapper.querySelector(`[name$="[${maskElement}]"]`);
-      if (elementToHide) {
-        elementToHide.closest('.field').style.display = 'none';
-        elementToHide.closest('.field').querySelectorAll('[required="required"]').forEach(function (e){
-          e.setAttribute("data-required", "required");
-          e.removeAttribute("required");
-        })
+      let layerToHide = formWrapper.querySelector(`[name$="[${maskElement}]"]`);
+      // By id alternative
+      if (!layerToHide) {
+        layerToHide = formWrapper.querySelector(`#${maskElement}`);
+      }
+      if (layerToHide) {
+        const elementToHide = layerToHide;
+        if (!layerToHide.classList.contains('.tab-pane')) {
+          elementToHide.closest('.field');
+        }
+        if (elementToHide) {
+          elementToHide.style.display = 'none';
+          elementToHide.querySelectorAll('[required="required"]').forEach(function (e){
+            e.setAttribute("data-required", "required");
+            e.removeAttribute("required");
+          })
+        }
       }
     });
     // Show only the mask elements related to the selected choice value
@@ -23,13 +33,23 @@ const EasyCrudChoiceMaskHandler = function () {
       return;
     }
     fieldsToShow.forEach((maskElement) => {
-      const elementToShow = formWrapper.querySelector(`[name$="[${maskElement}]"]`);
-      if (elementToShow) {
-        elementToShow.closest('.field').style.display = '';
-        elementToShow.querySelectorAll('[data-required="required"]')
-          .forEach(function (e) {
-            e.setAttribute("required", "required");
-          })
+      let layerToShow = formWrapper.querySelector(`[name$="[${maskElement}]"]`);
+      // By id alternative
+      if (!layerToShow) {
+        layerToShow = formWrapper.querySelector(`#${maskElement}`);
+      }
+      if (layerToShow) {
+        const elementToShow = layerToShow;
+        if (!layerToShow.classList.contains('.tab-pane')) {
+          elementToShow.closest('.field');
+        }
+        if (elementToShow) {
+          elementToShow.style.display = '';
+          elementToShow.querySelectorAll('[data-required="required"]')
+            .forEach(function (e) {
+              e.setAttribute("required", "required");
+            })
+        }
       }
     });
   };
@@ -56,6 +76,19 @@ const EasyCrudChoiceMaskHandler = function () {
     });
     // Remove duplicates
     allMaskElements = [...new Set(allMaskElements)];
+
+    // field is a selector
+    if(field && field.tagName === 'SELECT'){
+      field.addEventListener('change', (ev) => {
+        self.handleChoiceMaskChange(choiceMaskMap, formWrapper, allMaskElements, ev.target.value);
+      });
+      // On load, get field input checked value and update the mask elements visibility
+      const selectedValue = field.value;
+      if (selectedValue) {
+        self.handleChoiceMaskChange(choiceMaskMap, formWrapper, allMaskElements, selectedValue);
+      }
+      return;
+    }
 
     // For each mapping, show/hide the related mask elements based on the selected choice value
     // Add event listener to all input radio inside the field
