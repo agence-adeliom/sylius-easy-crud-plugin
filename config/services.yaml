@@ -69,7 +69,13 @@ services:
     adeliom.sylius.twig.crud_render_extension:
         alias: Adeliom\SyliusEasyCrudPlugin\Twig\CrudRenderExtension
         public: true
-    
+
+    Adeliom\SyliusEasyCrudPlugin\Autocomplete\ResourceChoiceAutocompleter:
+        arguments:
+            $entitySearchUtil: '@ux.autocomplete.entity_search_util'
+        tags:
+            - { name: 'ux.entity_autocompleter', alias: 'adeliom_sylius_easy_crud_resource_choice' }
+
     Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection:
         arguments:
             - !tagged_iterator easy.fields.configurator
@@ -95,7 +101,8 @@ services:
         class: Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType
         tags: [ 'form.type' ]
         arguments:
-            - "@sylius.registry.resource_repository"
+            $resourceRepositoryRegistry: "@sylius.registry.resource_repository"
+            $autocompleterRegistry: '@ux.autocomplete.autocompleter_registry'
     Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType:
         public: true
         alias: adeliom.sylius.form.type.resource_choice

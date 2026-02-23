@@ -22,12 +22,27 @@ final class ResourceChoiceField implements FieldInterface
             ->setFormTypeOption('persist_into_an_array', false)
             ->setFormTypeOption('multiple', false)
             ->setFormTypeOption('autocomplete', true)
+            ->setFormTypeOption('max_results', 10)
             ->setLabel($label);
     }
 
     public function setResourceAlias(string $resource): self
     {
         $this->setFormTypeOption('resource', $resource);
+
+        return $this;
+    }
+
+    public function setAutocompleteRouteAlias(string $alias): self
+    {
+        $this->setFormTypeOption('autocomplete_route_alias', $alias);
+
+        return $this;
+    }
+
+    public function setAutocompleteMaxResult(int $value): self
+    {
+        $this->setFormTypeOption('max_results', $value);
 
         return $this;
     }

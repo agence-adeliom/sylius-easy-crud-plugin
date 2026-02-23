@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\Autocomplete\ResourceChoiceAutocompleter;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\UX\Autocomplete\AutocompleterRegistry;
+use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 use function PHPUnit\Framework\assertTrue;
 use Sylius\Component\Registry\ServiceRegistryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Sylius\Resource\Model\ResourceInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,8 +27,12 @@ use Webmozart\Assert\Assert;
 
 class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 {
+    private const DEFAULT_AUTOCOMPLETE_ALIAS = 'sylius_admin_product';
+
     public function __construct(
         protected ServiceRegistryInterface $resourceRepositoryRegistry,
+        protected RouterInterface $router,
+        private AutocompleterRegistry $autocompleterRegistry,
     ) {
     }
 
@@ -119,13 +127,75 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
     {
         parent::configureOptions($resolver);
 
+        // Resolve the autocomplete URL based on the provided route alias
+        // Usefull for symfony/ux-autocomplete-bundle v2.0+ where the autocomplete URL is required
+        $resolver->setNormalizer('autocomplete_url', function (Options $options, mixed $autocompleteUrl): string {
+            if (is_string($autocompleteUrl) && '' !== $autocompleteUrl) {
+                return $autocompleteUrl;
+            }
+
+            $requestedAlias = $options['autocomplete_route_alias'] ?? self::DEFAULT_AUTOCOMPLETE_ALIAS;
+            Assert::string($requestedAlias);
+
+            $alias = $this->resolveAutocompleteAlias($requestedAlias);
+
+            return $this->router->generate('sylius_admin_entity_autocomplete', [
+                'alias' => $alias,
+            ]);
+        });
+
+        $resolver->setNormalizer('extra_options', function (Options $options, array $extraOptions): array {
+            if (!$this->shouldUseFallbackAutocompleter($options)) {
+                return $extraOptions;
+            }
+
+            if (is_string($options['class']) && '' !== $options['class']) {
+                $extraOptions['class'] ??= $options['class'];
+            }
+
+            if (is_string($options['resource']) && '' !== $options['resource']) {
+                $extraOptions['resource'] ??= $options['resource'];
+            }
+
+            if (is_string($options['choice_label']) && '' !== $options['choice_label']) {
+                $extraOptions['choice_label'] ??= $options['choice_label'];
+            }
+
+            if (is_string($options['choice_value']) && '' !== $options['choice_value']) {
+                $extraOptions['choice_value'] ??= $options['choice_value'];
+            }
+
+            if (is_string($options['choice_name']) && '' !== $options['choice_name']) {
+                $extraOptions['choice_name'] ??= $options['choice_name'];
+            }
+
+            if (is_int($options['max_results']) && $options['max_results'] > 0) {
+                $extraOptions['max_results'] ??= $options['max_results'];
+            }
+
+            if (is_array($options['searchable_fields']) && [] !== $options['searchable_fields']) {
+                $extraOptions['searchable_fields'] ??= $options['searchable_fields'];
+            }
+
+            return $extraOptions;
+        });
+
         $resolver
             ->setRequired([
                               'class',
                               'resource',
                               'choice_name',
+                              'autocomplete_route_alias'
                           ])
             ->setDefaults([
+                              'max_results' => 2,
+                              'autocomplete_route_alias' => self::DEFAULT_AUTOCOMPLETE_ALIAS,
+                              'extra_options' => [],
+                              'filter_query' => function (QueryBuilder $qb, string $query): void {
+                                  if ('' === $query) {
+                                      return;
+                                  }
+                              },
                               'class' => null,
                               'resource' => null,
                               'autocomplete' => true,
@@ -142,17 +212,17 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                               'choice_label' => 'name',
                               'choice_name' => 'name',
                               'choices' => function (Options $options) {
-                                  Assert::string($options['resource']);
-                                  $repository = $this->resourceRepositoryRegistry->get($options['resource']);
-
-                                  if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
-                                      Assert::isArray($options['repositoryArguments']);
-
-                                      /** @phpstan-ignore-next-line */
-                                      return call_user_func([$repository, $options['repositoryMethod']], ...$options['repositoryArguments']);
-                                  }
-
-                                  return method_exists($repository, 'findAll') ? $repository->findAll() : [];
+                                  //Assert::string($options['resource']);
+                                  //$repository = $this->resourceRepositoryRegistry->get($options['resource']);
+                                  //
+                                  //if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
+                                  //    Assert::isArray($options['repositoryArguments']);
+                                  //
+                                  //    /** @phpstan-ignore-next-line */
+                                  //    return call_user_func([$repository, $options['repositoryMethod']], ...$options['repositoryArguments']);
+                                  //}
+                                  //
+                                  //return method_exists($repository, 'findAll') ? $repository->findAll() : [];
                               },
                               'repository' => function (Options $options) {
                                   Assert::string($options['resource']);
@@ -164,6 +234,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                           ])
             ->setAllowedTypes('multiple', ['bool'])
             ->setAllowedTypes('placeholder', ['string'])
+            ->setAllowedTypes('extra_options', ['array'])
 
             ->addAllowedTypes('resource', ['string', 'null'])
             ->addAllowedTypes('repositoryMethod', ['string', 'null'])
@@ -195,6 +266,23 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 
     public function getParent(): string
     {
-        return EntityType::class;
+        return BaseEntityAutocompleteType::class;
+    }
+
+    private function resolveAutocompleteAlias(string $requestedAlias): string
+    {
+        if (null !== $this->autocompleterRegistry->getAutocompleter($requestedAlias)) {
+            return $requestedAlias;
+        }
+
+        return ResourceChoiceAutocompleter::ALIAS;
+    }
+
+    private function shouldUseFallbackAutocompleter(Options $options): bool
+    {
+        $requestedAlias = $options['autocomplete_route_alias'] ?? self::DEFAULT_AUTOCOMPLETE_ALIAS;
+        Assert::string($requestedAlias);
+
+        return ResourceChoiceAutocompleter::ALIAS === $this->resolveAutocompleteAlias($requestedAlias);
     }
 }

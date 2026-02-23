@@ -26,7 +26,10 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Form\Test\DataTestType;
+use Sylius\Bundle\AdminBundle\Form\Type\Grid\Filter\UxAutocompleteFilterType;
 use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
+use Sylius\Bundle\GridBundle\Builder\Filter\Filter;
+use Sylius\Component\Core\Grid\Filter\ResourceAutocompleteFilter;
 use Sylius\Component\Core\Model\Product;
 use Sylius\Component\Core\Model\Taxon;
 use Symfony\Component\Validator\Constraints\Length;
@@ -49,6 +52,20 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
     {
         yield BooleanFilter::create('enabled')
             ->setLabel('Enabled');
+
+        yield Filter::create('name', 'ux_translatable_autocomplete')
+            ->setLabel('Name')
+            ->setFormOptions([
+                'extra_options' => [
+                    'class' => 'Tests\Adeliom\SyliusEasyCrudPlugin\Entity\Post',
+                    'translation_fields' => ['name'],
+                    'choice_label' => 'name',
+                ],
+                'multiple' => true,
+            ])
+            ->setOptions([
+                'fields' => ['translations.name'],
+            ]);
     }
 
     public static function getEntityFqcn(): string
@@ -148,7 +165,14 @@ final class PostAdmin extends AbstractAdmin implements ServiceSubscriberInterfac
         yield ResourceChoiceField::new('relatedPosts')
             ->setLabel('Related posts')
             ->hideOnIndex()
+            ->setAutocompleteRouteAlias('admin_tests_adeliom_sylius_easy_crud_plugin_entity_post')
             ->setResourceAlias('tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post')
+            ->setMultiple();
+
+        yield ResourceChoiceField::new('products')
+            ->setLabel('Products')
+            ->hideOnIndex()
+            ->setResourceAlias('sylius.product')
             ->setMultiple();
 
         yield ResourceChoiceField::new('productsAsJson')
