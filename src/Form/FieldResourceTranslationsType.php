@@ -157,11 +157,15 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                                         if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
                                             $value = $actualValue::normalizeFormData($value);
                                         }
-                                        $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
-                                            AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
-                                        ]);
-                                        $this->propertyAccessor->setValue($translation, $property, $objectValue);
+                                        try {
+                                            $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
+                                                AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
+                                                AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+                                            ]);
+                                            $this->propertyAccessor->setValue($translation, $property, $objectValue);
+                                        } catch (\Symfony\Component\Serializer\Exception\NotNormalizableValueException $e) {
+                                            // some data cannot be denormalized, skip it
+                                        }
                                     }
                                 }
                             } elseif (
