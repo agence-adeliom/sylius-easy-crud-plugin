@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Component\Resource\Metadata\Metadata;
+use Symfony\Component\DependencyInjection\Attribute\Required;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,10 +14,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait ResourceAutocompleteTrait
 {
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
+    private ManagerRegistry $managerRegistry;
+
+    #[Required]
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): void
+    {
+        $this->managerRegistry = $managerRegistry;
+    }
+
     public function autocompleteAction(Request $request): Response
     {
         // set metadata for resource that need an autocomplete search
@@ -42,10 +45,8 @@ trait ResourceAutocompleteTrait
         foreach ($resources as $alias => $configuration) {
             if ($resourceName === $alias) {
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
-                $doctrine = $this->container->get(ManagerRegistry::class);
-                assert($doctrine instanceof ManagerRegistry);
                 /** @phpstan-ignore-next-line */
-                $this->repository = $doctrine->getRepository($configuration['classes']['model']);
+                $this->repository = $this->managerRegistry->getRepository($configuration['classes']['model']);
             }
         }
 

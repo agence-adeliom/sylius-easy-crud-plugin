@@ -7,7 +7,6 @@ namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractFormType;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
-use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\View\View;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
@@ -19,13 +18,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class SyliusCrudResourceController extends ResourceController
 {
     use ResourceAutocompleteTrait;
-
-    public static function getSubscribedServices(): array
-    {
-        return array_merge(parent::getSubscribedServices(), [
-            ManagerRegistry::class => ManagerRegistry::class,
-        ]);
-    }
 
     public function indexAction(Request $request): Response
     {
