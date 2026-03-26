@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Component\Resource\Metadata\Metadata;
@@ -43,20 +43,10 @@ trait ResourceAutocompleteTrait
         foreach ($resources as $alias => $configuration) {
             if ($resourceName === $alias) {
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
-                $syliusRepositoryService = str_replace('sylius.', 'sylius.repository.', $alias);
-                if ($this->container->has($syliusRepositoryService)) {
-                    $containerRepository = $this->container->get($syliusRepositoryService);
-                    assert($containerRepository instanceof RepositoryInterface, 'Repository from container must implement RepositoryInterface');
-                    $this->repository = $containerRepository;
-                } else {
-                    $doctrine = $this->container->get('doctrine');
-                    assert($doctrine instanceof EntityManagerInterface, 'Doctrine service must implement EntityManagerInterface');
-                    /** @phpstan-ignore-next-line */
-                    $repository = $doctrine
-                        ->getRepository($configuration['classes']['model']);
-                    /** @phpstan-ignore-next-line */
-                    $this->repository = $repository;
-                }
+                $doctrine = $this->container->get('doctrine');
+                assert($doctrine instanceof ManagerRegistry, 'Doctrine service must implement ManagerRegistry');
+                /** @phpstan-ignore-next-line */
+                $this->repository = $doctrine->getRepository($configuration['classes']['model']);
             }
         }
 

@@ -11,7 +11,6 @@ use FOS\RestBundle\View\View;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\ResourceController;
 use Sylius\Resource\ResourceActions;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -85,19 +84,13 @@ class SyliusCrudResourceController extends ResourceController
             return $eventResponse;
         }
 
-        /** @var ?FormFactoryInterface $formFactory */
-        $formFactory = $this->container->get('form.factory');
-
-        assert($formFactory instanceof FormFactoryInterface, 'form.factory service must be an instance of FormFactoryInterface');
-
-        $form = $formFactory
-            ->create(
-                $this->metadata->getParameters()['classes']['form'],
-                null,
-                [
-                    'page_name' => Crud::PAGE_DETAIL,
-                ],
-            );
+        $form = $this->createForm(
+            $this->metadata->getParameters()['classes']['form'],
+            null,
+            [
+                'page_name' => Crud::PAGE_DETAIL,
+            ],
+        );
         $formType = $form->getConfig()->getType()->getInnerType();
 
         assert($formType instanceof AbstractFormType, 'Form type must be an instance of AbstractFormType');
