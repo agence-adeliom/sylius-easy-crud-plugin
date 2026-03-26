@@ -8,7 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Component\Resource\Metadata\Metadata;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,8 +42,8 @@ trait ResourceAutocompleteTrait
         foreach ($resources as $alias => $configuration) {
             if ($resourceName === $alias) {
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
-                $doctrine = $this->container->get('doctrine');
-                assert($doctrine instanceof ManagerRegistry, 'Doctrine service must implement ManagerRegistry');
+                $doctrine = $this->container->get(ManagerRegistry::class);
+                assert($doctrine instanceof ManagerRegistry);
                 /** @phpstan-ignore-next-line */
                 $this->repository = $doctrine->getRepository($configuration['classes']['model']);
             }
