@@ -1,6 +1,7 @@
 imports:
     - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
     - { resource: "packages/sylius_resource.yaml" }
+    - { resource: "packages/sylius_easy_crud.yaml" }
     - { resource: "services.yaml" }
     - { resource: "services_test.php" }
 

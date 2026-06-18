@@ -115,16 +115,19 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
                 continue;
             }
             if (array_key_exists('enabled', $attributes)) {
+                // last block wins, like Symfony's scalar config merge
                 $enabled = (bool) $attributes['enabled'];
             }
             if (array_key_exists('paths', $attributes) && is_array($attributes['paths'])) {
-                $paths = $attributes['paths'];
+                // merge across all config blocks (packages/, env, plugin overrides) instead of
+                // letting the last one overwrite the others, mirroring Symfony's list merge
+                $paths = array_merge($paths, array_values($attributes['paths']));
             }
         }
 
         return [
             'enabled' => $enabled,
-            'paths' => $this->resolveExistingDirectories($container, $paths),
+            'paths' => $this->resolveExistingDirectories($container, array_values(array_unique($paths))),
         ];
     }
 
