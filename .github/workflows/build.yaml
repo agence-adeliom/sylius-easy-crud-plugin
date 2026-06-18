@@ -26,6 +26,10 @@ jobs:
                 sylius: ["~2.0.0", "~2.1.0"]
                 node: ["22.x"]
                 mysql: ["8.4"]
+                exclude:
+                    -
+                        php: "8.5"
+                        sylius: "~2.0.0"
 
         env:
             APP_ENV: test
@@ -91,6 +95,11 @@ jobs:
                 name: Restrict Sylius version
                 if: matrix.sylius != ''
                 run: composer require "sylius/sylius:${{ matrix.sylius }}" --no-update --no-scripts --no-interaction
+
+            -
+                name: Restrict Gherkin version for Sylius 2.0
+                if: matrix.sylius == '~2.0.0'
+                run: composer require "behat/gherkin:^4.12 <4.13" --dev --no-update --no-scripts --no-interaction
 
             -
                 name: Install PHP dependencies
