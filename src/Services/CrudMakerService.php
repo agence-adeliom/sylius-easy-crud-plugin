@@ -26,6 +26,9 @@ class CrudMakerService
     /** @var array<string, \ReflectionClass<ResourceInterface>|\ReflectionClass<RepositoryInterface>|string|null> */
     protected array $namespaces;
 
+    /** @var array<string, string> */
+    private array $generatedClassPaths = [];
+
     protected string $yamlRoutesFile;
 
     protected string $yamlResourceFile;
@@ -98,15 +101,21 @@ class CrudMakerService
         ?string $className = null,
         ?string $templatePath = null,
         ?array $variables = [],
+        bool $registerService = true,
     ): ClassNameDetails {
         $adminDetails = $this->generateFileFromTpm('Admin', $suffix, $className, $templatePath, $variables);
 
-        // Register the Admin service with sylius_easy_crud tag
-        $this->registerAdminService(
-            str_replace('Entity', 'Admin', $adminDetails->getRelativeName()),
-        );
+        if ($registerService) {
+            // Legacy YAML mode needs an explicit service tag. Attribute mode relies on app autoconfiguration.
+            $this->registerAdminService($adminDetails->getFullName());
+        }
 
         return $adminDetails;
+    }
+
+    public function getGeneratedClassPath(string $className): ?string
+    {
+        return $this->generatedClassPaths[$className] ?? null;
     }
 
     /**
@@ -371,13 +380,21 @@ class CrudMakerService
         if (null === $suffix) {
             $suffix = $templateName;
         }
-        $file = $this->generator->createClassNameDetails(
-            $className ?? ($this->entity ? $this->entity->getShortName() : ''),
-            $templateName,
-            $suffix,
-        );
+        if (null === $className) {
+            $fullClassName = $this->generator->createClassNameDetails(
+                $this->entity ? $this->entity->getShortName() : '',
+                $templateName,
+                $suffix,
+            )->getFullName();
+        } else {
+            $fullClassName = str_replace('Entity', $templateName, $className) . $templateName;
+        }
 
-        $fullClassName = str_replace('Entity', $templateName, $className ?: '') . $templateName;
+        $file = $this->generator->createClassNameDetails(
+            '\\' . ltrim($fullClassName, '\\'),
+            $templateName,
+            '',
+        );
 
         // Check if class already exists
         if (class_exists($fullClassName)) {
@@ -387,7 +404,7 @@ class CrudMakerService
             return $file;
         }
 
-        $this->generator->generateClass(
+        $generatedPath = $this->generator->generateClass(
             $fullClassName,
             (is_string($templatePath) && file_exists($templatePath)) ? $templatePath : __DIR__ . '/../Resources/skeleton/' . $templateName . '.tpl.php',
             array_merge([
@@ -397,6 +414,7 @@ class CrudMakerService
         );
         $this->generator->writeChanges();
         $this->namespaces[strtolower($templateName)] = $file->getFullName();
+        $this->generatedClassPaths[$file->getFullName()] = $generatedPath;
 
         return $file;
     }
@@ -405,9 +423,9 @@ class CrudMakerService
      * Adds a #[AsEasyCrudAdmin] attribute to an Admin class file, as an
      * alternative to the legacy config/routes.yaml + sylius_resource.yaml blocks.
      *
-     * The bare attribute relies on easy-crud's defaults (admin section, easy-crud
-     * templates, "update" redirect) and on the Admin's own getEntityFqcn()/getName()
-     * for the entity and grid, reproducing the same resource the YAML blocks produced.
+     * The attribute relies on easy-crud's defaults (admin section, easy-crud
+     * templates, "update" redirect) and stores entity/grid metadata directly when
+     * the generated Admin does not override getEntityFqcn()/getName().
      *
      * When a convention-based custom controller exists, it is referenced via the
      * "controller:" argument (mirroring the legacy resource generator).
@@ -416,8 +434,13 @@ class CrudMakerService
      *
      * @throws \RuntimeException when the class file cannot be found
      */
-    public function addEasyCrudAttributeToClass(string $filePath, string $shortClassName, ?string $controller = null): string
-    {
+    public function addEasyCrudAttributeToClass(
+        string $filePath,
+        string $shortClassName,
+        ?string $controller = null,
+        ?string $entityShortClassName = null,
+        ?string $grid = null,
+    ): string {
         if (!is_file($filePath)) {
             throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsEasyCrudAdmin] attribute.', $filePath));
         }
@@ -439,10 +462,21 @@ class CrudMakerService
             }
         }
 
-        // 2. Add the attribute right above the class declaration (with the custom controller if any).
-        $attribute = null !== $controller
-            ? sprintf('#[AsEasyCrudAdmin(controller: \\%s::class)]', ltrim($controller, '\\'))
-            : '#[AsEasyCrudAdmin]';
+        // 2. Add the attribute right above the class declaration.
+        $attributeArguments = [];
+        if (null !== $entityShortClassName) {
+            $attributeArguments[] = sprintf('entity: %s::class', $entityShortClassName);
+        }
+        if (null !== $grid) {
+            $attributeArguments[] = sprintf("grid: '%s'", $grid);
+        }
+        if (null !== $controller) {
+            $attributeArguments[] = sprintf('controller: \\%s::class', ltrim($controller, '\\'));
+        }
+
+        $attribute = [] === $attributeArguments
+            ? '#[AsEasyCrudAdmin]'
+            : "#[AsEasyCrudAdmin(\n    " . implode(",\n    ", $attributeArguments) . ",\n)]";
         $content = preg_replace(
             '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
             $attribute . "\n" . '$1',
