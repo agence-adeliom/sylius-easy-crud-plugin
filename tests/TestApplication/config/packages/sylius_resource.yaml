@@ -1,2 +1,7 @@
 sylius_resource:
     resources: {}
+    # Native #[AsResource] discovery: scan the test-application entities so Post is
+    # auto-registered into sylius.resources (easy-crud's #[AsAdmin] then enriches it).
+    mapping:
+        paths:
+            - '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
