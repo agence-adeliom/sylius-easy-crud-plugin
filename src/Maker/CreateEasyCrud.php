@@ -148,9 +148,14 @@ final class CreateEasyCrud extends AbstractMaker
             if ($this->isAttributeModeEnabled()) {
                 // Attribute mode: declare the resource via #[AsEasyCrudAdmin] on
                 // the Admin class instead of the config/routes.yaml + sylius_resource.yaml blocks.
+                // Carry over a convention-based custom controller if one exists (legacy parity).
+                $conventionController = str_replace('Entity', 'Controller', $entryClassName) . 'Controller';
+                $customController = class_exists($conventionController) ? $conventionController : null;
+
                 $annotatedPath = $resourceConfigGenerator->addEasyCrudAttributeToClass(
                     $adminFilePath,
                     $adminClassDetails->getShortName(),
+                    $customController,
                 );
 
                 $io->comment(sprintf(
