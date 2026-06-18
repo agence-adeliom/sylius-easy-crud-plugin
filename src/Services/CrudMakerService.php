@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
-use Adeliom\SyliusEasyCrudPlugin\Metadata\AsEasyCrudAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
 use Doctrine\Persistence\ManagerRegistry;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Sylius\Resource\Model\ResourceInterface;
@@ -420,7 +420,7 @@ class CrudMakerService
     }
 
     /**
-     * Adds a #[AsEasyCrudAdmin] attribute to an Admin class file, as an
+     * Adds a #[AsAdmin] attribute to an Admin class file, as an
      * alternative to the legacy config/routes.yaml + sylius_resource.yaml blocks.
      *
      * The attribute relies on easy-crud's defaults (admin section, easy-crud
@@ -442,18 +442,18 @@ class CrudMakerService
         ?string $grid = null,
     ): string {
         if (!is_file($filePath)) {
-            throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsEasyCrudAdmin] attribute.', $filePath));
+            throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsAdmin] attribute.', $filePath));
         }
 
         $content = file_get_contents($filePath) ?: '';
 
         // Idempotent: do nothing if the attribute is already declared.
-        if (str_contains($content, '#[AsEasyCrudAdmin')) {
+        if (str_contains($content, '#[AsAdmin')) {
             return $filePath;
         }
 
         // 1. Import the attribute class (after the existing use block, else after the namespace).
-        $useLine = sprintf('use %s;', AsEasyCrudAdmin::class);
+        $useLine = sprintf('use %s;', AsAdmin::class);
         if (!str_contains($content, $useLine)) {
             if (preg_match('/(?:^use [^;]+;\R)+/m', $content)) {
                 $content = preg_replace('/((?:^use [^;]+;\R)+)/m', '$1' . $useLine . "\n", $content, 1) ?? $content;
@@ -465,7 +465,7 @@ class CrudMakerService
         // 2. Add the attribute right above the class declaration.
         $attributeArguments = [];
         if (null !== $entityShortClassName) {
-            $attributeArguments[] = sprintf('entity: %s::class', $entityShortClassName);
+            $attributeArguments[] = sprintf('resourceClass: %s::class', $entityShortClassName);
         }
         if (null !== $grid) {
             $attributeArguments[] = sprintf("grid: '%s'", $grid);
@@ -475,11 +475,56 @@ class CrudMakerService
         }
 
         $attribute = [] === $attributeArguments
-            ? '#[AsEasyCrudAdmin]'
-            : "#[AsEasyCrudAdmin(\n    " . implode(",\n    ", $attributeArguments) . ",\n)]";
+            ? '#[AsAdmin]'
+            : "#[AsAdmin(\n    " . implode(",\n    ", $attributeArguments) . ",\n)]";
         $content = preg_replace(
             '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
             $attribute . "\n" . '$1',
+            $content,
+            1,
+        ) ?? $content;
+
+        file_put_contents($filePath, $content);
+
+        return $filePath;
+    }
+
+    /**
+     * Ensures the resource model carries the native #[\Sylius\Resource\Metadata\AsResource]
+     * attribute, which auto-registers it into sylius.resources. #[AsAdmin] then enriches
+     * that entry (controller/form) — so the resource must exist first.
+     *
+     * Idempotent: does nothing when the class already declares #[AsResource].
+     *
+     * @throws \RuntimeException when the class file cannot be found
+     */
+    public function addAsResourceAttributeToEntity(string $filePath, string $shortClassName): string
+    {
+        if (!is_file($filePath)) {
+            throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsResource] attribute.', $filePath));
+        }
+
+        $content = file_get_contents($filePath) ?: '';
+
+        // Idempotent: do nothing if the resource attribute is already declared.
+        if (preg_match('/#\[\s*(?:\\\\?Sylius\\\\Resource\\\\Metadata\\\\)?AsResource\b/', $content)) {
+            return $filePath;
+        }
+
+        // 1. Import the attribute class (after the existing use block, else after the namespace).
+        $useLine = 'use Sylius\\Resource\\Metadata\\AsResource;';
+        if (!str_contains($content, $useLine)) {
+            if (preg_match('/(?:^use [^;]+;\R)+/m', $content)) {
+                $content = preg_replace('/((?:^use [^;]+;\R)+)/m', '$1' . $useLine . "\n", $content, 1) ?? $content;
+            } else {
+                $content = preg_replace('/^(namespace [^;]+;\R)/m', "$1\n" . $useLine . "\n", $content, 1) ?? $content;
+            }
+        }
+
+        // 2. Add the attribute right above the class declaration (stacks with the ORM attributes).
+        $content = preg_replace(
+            '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
+            "#[AsResource]\n" . '$1',
             $content,
             1,
         ) ?? $content;

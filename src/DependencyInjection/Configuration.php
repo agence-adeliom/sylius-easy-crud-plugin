@@ -20,7 +20,7 @@ final class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('attributes')
-                    ->info('Declare easy-crud resources via #[AsEasyCrudAdmin] on Admin classes instead of YAML.')
+                    ->info('Declare easy-crud resources via #[AsAdmin] on Admin classes instead of YAML.')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('enabled')
@@ -28,7 +28,7 @@ final class Configuration implements ConfigurationInterface
                             ->defaultFalse()
                         ->end()
                         ->arrayNode('paths')
-                            ->info('Directories scanned for Admin classes carrying #[AsEasyCrudAdmin].')
+                            ->info('Directories scanned for Admin classes carrying #[AsAdmin].')
                             ->scalarPrototype()->end()
                             ->defaultValue([])
                         ->end()
