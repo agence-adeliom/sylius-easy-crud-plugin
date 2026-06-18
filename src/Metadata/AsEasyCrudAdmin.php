@@ -43,7 +43,9 @@ final class AsEasyCrudAdmin
      * @param list<int>|null       $limits     Pagination limits (feeds getLimits()).
      * @param string|null          $repositoryMethod    Grid data repository method (feeds getRepositoryMethod()['method']).
      * @param list<mixed>|null     $repositoryArguments Arguments for that repository method (feeds getRepositoryMethod()['arguments']).
-     * @param bool                 $permission Whether the resource requires permission checks.
+     * @param bool|null            $permission Whether the resource requires permission checks. Left null (omitted)
+     *                                          by default so it matches the legacy behaviour (Sylius => false);
+     *                                          set explicitly to enable app.<resource>.<action> permission checks.
      * @param list<string>         $except     Actions to exclude (index, create, update, show, delete, bulkDelete).
      * @param list<string>         $only       Actions to restrict to (mutually exclusive with $except).
      * @param string               $redirect   Action to redirect to after create/update ("update" by default).
@@ -69,7 +71,7 @@ final class AsEasyCrudAdmin
         public ?array $limits = null,
         public ?string $repositoryMethod = null,
         public ?array $repositoryArguments = null,
-        public bool $permission = true,
+        public ?bool $permission = null,
         public array $except = [],
         public array $only = [],
         public string $redirect = 'update',

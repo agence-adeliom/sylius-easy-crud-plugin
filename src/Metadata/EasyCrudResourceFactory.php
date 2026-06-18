@@ -122,7 +122,6 @@ final class EasyCrudResourceFactory
             'section' => $attribute->section,
             'templates' => $attribute->templates,
             'redirect' => $attribute->redirect,
-            'permission' => $attribute->permission,
             'grid' => $grid,
             'form' => [
                 'type' => $adminClass,
@@ -131,6 +130,12 @@ final class EasyCrudResourceFactory
             'vars' => self::buildVars($attribute),
         ];
 
+        // Only emit "permission" when explicitly set, so a migrated resource keeps the
+        // legacy behaviour (omitted => Sylius normalizes to false) instead of silently
+        // turning on app.<resource>.<action> permission checks.
+        if (null !== $attribute->permission) {
+            $config['permission'] = $attribute->permission;
+        }
         if (null !== $attribute->path) {
             $config['path'] = $attribute->path;
         }
