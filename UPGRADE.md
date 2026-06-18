@@ -86,8 +86,18 @@ Mapping from the legacy `resource:` block to attribute arguments:
 | custom controller (`classes.controller`) | `controller`                                     |
 
 The entity, grid name and form type are read from the Admin (`getEntityFqcn()`,
-`getName()`, the Admin class). You may set them in the attribute (`entity:`, `grid:`)
-or keep the static methods — **the static method wins over the attribute**.
+`getName()`, the Admin class). The Admin static methods below can move to attribute
+arguments (or be dropped to use the defaults) — **a kept method always wins over the
+attribute**:
+
+| Admin static method      | `#[AsEasyCrudAdmin]` argument                |
+|--------------------------|----------------------------------------------|
+| `getEntityFqcn()`        | `entity`                                     |
+| `getName()`              | `grid` (or derived from the class name)      |
+| `getDefaultSortColumn()` | `defaultSort`                                |
+| `getDefaultSortOrder()`  | `defaultSortOrder`                           |
+| `getLimits()`            | `limits`                                     |
+| `getRepositoryMethod()`  | `repositoryMethod` + `repositoryArguments`   |
 
 #### 3. Remove the legacy blocks
 

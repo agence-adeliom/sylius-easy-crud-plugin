@@ -77,13 +77,18 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
     }
 
     /**
+     * Grid data repository method. Read from #[AsEasyCrudAdmin(repositoryMethod: ..., repositoryArguments: ...)]
+     * by default, otherwise the translatable-friendly "createListQueryBuilder" with the current locale.
+     *
      * @return array<string, mixed>
      */
     public static function getRepositoryMethod(): array
     {
+        $attribute = static::easyCrudAttribute();
+
         return [
-            'method' => 'createListQueryBuilder',
-            'arguments' => [
+            'method' => $attribute?->repositoryMethod ?? 'createListQueryBuilder',
+            'arguments' => $attribute?->repositoryArguments ?? [
                 "expr:service('sylius.context.locale').getLocaleCode()",
             ],
         ];

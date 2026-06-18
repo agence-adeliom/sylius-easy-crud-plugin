@@ -41,6 +41,8 @@ final class AsEasyCrudAdmin
      * @param string|null          $defaultSort Default sort column (feeds getDefaultSortColumn()).
      * @param string|null          $defaultSortOrder Default sort order "asc"/"desc" (feeds getDefaultSortOrder()).
      * @param list<int>|null       $limits     Pagination limits (feeds getLimits()).
+     * @param string|null          $repositoryMethod    Grid data repository method (feeds getRepositoryMethod()['method']).
+     * @param list<mixed>|null     $repositoryArguments Arguments for that repository method (feeds getRepositoryMethod()['arguments']).
      * @param bool                 $permission Whether the resource requires permission checks.
      * @param list<string>         $except     Actions to exclude (index, create, update, show, delete, bulkDelete).
      * @param list<string>         $only       Actions to restrict to (mutually exclusive with $except).
@@ -65,6 +67,8 @@ final class AsEasyCrudAdmin
         public ?string $defaultSort = null,
         public ?string $defaultSortOrder = null,
         public ?array $limits = null,
+        public ?string $repositoryMethod = null,
+        public ?array $repositoryArguments = null,
         public bool $permission = true,
         public array $except = [],
         public array $only = [],
