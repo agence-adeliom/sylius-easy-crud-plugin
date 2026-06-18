@@ -409,9 +409,14 @@ class CrudMakerService
      * templates, "update" redirect) and on the Admin's own getEntityFqcn()/getName()
      * for the entity and grid, reproducing the same resource the YAML blocks produced.
      *
+     * When a convention-based custom controller exists, it is referenced via the
+     * "controller:" argument (mirroring the legacy resource generator).
+     *
+     * @param class-string|null $controller custom controller FQCN to reference, if any
+     *
      * @throws \RuntimeException when the class file cannot be found
      */
-    public function addEasyCrudAttributeToClass(string $filePath, string $shortClassName): string
+    public function addEasyCrudAttributeToClass(string $filePath, string $shortClassName, ?string $controller = null): string
     {
         if (!is_file($filePath)) {
             throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsEasyCrudAdmin] attribute.', $filePath));
@@ -434,10 +439,13 @@ class CrudMakerService
             }
         }
 
-        // 2. Add the attribute right above the class declaration.
+        // 2. Add the attribute right above the class declaration (with the custom controller if any).
+        $attribute = null !== $controller
+            ? sprintf('#[AsEasyCrudAdmin(controller: \\%s::class)]', ltrim($controller, '\\'))
+            : '#[AsEasyCrudAdmin]';
         $content = preg_replace(
             '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
-            "#[AsEasyCrudAdmin]\n" . '$1',
+            $attribute . "\n" . '$1',
             $content,
             1,
         ) ?? $content;
