@@ -64,27 +64,19 @@ final class CreateEasyCrud extends AbstractMaker
 
         assert(is_string($entryClassName), 'entity must be a string.');
 
-        $entryTranslationClassName = $entryClassName . 'Translation';
+        $namespace = \trim($generator->getRootNamespace(), '\\');
+        $entryClassName = $this->resolveEntityClassName($entryClassName, $generator);
 
         if (!class_exists($entryClassName)) {
-            $entryClassNameDetail = $generator->createClassNameDetails(
+            throw new RuntimeCommandException(sprintf(
+                'Entity class "%s" does not exist. Create it first with make:easy-crud:create-entity or pass an existing Doctrine entity.',
                 $entryClassName,
-                'Entity\\',
-            );
-            $entryClassName = $entryClassNameDetail->getFullName();
-        }
-        if (!class_exists($entryTranslationClassName)) {
-            $entryTranslationClassNameDetail = $generator->createClassNameDetails(
-                $entryClassName,
-                'Entity\\',
-                'Translation',
-            );
-            $entryTranslationClassName = $entryTranslationClassNameDetail->getFullName();
+            ));
         }
 
+        $entryTranslationClassName = class_exists($entryClassName . 'Translation') ? $entryClassName . 'Translation' : null;
         $entryShortClassName = Str::getShortClassName($entryClassName);
-
-        $namespace = \trim($generator->getRootNamespace(), '\\');
+        $attributeModeEnabled = $this->isAttributeModeEnabled();
 
         [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
             $entryClassName,
@@ -102,15 +94,14 @@ final class CreateEasyCrud extends AbstractMaker
             );
 
             // Generate Admin class
-            $adminClassName = str_replace('Entity', 'Admin', $entryClassName) . 'Admin';
+            $adminClassName = $this->adminClassNameForEntity($entryClassName);
             $adminClassDetails = $generator->createClassNameDetails(
-                $entryShortClassName,
-                'Admin',
-                'Admin',
+                '\\' . $adminClassName,
+                'Admin\\',
             );
-            $adminFilePath = $generator->getRootDirectory() . '/' . $adminClassDetails->getRelativeName();
+            $adminFilePath = $this->getClassFilePath($adminClassName);
 
-            if (class_exists($adminClassName) || file_exists($adminFilePath)) {
+            if (class_exists($adminClassName) || ('' !== $adminFilePath && file_exists($adminFilePath))) {
                 $io->note(sprintf('Admin class already exists, skipping: %s', $adminClassName));
             } else {
                 $adminDetails = $resourceConfigGenerator->generateAdmin(
@@ -118,8 +109,11 @@ final class CreateEasyCrud extends AbstractMaker
                     variables: [
                        'entityShortName' => $entryShortClassName,
                        'namespace' => str_replace('Entity', 'Admin', $entryClassName),
+                       'useAttributeMetadata' => $attributeModeEnabled,
                     ],
+                    registerService: !$attributeModeEnabled,
                 );
+                $adminFilePath = $resourceConfigGenerator->getGeneratedClassPath($adminDetails->getFullName()) ?? $adminFilePath;
                 $io->success(sprintf('Created: %s', $adminDetails->getFullName()));
             }
 
@@ -145,7 +139,7 @@ final class CreateEasyCrud extends AbstractMaker
                 $io->success(sprintf('Created: %s', $menuListenerFqcn));
             }
 
-            if ($this->isAttributeModeEnabled()) {
+            if ($attributeModeEnabled) {
                 // Attribute mode: declare the resource via #[AsEasyCrudAdmin] on
                 // the Admin class instead of the config/routes.yaml + sylius_resource.yaml blocks.
                 // Carry over a convention-based custom controller if one exists (legacy parity).
@@ -156,6 +150,8 @@ final class CreateEasyCrud extends AbstractMaker
                     $adminFilePath,
                     $adminClassDetails->getShortName(),
                     $customController,
+                    Str::asClassName($entryShortClassName),
+                    'admin_' . mb_strtolower(Str::asSnakeCase($entryClassName)),
                 );
 
                 $io->comment(sprintf(
@@ -276,5 +272,39 @@ final class CreateEasyCrud extends AbstractMaker
         }
 
         return $choices;
+    }
+
+    private function resolveEntityClassName(string $entity, Generator $generator): string
+    {
+        $entity = ltrim($entity, '\\');
+        if (class_exists($entity)) {
+            return $entity;
+        }
+
+        if (str_contains($entity, '\\')) {
+            return $entity;
+        }
+
+        return $generator->createClassNameDetails($entity, 'Entity\\')->getFullName();
+    }
+
+    /**
+     * @param class-string $entityClassName
+     */
+    private function adminClassNameForEntity(string $entityClassName): string
+    {
+        return str_replace('\\Entity\\', '\\Admin\\', $entityClassName) . 'Admin';
+    }
+
+    private function getClassFilePath(string $className): string
+    {
+        if (class_exists($className)) {
+            $fileName = (new \ReflectionClass($className))->getFileName();
+            if (is_string($fileName)) {
+                return $fileName;
+            }
+        }
+
+        return '';
     }
 }

@@ -37,6 +37,7 @@ use Symfony\Component\Validator\Constraints\Length;
 
 final class <?= $entityShortName ?>Admin extends AbstractAdmin
 {
+<?php if (empty($useAttributeMetadata)) { ?>
     public static function getName(): string
     {
         return 'admin_<?= mb_strtolower(Str::asSnakeCase($entity)) ?>';
@@ -52,6 +53,7 @@ final class <?= $entityShortName ?>Admin extends AbstractAdmin
         return '';
     }
 
+<?php } ?>
     /**
     * @return iterable<FieldInterface>
     */
