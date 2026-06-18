@@ -8,9 +8,9 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldCollection;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Resource\ResourceContext;
@@ -23,12 +23,15 @@ use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Component\Resource\ResourceActions;
 use Sylius\Resource\Model\ResourceInterface;
+use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Webmozart\Assert\Assert;
 
@@ -77,9 +80,12 @@ abstract class AbstractFormType extends AbstractGridType
     public function __construct(
         string $dataClass,
         array $validationGroups,
-        protected CrudAdminFactory $crudAdminFactory,
         protected CrudViewBuilderFactory $crudViewBuilderFactory,
         protected ResourceContextResolver $resourceContextResolver,
+        protected FieldConfiguratorCollection $fieldConfiguratorCollection,
+        protected DoctrineOrmTypeGuesser $doctrineOrmTypeGuesser,
+        protected PropertyAccessor $propertyAccessor,
+        protected RequestStack $requestStack,
         protected LocaleProviderInterface $localeProvider,
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
@@ -126,7 +132,7 @@ abstract class AbstractFormType extends AbstractGridType
 
         $fields = FieldCollection::new(
             $this->configureFields($pageName, $context),
-            $this->crudAdminFactory->getFieldConfiguratorCollection(),
+            $this->fieldConfiguratorCollection,
             $this->resource,
         );
 
@@ -152,9 +158,7 @@ abstract class AbstractFormType extends AbstractGridType
                 }
 
                 if (null === $formFieldType = $fieldDto->getFormType()) {
-                    $guessType = $this->crudAdminFactory
-                        ->getDoctrineOrmTypeGuesser()
-                        ->guessType($options['data_class'], $fieldDto->getProperty());
+                    $guessType = $this->doctrineOrmTypeGuesser->guessType($options['data_class'], $fieldDto->getProperty());
 
                     assert(null !== $guessType, 'Could not guess the form type for the field ' . $fieldDto->getProperty() . '. Make sure the property exists and is mapped in Doctrine.');
 
@@ -187,7 +191,7 @@ abstract class AbstractFormType extends AbstractGridType
                         $fieldsDto = $fieldDto->getCustomOption('fieldsDto');
                         $subFieldsDto = FieldCollection::new(
                             $fieldsDto,
-                            $this->crudAdminFactory->getFieldConfiguratorCollection(),
+                            $this->fieldConfiguratorCollection,
                             $this->resource,
                         );
                         if (method_exists($options['data_class'], 'getTranslationClass')) {
@@ -197,9 +201,7 @@ abstract class AbstractFormType extends AbstractGridType
                         foreach ($subFieldsDto as $subFieldDto) {
                             $formSubFieldOptions = $subFieldDto->getFormTypeOptions();
                             if (null === $formSubFieldType = $subFieldDto->getFormType()) {
-                                $guessType = $this->crudAdminFactory
-                                    ->getDoctrineOrmTypeGuesser()
-                                    ->guessType($options['data_class'], $subFieldDto->getProperty());
+                                $guessType = $this->doctrineOrmTypeGuesser->guessType($options['data_class'], $subFieldDto->getProperty());
 
                                 assert(null !== $guessType, 'Could not guess the form type for the field ' . $subFieldDto->getProperty() . '. Make sure the property exists and is mapped in Doctrine.');
 
@@ -286,7 +288,7 @@ abstract class AbstractFormType extends AbstractGridType
         $crudViewBuilder = $this->crudViewBuilderFactory->create();
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_DETAIL),
-            $this->crudAdminFactory->getFieldConfiguratorCollection(),
+            $this->fieldConfiguratorCollection,
             $resource,
         );
 
@@ -301,10 +303,9 @@ abstract class AbstractFormType extends AbstractGridType
                 $fieldDto->getDisplayedOn()->has(Crud::PAGE_DETAIL)
             ) {
                 if ($fieldDto->getProperty()) {
-                    $propertyAccessor = $this->crudAdminFactory->getPropertyAccessor();
                     $propertyPath = $fieldDto->getProperty();
-                    if ($propertyAccessor->isReadable($resource, $propertyPath)) {
-                        $value = $propertyAccessor->getValue($resource, $propertyPath);
+                    if ($this->propertyAccessor->isReadable($resource, $propertyPath)) {
+                        $value = $this->propertyAccessor->getValue($resource, $propertyPath);
                         $fieldDto->setValue($value);
                     }
                 }
@@ -356,7 +357,7 @@ abstract class AbstractFormType extends AbstractGridType
         $crudViewBuilder = $this->crudViewBuilderFactory->create();
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_INDEX),
-            $this->crudAdminFactory->getFieldConfiguratorCollection(),
+            $this->fieldConfiguratorCollection,
             null,
         );
 

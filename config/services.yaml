@@ -77,6 +77,12 @@ services:
     adeliom.sylius.field.configurator.collection:
         alias: Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection
         public: true
+
+    Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser:
+        alias: form.type_guesser.doctrine
+
+    Symfony\Component\PropertyAccess\PropertyAccessor:
+        alias: property_accessor
     
     adeliom.sylius.form.type.field_resource_translations:
         public: true
@@ -100,20 +106,6 @@ services:
         public: true
         alias: adeliom.sylius.form.type.resource_choice
     
-    adeliom.sylius.crud.admin.factory:
-        class: Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory
-        public: true
-        arguments:
-            - "@form.type_guesser.doctrine"
-            - "@adeliom.sylius.field.configurator.collection"
-            - "@property_accessor"
-            - "@request_stack"
-            - "@parameter_bag"
-    
-    Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
-        public: true
-        alias: adeliom.sylius.crud.admin.factory
-
     Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilderFactory:
         arguments:
             - "@knp_menu.factory"
