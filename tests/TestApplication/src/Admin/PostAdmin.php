@@ -25,15 +25,15 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Form\Test\DataTestType;
-use Adeliom\SyliusEasyCrudPlugin\Metadata\AsEasyCrudAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
 use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
 use Sylius\Component\Core\Model\Product;
 use Sylius\Component\Core\Model\Taxon;
 use Symfony\Component\Validator\Constraints\Length;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Entity\Post;
 
-#[AsEasyCrudAdmin(
-    entity: Post::class,
+#[AsAdmin(
+    resourceClass: Post::class,
     alias: 'tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post',
     grid: 'admin_tests_adeliom_sylius_easy_crud_plugin_entity_post',
 )]
