@@ -18,6 +18,9 @@ use Sylius\Bundle\GridBundle\Grid\ResourceAwareGridInterface;
 use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
 use Sylius\Resource\Model\TranslatableInterface;
 
+/**
+ * @phpstan-type GridActionData array{type: string, options?: array<string, mixed>, icon?: string, enabled?: bool, position?: int, label?: string}
+ */
 abstract class AbstractGridType extends AbstractResourceType implements ResourceAwareGridInterface
 {
     /**
@@ -85,14 +88,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     }
 
     /**
-     * @param array{
-     *     type: string,
-     *     options?: array<string, mixed>,
-     *     icon?: string,
-     *     enabled?: bool,
-     *     position?: int,
-     *     label?: string
-     * } $data
+     * @param GridActionData $data
      */
     protected function transformActionsAsGridDefinition(string $name, array $data): \Sylius\Component\Grid\Definition\Action
     {
@@ -120,12 +116,15 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
             'item' => [],
             'subitem' => [],
         ];
+        /** @var GridActionData $mainAction */
         foreach ($mainActions->toArray() as $name => $mainAction) {
             $actions['main'][] = $this->transformActionsAsGridDefinition($name, $mainAction);
         }
+        /** @var GridActionData $itemAction */
         foreach ($itemActions->toArray() as $name => $itemAction) {
             $actions['item'][] = $this->transformActionsAsGridDefinition($name, $itemAction);
         }
+        /** @var GridActionData $subItemAction */
         foreach ($subItemActions->toArray() as $name => $subItemAction) {
             $actions['subitem'][] = $this->transformActionsAsGridDefinition($name, $subItemAction);
         }
