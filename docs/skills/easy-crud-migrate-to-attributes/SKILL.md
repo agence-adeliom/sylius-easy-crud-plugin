@@ -104,8 +104,9 @@ Apply, in order:
 2. **Remove `public static function getEntityFqcn()`** — now provided by `entity:`.
 3. **Remove `public static function getName()`** — now provided by `grid:` (or derivation).
 4. **`getDefaultSortColumn()`**: if it returns `''`, remove it; otherwise move the value to
-   `defaultSort:` and remove the method. Same idea for `getDefaultSortOrder()` → `defaultSortOrder:`
-   and `getLimits()` → `limits:` if they were overridden.
+   `defaultSort:` and remove the method. Same idea for `getDefaultSortOrder()` → `defaultSortOrder:`,
+   `getLimits()` → `limits:`, and `getRepositoryMethod()` → `repositoryMethod:` + `repositoryArguments:`
+   (only if they were overridden; the easy-crud defaults are otherwise kept).
 5. **`ServiceSubscriberInterface`**: if the class `implements ServiceSubscriberInterface` **and**
    `getSubscribedServices()` returns `[]` (empty), remove both the method and the interface (and its
    `use`). If `getSubscribedServices()` returns real services, keep them.
