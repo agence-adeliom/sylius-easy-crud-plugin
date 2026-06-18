@@ -107,7 +107,6 @@ services:
             - "@form.type_guesser.doctrine"
             - "@adeliom.sylius.field.configurator.collection"
             - "@property_accessor"
-            - "@sylius.resource_controller.request_configuration_factory"
             - "@request_stack"
             - "@parameter_bag"
     
@@ -118,6 +117,12 @@ services:
     Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilderFactory:
         arguments:
             - "@knp_menu.factory"
+
+    Adeliom\SyliusEasyCrudPlugin\CrudFactory\Resource\ResourceContextResolver:
+        arguments:
+            - "@parameter_bag"
+            - "@request_stack"
+            - "@sylius.resource_controller.request_configuration_factory"
     
     'assets._package_sylius.easy_crud':
         class: Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage

@@ -13,6 +13,8 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Resource\ResourceContext;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Resource\ResourceContextResolver;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilder;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilderFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +38,7 @@ abstract class AbstractFormType extends AbstractGridType
 
     private ?object $resource = null;
 
-    private ?string $resourceAlias = null;
+    private ?ResourceContext $resourceContext = null;
 
     public function getResource(): ?object
     {
@@ -45,7 +47,7 @@ abstract class AbstractFormType extends AbstractGridType
 
     public function getResourceAlias(): ?string
     {
-        return $this->resourceAlias;
+        return $this->resourceContext?->getAlias();
     }
 
     private ?UserInterface $user = null;
@@ -77,6 +79,7 @@ abstract class AbstractFormType extends AbstractGridType
         array $validationGroups,
         protected CrudAdminFactory $crudAdminFactory,
         protected CrudViewBuilderFactory $crudViewBuilderFactory,
+        protected ResourceContextResolver $resourceContextResolver,
         protected LocaleProviderInterface $localeProvider,
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
@@ -88,7 +91,12 @@ abstract class AbstractFormType extends AbstractGridType
             $validationGroups,
         );
         $this->user = $security->getUser();
-        $this->resourceAlias = $this->crudAdminFactory->initContext($this->getResourceClass());
+        $this->resourceContext = $this->resourceContextResolver->resolve($this->getResourceClass());
+    }
+
+    protected function getResourceContext(): ?ResourceContext
+    {
+        return $this->resourceContext;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
