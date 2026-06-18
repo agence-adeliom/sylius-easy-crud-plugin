@@ -49,10 +49,12 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 
     public function configureActions(string $pageName): Actions
     {
+        $resourceContext = $this->getResourceContext();
+
         $actions = Actions::new();
         $actions->setRoutePrefix($this->getName());
-        $actions->setRequestConfiguration($this->crudAdminFactory->getRequestConfiguration());
-        $actions->setMetadata($this->crudAdminFactory->getMetadata());
+        $actions->setRequestConfiguration($resourceContext?->getRequestConfiguration());
+        $actions->setMetadata($resourceContext?->getMetadata());
         $actions
             ->addBatchAction(Action::BATCH_DELETE)
 
@@ -119,7 +121,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     protected function getResourceFieldValueInRequest(string $formName, string $fieldName, string $queryKey = 'id'): ?string
     {
-        $request = $this->crudAdminFactory->requestStack->getMainRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if ($request) {
             $resourceValue = $request->query->get($queryKey) ?? $request->request->get(sprintf('%s[%s]', $formName, $fieldName));

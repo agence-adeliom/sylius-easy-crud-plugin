@@ -3,7 +3,8 @@
 {% endif %}
 
 {% if resource is not defined %}
-    {% set resource = hookable_metadata.context.resource|default(null) %}
+    {# don't put hookable_metadata.context.resource|default(null) because it triggers a __toString on resource #}
+    {% set resource = hookable_metadata.context.resource is defined ? hookable_metadata.context.resource : null %}
 {% endif %}
 
 {% form_theme form '@SyliusAdmin/shared/form_theme.html.twig' %}
