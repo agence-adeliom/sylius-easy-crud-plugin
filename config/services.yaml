@@ -106,7 +106,6 @@ services:
         arguments:
             - "@form.type_guesser.doctrine"
             - "@adeliom.sylius.field.configurator.collection"
-            - "@knp_menu.factory"
             - "@property_accessor"
             - "@sylius.resource_controller.request_configuration_factory"
             - "@request_stack"
@@ -115,6 +114,10 @@ services:
     Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
         public: true
         alias: adeliom.sylius.crud.admin.factory
+
+    Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilderFactory:
+        arguments:
+            - "@knp_menu.factory"
     
     'assets._package_sylius.easy_crud':
         class: Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage

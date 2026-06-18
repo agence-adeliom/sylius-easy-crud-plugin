@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory;
 
-use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
-use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
-use Knp\Menu\FactoryInterface;
-use Knp\Menu\MenuItem;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfigurationFactory;
 use Sylius\Resource\Metadata\Metadata;
@@ -22,23 +16,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class CrudAdminFactory
 {
-    /** @var string[] */
-    public array $formThemes = [];
-
-    /** @var AssetDto[] */
-    public array $cssAssets = [];
-
-    /** @var AssetDto[] */
-    public array $jsAssets = [];
-
-    /** @var AssetDto[] */
-    public array $webpackEncoreAssets = [];
-
-    protected ?MenuItem $menu = null;
-
-    /** @var array<array<string, mixed>> */
-    public array $columns = [];
-
     protected ?Metadata $metadata = null;
 
     protected ?RequestConfiguration $requestConfiguration = null;
@@ -46,13 +23,11 @@ class CrudAdminFactory
     public function __construct(
         protected DoctrineOrmTypeGuesser $doctrineOrmTypeGuesser,
         protected FieldConfiguratorCollection $fieldConfiguratorCollection,
-        protected FactoryInterface $menuFactory,
         protected PropertyAccessor $propertyAccessor,
         protected RequestConfigurationFactory $requestConfigurationFactory,
         public RequestStack $requestStack,
         public ParameterBagInterface $parameterBag,
     ) {
-        $this->initMenu();
     }
 
     public function initContext(string $model): ?string
@@ -108,143 +83,5 @@ class CrudAdminFactory
     public function getDoctrineOrmTypeGuesser(): DoctrineOrmTypeGuesser
     {
         return $this->doctrineOrmTypeGuesser;
-    }
-
-    public function initMenu(): void
-    {
-        $this->menu = new MenuItem('root', $this->menuFactory);
-    }
-
-    public function getMenu(): MenuItem
-    {
-        return $this->menu ?? new MenuItem('root', $this->menuFactory);
-    }
-
-    public function getMenuFactory(): FactoryInterface
-    {
-        return $this->menuFactory;
-    }
-
-    public function manageFieldAssets(FieldDto $fieldDto): void
-    {
-        if (is_array($fieldDto->getFormThemes())) {
-            foreach ($fieldDto->getFormThemes() as $theme) {
-                $this->formThemes[$theme] = $theme;
-            }
-        }
-
-        if (is_array($fieldDto->getAssets()->getCssAssets())) {
-            foreach ($fieldDto->getAssets()->getCssAssets() as $path) {
-                $this->cssAssets[$path->getValue()] = $path;
-            }
-        }
-
-        if (is_array($fieldDto->getAssets()->getJsAssets())) {
-            foreach ($fieldDto->getAssets()->getJsAssets() as $path) {
-                $this->jsAssets[$path->getValue()] = $path;
-            }
-        }
-
-        if (is_array($fieldDto->getAssets()->getWebpackEncoreAssets())) {
-            foreach ($fieldDto->getAssets()->getWebpackEncoreAssets() as $path) {
-                $this->webpackEncoreAssets[$path->getValue()] = $path;
-            }
-        }
-    }
-
-    /**
-     * @return array{MenuItem, array<string, mixed>}
-     */
-    public function addTab(string $name, ?string $label = null, ?string $template = null, ?bool $horizontalDisplay =
-    false): array
-    {
-        $menuItem = new MenuItem($name, $this->getMenuFactory());
-        $menuItem->setAttribute(
-            'template',
-            null === $template ?
-                '@SyliusEasyCrudPlugin/crud/form/_tab.html.twig' :
-                $template,
-        );
-        $menuItem->setLabel($label);
-        $this->getMenu()->addChild($menuItem);
-        if (null === $this->getMenu()->getAttribute(TabField::HORIZONTAL_DISPLAY)) {
-            $this->getMenu()->setAttribute(TabField::HORIZONTAL_DISPLAY, $horizontalDisplay);
-        }
-        $column = $this->newColumn($menuItem, 'default_column', null);
-        $this->columns[] = $column;
-
-        return [$menuItem, $column];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function addColumn(MenuItem $menuItem, FieldDto $fieldDto): array
-    {
-        /** @var ColumnSizeEnum|null $size */
-        $size = $fieldDto->getCustomOption('columnSize');
-
-        /** @var bool|null $newLine */
-        $newLine = $fieldDto->getCustomOption('newLine');
-
-        $column = $this->newColumn(
-            $menuItem,
-            $fieldDto->getProperty(),
-            $fieldDto->getLabel(),
-            $size,
-            $newLine,
-        );
-        $this->columns[] = $column;
-
-        return $column;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function newColumn(
-        MenuItem $menuItem,
-        ?string $name = null,
-        ?string $label = null,
-        ?ColumnSizeEnum $size = ColumnSizeEnum::WIDE_12_OF_12,
-        ?bool $newLine = true,
-    ): array {
-        return [
-            'id' => md5((string) rand()),
-            'name' => $name ?? 'default_column',
-            'size' => $size,
-            'label' => $label ?? null,
-            'newLine' => $newLine,
-            'menuItem' => $menuItem->getName(),
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function getViewVars(): array
-    {
-        $vars = [];
-        $vars['form_themes'] = array_values(
-            [
-                '@SyliusAdmin/shared/form_theme.html.twig',
-            ]
-            + $this->formThemes,
-        );
-        $vars['css_assets'] = $this->cssAssets;
-        $vars['js_assets'] = $this->jsAssets;
-        $vars['webpack_encore_assets'] = $this->webpackEncoreAssets;
-        $vars['menu'] = $this->getMenu();
-        $vars['columns'] = count($this->columns) ? $this->columns : [[
-           'id' => md5((string) rand()),
-           'name' => 'default',
-           'label' => null,
-           'size' => ColumnSizeEnum::WIDE_12_OF_12,
-           'menuItem' => $this->menu && $this->menu->count() ?
-               $this->menu->getFirstChild() :
-               null,
-       ]];
-
-        return $vars;
     }
 }

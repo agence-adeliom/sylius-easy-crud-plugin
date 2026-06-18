@@ -13,6 +13,8 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilder;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilderFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
@@ -30,6 +32,8 @@ use Webmozart\Assert\Assert;
 
 abstract class AbstractFormType extends AbstractGridType
 {
+    private const CRUD_VIEW_BUILDER_ATTRIBUTE = 'easy_crud_view_builder';
+
     private ?object $resource = null;
 
     private ?string $resourceAlias = null;
@@ -72,6 +76,7 @@ abstract class AbstractFormType extends AbstractGridType
         string $dataClass,
         array $validationGroups,
         protected CrudAdminFactory $crudAdminFactory,
+        protected CrudViewBuilderFactory $crudViewBuilderFactory,
         protected LocaleProviderInterface $localeProvider,
         protected EntityManagerInterface $entityManager,
         protected ContainerInterface $locator,
@@ -108,6 +113,8 @@ abstract class AbstractFormType extends AbstractGridType
         Assert::string($options['data_class']);
 
         $this->resource = $options['data'] ?? null;
+        $crudViewBuilder = $this->crudViewBuilderFactory->create();
+        $builder->setAttribute(self::CRUD_VIEW_BUILDER_ATTRIBUTE, $crudViewBuilder);
 
         $fields = FieldCollection::new(
             $this->configureFields($pageName, $context),
@@ -150,16 +157,15 @@ abstract class AbstractFormType extends AbstractGridType
                 if ($fieldDto->getFieldFqcn() === TabField::class) {
                     $horizontalDisplay = $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY);
                     assert(is_bool($horizontalDisplay) || null === $horizontalDisplay, 'The field option "horizontal_display" should be a boolean.');
-                    [$menuItem, $column] = $this->crudAdminFactory
-                        ->addTab(
-                            name: $fieldDto->getProperty(),
-                            label:  $fieldDto->getLabel(),
-                            horizontalDisplay:  $horizontalDisplay,
-                        );
+                    [$menuItem, $column] = $crudViewBuilder->addTab(
+                        name: $fieldDto->getProperty(),
+                        label:  $fieldDto->getLabel(),
+                        horizontalDisplay:  $horizontalDisplay,
+                    );
                 }
 
                 if ($fieldDto->getFieldFqcn() === ColumnField::class && $menuItem) {
-                    $column = $this->crudAdminFactory->addColumn($menuItem, $fieldDto);
+                    $column = $crudViewBuilder->addColumn($menuItem, $fieldDto);
                 }
 
                 if (
@@ -201,7 +207,7 @@ abstract class AbstractFormType extends AbstractGridType
                             } else {
                                 $subName = $subFieldDto->getProperty();
                             }
-                            $this->crudAdminFactory->manageFieldAssets($subFieldDto);
+                            $crudViewBuilder->manageFieldAssets($subFieldDto);
                             $subFields[] = [
                                 'type' => $formSubFieldType,
                                 'name' => $subName,
@@ -233,7 +239,7 @@ abstract class AbstractFormType extends AbstractGridType
                         }
                     }
 
-                    $this->crudAdminFactory->manageFieldAssets($fieldDto);
+                    $crudViewBuilder->manageFieldAssets($fieldDto);
 
                     $formField->setAttribute('menuItem', $menuItem);
                     $formField->setAttribute('columnId', $column['id'] ?? null);
@@ -247,21 +253,21 @@ abstract class AbstractFormType extends AbstractGridType
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         assert(is_string($form->getConfig()->getOption('page_name')), 'The form option "page_name" should be a string.');
+        $crudViewBuilder = $form->getConfig()->getAttribute(self::CRUD_VIEW_BUILDER_ATTRIBUTE);
+
+        if (!$crudViewBuilder instanceof CrudViewBuilder) {
+            throw new \LogicException(sprintf('Missing "%s" form build attribute.', self::CRUD_VIEW_BUILDER_ATTRIBUTE));
+        }
 
         $actions = $this->processDetailAndUpdateActions($form->getConfig()->getOption('page_name'));
 
         $view->vars = array_merge(
             $view->vars,
-            $this->crudAdminFactory->getViewVars(),
+            $crudViewBuilder->build()->toViewVars(),
             [
                 'actionsGroups' => $actions,
             ],
         );
-    }
-
-    public function resetBuild(): void
-    {
-        $this->crudAdminFactory->initMenu();
     }
 
     /**
@@ -269,6 +275,7 @@ abstract class AbstractFormType extends AbstractGridType
      */
     public function buildDetail(ResourceInterface $resource): array
     {
+        $crudViewBuilder = $this->crudViewBuilderFactory->create();
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_DETAIL),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),
@@ -298,7 +305,7 @@ abstract class AbstractFormType extends AbstractGridType
                     $horizontalDisplay = $fieldDto->getCustomOption(TabField::HORIZONTAL_DISPLAY);
                     assert(is_bool($horizontalDisplay) || null === $horizontalDisplay, 'The field option "horizontal_display" should be a boolean.');
 
-                    [$menuItem, $column] = $this->crudAdminFactory->addTab(
+                    [$menuItem, $column] = $crudViewBuilder->addTab(
                         name: $fieldDto->getProperty(),
                         label:  $fieldDto->getLabel(),
                         template: '@SyliusEasyCrudPlugin/crud/show/_tab.html.twig',
@@ -307,14 +314,14 @@ abstract class AbstractFormType extends AbstractGridType
                 }
 
                 if ($fieldDto->getFieldFqcn() === ColumnField::class && null !== $menuItem) {
-                    $column = $this->crudAdminFactory->addColumn($menuItem, $fieldDto);
+                    $column = $crudViewBuilder->addColumn($menuItem, $fieldDto);
                 }
 
                 if (
                     $fieldDto->getFieldFqcn() !== TabField::class &&
                     $fieldDto->getFieldFqcn() !== ColumnField::class
                 ) {
-                    $this->crudAdminFactory->manageFieldAssets($fieldDto);
+                    $crudViewBuilder->manageFieldAssets($fieldDto);
                     $fieldDto->setCustomOption('columnId', $column['id'] ?? null);
                     $fieldDto->setCustomOption('menuItem', $menuItem);
                 } else {
@@ -328,7 +335,7 @@ abstract class AbstractFormType extends AbstractGridType
         $actions = $this->processDetailAndUpdateActions(Crud::PAGE_DETAIL);
 
         return array_merge(
-            $this->crudAdminFactory->getViewVars(),
+            $crudViewBuilder->build()->toViewVars(),
             [
                 'fields' => $fields,
                 'actionsGroups' => $actions,
@@ -338,6 +345,7 @@ abstract class AbstractFormType extends AbstractGridType
 
     public function buildGrid(GridBuilderInterface $gridBuilder): void
     {
+        $crudViewBuilder = $this->crudViewBuilderFactory->create();
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_INDEX),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),
@@ -352,7 +360,7 @@ abstract class AbstractFormType extends AbstractGridType
                 $fieldDto->getDisplayedOn()->has(Crud::PAGE_INDEX) &&
                 !$fieldDto->isVirtual()
             ) {
-                $this->crudAdminFactory->manageFieldAssets($fieldDto);
+                $crudViewBuilder->manageFieldAssets($fieldDto);
 
                 if ($fieldDto->getFieldFqcn() && method_exists($fieldDto->getFieldFqcn(), 'create')) {
                     $field = $fieldDto->getFieldFqcn()::create($fieldDto->getProperty());
@@ -386,9 +394,10 @@ abstract class AbstractFormType extends AbstractGridType
             $gridBuilder,
         );
 
-        $gridBuilder->setDriverOption('css_assets', $this->crudAdminFactory->cssAssets);
-        $gridBuilder->setDriverOption('js_assets', $this->crudAdminFactory->jsAssets);
-        $gridBuilder->setDriverOption('webpack_encore_assets', $this->crudAdminFactory->webpackEncoreAssets);
+        $crudView = $crudViewBuilder->build();
+        $gridBuilder->setDriverOption('css_assets', $crudView->getCssAssets());
+        $gridBuilder->setDriverOption('js_assets', $crudView->getJsAssets());
+        $gridBuilder->setDriverOption('webpack_encore_assets', $crudView->getWebpackEncoreAssets());
     }
 
     /**
