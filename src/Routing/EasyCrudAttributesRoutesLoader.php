@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Replays the routing configs produced from #[AsEasyCrudAdmin] attributes
+ * Replays the routing configs produced from #[AsAdmin] attributes
  * (precomputed in the bundle extension's prepend()) through the legacy
  * `sylius.resource` route loader, so the generated routes are byte-identical to
  * the ones the equivalent `type: sylius.resource` block used to produce.

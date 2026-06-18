@@ -7,13 +7,13 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
-use Adeliom\SyliusEasyCrudPlugin\Metadata\AsEasyCrudAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
 use Doctrine\ORM\Mapping\Entity;
 use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 {
-    /** @var array<class-string, AsEasyCrudAdmin|null> */
+    /** @var array<class-string, AsAdmin|null> */
     private static array $easyCrudAttributeCache = [];
 
     public function getResourceClass(): string
@@ -22,24 +22,24 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
     }
 
     /**
-     * Entity FQCN. Read from #[AsEasyCrudAdmin(entity: ...)] by default;
+     * Resource model FQCN. Read from #[AsAdmin(resourceClass: ...)] by default;
      * override this method to set it explicitly.
      */
     public static function getEntityFqcn(): string
     {
-        $entity = static::easyCrudAttribute()?->entity;
-        if (null !== $entity) {
-            return $entity;
+        $resourceClass = static::easyCrudAttribute()?->resourceClass;
+        if (null !== $resourceClass) {
+            return $resourceClass;
         }
 
         throw new \LogicException(sprintf(
-            'No entity defined for "%s": set #[AsEasyCrudAdmin(entity: YourEntity::class)] or override getEntityFqcn().',
+            'No resource class defined for "%s": set #[AsAdmin(resourceClass: YourResource::class)] or override getEntityFqcn().',
             static::class,
         ));
     }
 
     /**
-     * Grid name (also used as route prefix). Read from #[AsEasyCrudAdmin(grid: ...)]
+     * Grid name (also used as route prefix). Read from #[AsAdmin(grid: ...)]
      * by default, otherwise derived from the Admin class name ("PostAdmin" => "admin_post").
      */
     public static function getName(): string
@@ -53,14 +53,14 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
     }
 
     /**
-     * Returns the #[AsEasyCrudAdmin] attribute declared on the concrete Admin, if any.
+     * Returns the #[AsAdmin] attribute declared on the concrete Admin, if any.
      */
-    protected static function easyCrudAttribute(): ?AsEasyCrudAdmin
+    protected static function easyCrudAttribute(): ?AsAdmin
     {
         $class = static::class;
 
         if (!array_key_exists($class, self::$easyCrudAttributeCache)) {
-            $attributes = (new \ReflectionClass($class))->getAttributes(AsEasyCrudAdmin::class);
+            $attributes = (new \ReflectionClass($class))->getAttributes(AsAdmin::class);
             self::$easyCrudAttributeCache[$class] = [] === $attributes ? null : $attributes[0]->newInstance();
         }
 
@@ -77,7 +77,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
     }
 
     /**
-     * Grid data repository method. Read from #[AsEasyCrudAdmin(repositoryMethod: ..., repositoryArguments: ...)]
+     * Grid data repository method. Read from #[AsAdmin(repositoryMethod: ..., repositoryArguments: ...)]
      * by default, otherwise the translatable-friendly "createListQueryBuilder" with the current locale.
      *
      * @return array<string, mixed>

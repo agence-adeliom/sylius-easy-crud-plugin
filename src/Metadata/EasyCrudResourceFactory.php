@@ -7,21 +7,29 @@ namespace Adeliom\SyliusEasyCrudPlugin\Metadata;
 use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController;
 use Doctrine\ORM\Mapping\Entity;
+use Sylius\Resource\Metadata\AsResource;
 use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Reflection\ClassReflection;
+use function Symfony\Component\String\u;
 
 /**
- * Scans the configured paths for Admin classes carrying #[AsEasyCrudAdmin] and
- * translates each one into the legacy Sylius resource configuration and routing
- * configuration that the equivalent config/routes.yaml + sylius_resource.yaml
- * blocks used to provide.
+ * Scans the configured paths for Admin classes carrying #[AsAdmin] and translates
+ * each one into the legacy Sylius resource configuration + routing configuration
+ * that the config/routes.yaml + sylius_resource.yaml blocks used to provide.
  *
- * Everything is read straight from the Admin: the entity comes from
- * Admin::getEntityFqcn(), the grid from Admin::getName(), and the form type IS
- * the Admin class itself. No entity => Admin resolution is required.
+ * The resource identity (alias) is owned by the native #[\Sylius\Resource\Metadata\AsResource]
+ * declared on the model ($resourceClass): we read it back by reflection. The full
+ * resource entry is then contributed in the bundle's prepend() via
+ * prependExtensionConfig('sylius_resource', …). Sylius' own #[AsResource] auto-registration
+ * (autoRegisterResources) skips any alias already declared, so easy-crud owns the entry
+ * (controller => SyliusCrudResourceController, form => the Admin, repository, translation).
  *
- * Pure helper (no DI): it runs at container build time, from the bundle
- * extension's prepend(), where service tags are not yet available.
+ * This is required because the Sylius resource driver materializes the per-resource
+ * services (controller, repository, translation sub-resource) during load(), i.e. before
+ * any compiler pass — so the controller class / translation sub-resource cannot be patched
+ * after the fact and must be present in the resource config from prepend().
+ *
+ * Pure helper (no DI): it runs at container build time from the bundle extension's prepend().
  *
  * @phpstan-type ResourceDescriptor array{
  *     alias: string,
@@ -59,13 +67,13 @@ final class EasyCrudResourceFactory
                 continue;
             }
 
-            $attributes = ClassReflection::getClassAttributes($className, AsEasyCrudAdmin::class);
+            $attributes = ClassReflection::getClassAttributes($className, AsAdmin::class);
             if ([] === $attributes) {
                 continue;
             }
 
             $attribute = $attributes[0]->newInstance();
-            if (!$attribute instanceof AsEasyCrudAdmin) {
+            if (!$attribute instanceof AsAdmin) {
                 continue;
             }
 
@@ -80,21 +88,21 @@ final class EasyCrudResourceFactory
      *
      * @return ResourceDescriptor
      */
-    private static function buildDescriptor(string $adminClass, AsEasyCrudAdmin $attribute): array
+    private static function buildDescriptor(string $adminClass, AsAdmin $attribute): array
     {
-        /** @var class-string $entityClass */
-        $entityClass = $adminClass::getEntityFqcn();
-        $grid = $adminClass::getName();
-        $alias = $attribute->alias ?? sprintf('%s.%s', self::DEFAULT_APPLICATION_NAME, self::snake(self::shortName($entityClass)));
+        /** @var class-string $resourceClass */
+        $resourceClass = ltrim((string) ($attribute->resourceClass ?? $adminClass::getEntityFqcn()), '\\');
+        $grid = $attribute->grid ?? $adminClass::getName();
+        $alias = $attribute->alias ?? self::resolveResourceAlias($resourceClass, $adminClass);
         $controller = $attribute->controller ?? self::DEFAULT_CONTROLLER;
 
         // --- Registry entry (equivalent to sylius_resource.resources.<alias>) ---
         $classes = [
-            'model' => $entityClass,
+            'model' => $resourceClass,
             'controller' => $controller,
             'form' => $adminClass,
         ];
-        $repository = self::resolveRepository($entityClass);
+        $repository = self::resolveRepository($resourceClass);
         if (null !== $repository) {
             $classes['repository'] = $repository;
         }
@@ -104,9 +112,9 @@ final class EasyCrudResourceFactory
             'classes' => $classes,
         ];
 
-        if (is_a($entityClass, TranslatableInterface::class, true) && method_exists($entityClass, 'getTranslationClass')) {
+        if (is_a($resourceClass, TranslatableInterface::class, true) && method_exists($resourceClass, 'getTranslationClass')) {
             /** @var string $translationClass */
-            $translationClass = call_user_func([$entityClass, 'getTranslationClass']);
+            $translationClass = call_user_func([$resourceClass, 'getTranslationClass']);
             $registry['translation'] = [
                 'classes' => [
                     'model' => $translationClass,
@@ -157,12 +165,50 @@ final class EasyCrudResourceFactory
     }
 
     /**
+     * Reads the alias from the native #[AsResource] on the model, mirroring
+     * SyliusResourceExtension::getResourceAlias(): the explicit alias wins, otherwise
+     * it is derived from <applicationName>.<short name without "Resource" suffix>.
+     *
+     * @param class-string $resourceClass
+     * @param class-string $adminClass
+     */
+    private static function resolveResourceAlias(string $resourceClass, string $adminClass): string
+    {
+        $attributes = ClassReflection::getClassAttributes($resourceClass, AsResource::class);
+        if ([] === $attributes) {
+            throw new \LogicException(sprintf(
+                'easy-crud admin "%s" references resourceClass "%s" which is not declared as a Sylius resource. ' .
+                'Add #[\Sylius\Resource\Metadata\AsResource] on it (or set an explicit "alias" on #[AsAdmin]).',
+                $adminClass,
+                $resourceClass,
+            ));
+        }
+
+        /** @var AsResource $resource */
+        $resource = $attributes[0]->newInstance();
+        $metadata = $resource->toMetadata();
+
+        $alias = $metadata->getAlias();
+        if (null !== $alias) {
+            return $alias;
+        }
+
+        $applicationName = $metadata->getApplicationName() ?? self::DEFAULT_APPLICATION_NAME;
+        $shortName = (new \ReflectionClass($resourceClass))->getShortName();
+        if (str_ends_with($shortName, 'Resource')) {
+            $shortName = substr($shortName, 0, -\strlen('Resource'));
+        }
+
+        return u($applicationName)->snake()->toString() . '.' . u($shortName)->snake()->toString();
+    }
+
+    /**
      * Builds the per-action vars, mirroring the maker-generated block, then
      * deep-merges the attribute's free-form vars on top.
      *
      * @return array<string, mixed>
      */
-    private static function buildVars(AsEasyCrudAdmin $attribute): array
+    private static function buildVars(AsAdmin $attribute): array
     {
         $prefix = self::DEFAULT_TRANSLATION_PREFIX;
 
@@ -195,15 +241,20 @@ final class EasyCrudResourceFactory
     }
 
     /**
-     * @param class-string $entityClass
+     * @param class-string $resourceClass
+     *
+     * @return class-string|null
      */
-    private static function resolveRepository(string $entityClass): ?string
+    private static function resolveRepository(string $resourceClass): ?string
     {
-        foreach (ClassReflection::getClassAttributes($entityClass, Entity::class) as $attribute) {
+        foreach (ClassReflection::getClassAttributes($resourceClass, Entity::class) as $attribute) {
             $arguments = $attribute->getArguments();
             $repository = $arguments['repositoryClass'] ?? $arguments[0] ?? null;
             if (is_string($repository) && '' !== $repository) {
-                return $repository;
+                /** @var class-string $repositoryClass */
+                $repositoryClass = $repository;
+
+                return $repositoryClass;
             }
         }
 
@@ -227,22 +278,5 @@ final class EasyCrudResourceFactory
         }
 
         return $base;
-    }
-
-    /**
-     * @param class-string $className
-     */
-    private static function shortName(string $className): string
-    {
-        $position = strrpos($className, '\\');
-
-        return false === $position ? $className : substr($className, $position + 1);
-    }
-
-    private static function snake(string $value): string
-    {
-        $snake = preg_replace('/(?<!^)[A-Z]/', '_$0', $value);
-
-        return mb_strtolower($snake ?? $value);
     }
 }

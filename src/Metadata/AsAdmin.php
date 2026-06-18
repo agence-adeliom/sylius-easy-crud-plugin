@@ -5,34 +5,36 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Metadata;
 
 /**
- * Declares an easy-crud admin resource directly on its Admin class, as an
- * alternative to the legacy `type: sylius.resource` block in config/routes.yaml
- * plus the matching `sylius_resource.resources.<alias>` entry.
+ * Declares an easy-crud admin on its Admin class, on top of a Sylius resource
+ * declared natively with #[\Sylius\Resource\Metadata\AsResource].
  *
- * The attribute lives on the Admin (the presentation layer that already defines
- * the fields, grid and form) — not on the Doctrine entity, which stays a pure
- * domain model. It carries the resource "data" (which entity, section, icon,
- * routing behaviour…), while the Admin methods keep the "logic"
- * (configureFields/Actions/Filters).
+ * The native #[AsResource] (placed on the entity) already registers the resource
+ * model/driver into Sylius (sylius.resources). This attribute, placed on the
+ * Admin, points back to that resource ($resourceClass) and lets easy-crud:
+ *   - override the resource controller (=> SyliusCrudResourceController) and form
+ *     (=> the Admin class) on the entry Sylius auto-registered;
+ *   - build the legacy "type: sylius.resource" routing (grid, vars, $context,
+ *     redirect, except/only) replayed by EasyCrudAttributesRoutesLoader.
+ *
+ * The override + routing are produced at container build time by
+ * RegisterEasyCrudAdminsPass (see EasyCrudResourceFactory). Discovery is opt-in:
+ * it only happens when `sylius_easy_crud.attributes.enabled` is true and the Admin
+ * lives under one of the configured `attributes.paths`.
  *
  * Most values are optional: AbstractAdmin reads them as defaults for
- * getEntityFqcn()/getName()/getDefaultSortColumn()/… so an Admin can either
- * carry them here or override the corresponding static method (the method wins).
- *
- * It is translated, at container build time, into the very same legacy resource
- * configuration and `sylius.resource` routes that the two YAML blocks used to
- * produce (see EasyCrudResourceFactory). Discovery is opt-in: it only happens
- * when `sylius_easy_crud.attributes.enabled` is true and the Admin lives under
- * one of the configured `attributes.paths`.
+ * getEntityFqcn()/getName()/getDefaultSortColumn()/… so an Admin can either carry
+ * them here or override the corresponding static method (the method wins).
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class AsEasyCrudAdmin
+final class AsAdmin
 {
     /**
-     * @param class-string|null    $entity     Model FQCN. Optional when the Admin overrides getEntityFqcn().
-     * @param string|null          $alias      Resource alias (e.g. "app.log_cron"). Defaults to "app.<entity_short>".
-     *                                          Route names/URLs depend only on `alias` + `section`, so set it
-     *                                          explicitly to keep them stable when migrating an existing resource.
+     * @param class-string|null    $resourceClass The class carrying #[AsResource] (usually the entity).
+     *                                          Optional when the Admin overrides getEntityFqcn().
+     * @param string|null          $alias      Explicit resource alias to target in sylius.resources. When null,
+     *                                          the alias is resolved from the resource whose model === $resourceClass.
+     *                                          Route names/URLs depend only on `alias` + `section`, and the alias is
+     *                                          owned by #[AsResource] — set it there to keep them stable on migration.
      * @param string               $section    Sylius section ("admin" by default).
      * @param string               $prefix     Route prefix ("admin" by default).
      * @param string               $templates  Templates namespace passed to the resource routing.
@@ -59,7 +61,7 @@ final class AsEasyCrudAdmin
      * @param string|null          $path       Base URL path override (defaults to the urlized plural alias name).
      */
     public function __construct(
-        public ?string $entity = null,
+        public ?string $resourceClass = null,
         public ?string $alias = null,
         public string $section = 'admin',
         public string $prefix = 'admin',

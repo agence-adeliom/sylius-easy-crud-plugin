@@ -62,10 +62,12 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
     }
 
     /**
-     * Scans #[AsEasyCrudAdmin] entities and translates them into legacy Sylius
-     * resources (registered through sylius_resource) plus routing configs replayed
-     * by EasyCrudAttributesRoutesLoader. Done in prepend() so the resources are
-     * processed by SyliusResourceExtension::load() like any YAML-declared resource.
+     * Scans #[AsAdmin] admins and contributes, for each, the full legacy Sylius resource
+     * (registered through sylius_resource) plus the routing config replayed by
+     * EasyCrudAttributesRoutesLoader. Done in prepend() — before SyliusResourceExtension::load()
+     * materializes per-resource services — so the easy-crud controller/form/translation are
+     * applied. The resource alias comes from the native #[AsResource] on the model;
+     * autoRegisterResources skips any alias we declare here, so easy-crud owns the entry.
      */
     private function prependAttributeResources(ContainerBuilder $container): void
     {

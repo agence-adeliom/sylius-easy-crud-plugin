@@ -13,10 +13,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Triggers a deprecation, at container build time, for every easy-crud resource
  * still declared the legacy way (sylius_resource + `type: sylius.resource`) — so
- * that upgrading users see what to migrate to #[AsEasyCrudAdmin], even when they
+ * that upgrading users see what to migrate to #[AsAdmin], even when they
  * never run the maker.
  *
- * Resources declared through #[AsEasyCrudAdmin] are excluded (their aliases are
+ * Resources declared through #[AsAdmin] are excluded (their aliases are
  * recorded by the extension during prepend()).
  */
 final class DeprecateLegacyResourcesPass implements CompilerPassInterface
@@ -57,7 +57,7 @@ final class DeprecateLegacyResourcesPass implements CompilerPassInterface
                 'agence-adeliom/sylius-easy-crud-plugin',
                 '2.1',
                 'Declaring the easy-crud resource "%s" through legacy YAML (sylius_resource + "type: sylius.resource") ' .
-                'is deprecated and will be removed in 3.0. Declare it with #[AsEasyCrudAdmin] on its Admin class instead',
+                'is deprecated and will be removed in 3.0. Declare it with #[AsAdmin] on its Admin class instead',
                 (string) $alias,
             );
         }

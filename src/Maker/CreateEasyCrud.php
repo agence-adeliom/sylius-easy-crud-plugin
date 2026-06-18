@@ -140,9 +140,26 @@ final class CreateEasyCrud extends AbstractMaker
             }
 
             if ($attributeModeEnabled) {
-                // Attribute mode: declare the resource via #[AsEasyCrudAdmin] on
-                // the Admin class instead of the config/routes.yaml + sylius_resource.yaml blocks.
-                // Carry over a convention-based custom controller if one exists (legacy parity).
+                // Attribute mode: declare the resource natively with #[AsResource] on the entity
+                // and enrich it with #[AsAdmin] on the Admin class, instead of the
+                // config/routes.yaml + sylius_resource.yaml blocks.
+
+                // 1. Ensure the entity is a native Sylius resource (auto-registered into sylius.resources).
+                $entityFilePath = $this->getClassFilePath($entryClassName);
+                if ('' !== $entityFilePath) {
+                    $resourceConfigGenerator->addAsResourceAttributeToEntity(
+                        $entityFilePath,
+                        $entryShortClassName,
+                    );
+                    $io->comment(sprintf(
+                        '%s: %s (#[AsResource])',
+                        '<fg=yellow>updated</>',
+                        $entityFilePath,
+                    ));
+                }
+
+                // 2. Enrich it with the easy-crud Admin. Carry over a convention-based custom
+                //    controller if one exists (legacy parity).
                 $conventionController = str_replace('Entity', 'Controller', $entryClassName) . 'Controller';
                 $customController = class_exists($conventionController) ? $conventionController : null;
 
@@ -155,7 +172,7 @@ final class CreateEasyCrud extends AbstractMaker
                 );
 
                 $io->comment(sprintf(
-                    '%s: %s (#[AsEasyCrudAdmin])',
+                    '%s: %s (#[AsAdmin])',
                     '<fg=yellow>updated</>',
                     $annotatedPath,
                 ));
@@ -168,13 +185,13 @@ final class CreateEasyCrud extends AbstractMaker
                     '2.1',
                     'Declaring easy-crud resources through the generated "config/routes.yaml" and ' .
                     '"config/packages/sylius_resource.yaml" blocks is deprecated and will be removed in 3.0. ' .
-                    'Enable "sylius_easy_crud.attributes" and declare the resource with the #[AsEasyCrudAdmin] ' .
+                    'Enable "sylius_easy_crud.attributes" and declare the resource with the #[AsAdmin] ' .
                     'attribute on the Admin class instead.',
                 );
 
                 $io->warning(
                     'Resource declared via YAML (deprecated). Set "sylius_easy_crud.attributes.enabled: true" ' .
-                    '(with "paths" pointing to your Admin directory) to declare it with #[AsEasyCrudAdmin] instead.',
+                    '(with "paths" pointing to your Admin directory) to declare it with #[AsAdmin] instead.',
                 );
 
                 // Generate/Update routes
@@ -225,7 +242,7 @@ final class CreateEasyCrud extends AbstractMaker
 
     /**
      * Warns when the Admin class is not located under one of the scanned attribute
-     * paths, in which case the #[AsEasyCrudAdmin] attribute would be ignored.
+     * paths, in which case the #[AsAdmin] attribute would be ignored.
      */
     private function warnIfClassOutsideScannedPaths(ConsoleStyle $io, string $classPath): void
     {
@@ -246,7 +263,7 @@ final class CreateEasyCrud extends AbstractMaker
 
         $io->warning(sprintf(
             'The Admin class "%s" is not under any "sylius_easy_crud.attributes.paths" directory (%s), ' .
-            'so its #[AsEasyCrudAdmin] attribute will not be discovered. Add its directory to the paths.',
+            'so its #[AsAdmin] attribute will not be discovered. Add its directory to the paths.',
             $classPath,
             implode(', ', $paths) ?: '(none configured)',
         ));
