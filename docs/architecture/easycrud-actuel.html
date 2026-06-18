@@ -85,7 +85,7 @@
   </div>
 
   <div class="flow">
-    <div class="box b-legacy"><b>Déclaration ressource</b><small>2 blocs YAML <em>(déprécié)</em> <em>ou</em> l'attribut <code>#[AsEasyCrudAdmin]</code> sur la classe Admin <em>(recommandé)</em></small></div>
+    <div class="box b-legacy"><b>Déclaration ressource</b><small>2 blocs YAML <em>(déprécié)</em> <em>ou</em> l'attribut <code>#[AsAdmin]</code> sur la classe Admin <em>(recommandé)</em></small></div>
     <div class="arrow">→</div>
     <div class="box b-legacy"><b>sylius_resource</b><small>registre : model / controller / repository / form</small></div>
     <div class="arrow">+</div>
@@ -167,7 +167,7 @@
 <span class="c"># Déclaration</span>
 Entité  +  PostAdmin (champs/grille/form)
         │
-        ▼  (2 blocs YAML [déprécié]  ou  #[AsEasyCrudAdmin] [recommandé])
+        ▼  (2 blocs YAML [déprécié]  ou  #[AsAdmin] [recommandé])
 sylius_resource (registre)  +  routes type: sylius.resource
         │
         ▼

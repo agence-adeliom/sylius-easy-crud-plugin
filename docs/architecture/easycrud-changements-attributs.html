@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>easy-crud — Détail des changements : déclaration par #[AsEasyCrudAdmin]</title>
+<title>easy-crud — Détail des changements : déclaration par #[AsResource] + #[AsAdmin]</title>
 <style>
   :root{
     --bg:#0f1420; --panel:#181f2e; --panel2:#1f2839; --ink:#e7ecf5; --muted:#9fb0c8;
@@ -55,7 +55,7 @@
 <div class="wrap">
 
   <h1>easy-crud — détail des changements</h1>
-  <p class="sub">Comment on a rendu possible la déclaration d'une ressource admin via l'attribut <code>#[AsEasyCrudAdmin]</code> sur la classe Admin, sans rien casser de l'existant (YAML).</p>
+  <p class="sub">Comment on déclare une ressource admin via <b>deux attributs</b> — <code>#[AsResource]</code> (natif Sylius, sur le modèle) + <code>#[AsAdmin]</code> (easy-crud, sur la classe Admin) — sans rien casser de l'existant (YAML).</p>
 
   <div class="legend">
     <span><span class="tag t-new">nouveau</span> fichier ajouté</span>
@@ -64,14 +64,19 @@
   </div>
 
   <div class="note">
-    <b>L'idée en une phrase.</b> Un attribut PHP sur la classe Admin remplace les deux blocs YAML (<code>config/routes.yaml</code> + <code>config/packages/sylius_resource.yaml</code>). Au build du conteneur, easy-crud scanne les Admin annotés et <b>régénère exactement la même configuration legacy</b> (ressource Sylius + routes <code>type: sylius.resource</code>) qu'avant. Donc <b>zéro changement de comportement</b> : on ne touche pas au contrôleur, à la grille, ni aux formulaires.
+    <b>L'idée en une phrase.</b> Le modèle porte l'attribut <b>natif Sylius&nbsp;2 <code>#[AsResource]</code></b> (identité/alias de la ressource), et la classe Admin porte <b><code>#[AsAdmin(resourceClass: …)]</code></b> (la couche easy-crud). Ensemble ils remplacent les deux blocs YAML (<code>config/routes.yaml</code> + <code>config/packages/sylius_resource.yaml</code>). easy-crud <b>régénère exactement la même configuration legacy</b> (contrôleur <code>SyliusCrudResourceController</code>, grille, formulaires) qu'avant → <b>zéro changement de comportement</b>.
+  </div>
+
+  <div class="note warn">
+    <b>Évolution depuis la 1<sup>re</sup> version.</b> L'attribut s'appelait <code>#[AsEasyCrudAdmin]</code> et construisait lui-même toute l'entrée de ressource. Après revue avec le lead, on s'appuie désormais sur le <code>#[AsResource]</code> natif pour l'identité de la ressource ; l'attribut easy-crud est renommé <code>#[AsAdmin]</code> (et <code>entity:</code> devient <code>resourceClass:</code>). <b>Point clé technique</b>&nbsp;: l'enrichissement ne peut PAS se faire dans un compiler pass — il doit rester en <code>prepend()</code> (voir §2bis).
   </div>
 
   <h2>Sommaire</h2>
   <div class="toc">
     <a href="#resultat">1. Le résultat pour le développeur</a><br>
     <a href="#principe">2. Le principe (build-time)</a><br>
-    <a href="#api">3. L'API : l'attribut + la config</a><br>
+    <a href="#blocage">2bis. ⚠ Pourquoi prepend() et pas un compiler pass</a><br>
+    <a href="#api">3. L'API : les attributs + la config</a><br>
     <a href="#moteur">4. Le moteur de traduction</a><br>
     <a href="#abstract">5. AbstractAdmin / AbstractFormType</a><br>
     <a href="#maker">6. Le maker</a><br>
@@ -113,12 +118,18 @@ class PostAdmin extends AbstractAdmin
     </div>
     <div>
       <h4>Après</h4>
-      <pre><code><span class="cmt">// config/packages/sylius_easy_crud.yaml</span>
+      <pre><code><span class="cmt"># config — deux listes de chemins</span>
 sylius_easy_crud:
   attributes: { enabled: true, paths: ['%kernel.project_dir%/src/Admin'] }
+sylius_resource:
+  mapping: { paths: ['%kernel.project_dir%/src/Entity'] }
+
+<span class="cmt">// App\Entity\Post.php</span>
+<span class="add">#[AsResource(alias: 'app.post')]</span>
+class Post implements ResourceInterface {...}
 
 <span class="cmt">// App\Admin\PostAdmin.php — c'est tout</span>
-<span class="add">#[AsEasyCrudAdmin(entity: Post::class, icon: 'newspaper', except: ['show'])]</span>
+<span class="add">#[AsAdmin(resourceClass: Post::class, icon: 'newspaper', except: ['show'])]</span>
 final class PostAdmin extends AbstractAdmin
 {
     public function configureFields(...) {...}
@@ -130,34 +141,67 @@ final class PostAdmin extends AbstractAdmin
   <!-- ============================================ -->
   <h2 id="principe">2. Le principe (tout se passe au build du conteneur)</h2>
   <div class="flow">
-    <div class="box b-admin"><b>Admin annoté</b><small><code>#[AsEasyCrudAdmin]</code> + champs</small></div>
+    <div class="box b-admin"><b>Modèle + Admin annotés</b><small><code>#[AsResource]</code> + <code>#[AsAdmin]</code></small></div>
     <div class="arrow">→</div>
-    <div class="box b-factory"><b>prepend() + Factory</b><small>scan des Admin, lecture de l'attribut</small></div>
+    <div class="box b-factory"><b>prepend() + Factory</b><small>scan des Admin, lecture de l'alias <code>#[AsResource]</code></small></div>
     <div class="arrow">→</div>
     <div class="box b-new"><b>config legacy régénérée</b><small>ressource <code>sylius_resource</code> + config de routage</small></div>
     <div class="arrow">→</div>
     <div class="box b-ctrl"><b>routes <code>sylius.resource</code></b><small>identiques à l'ancien YAML</small></div>
   </div>
-  <p>Le scan a lieu en <code>prepend()</code> de l'extension (avant le <code>load()</code> des bundles), car c'est le seul moment où l'on peut alimenter la config <code>sylius_resource</code> que Sylius transforme ensuite en paramètre <code>sylius.resources</code> (puis en ressources via ses compiler passes). Aucune décoration de service Sylius : on réutilise sa machinerie telle quelle.</p>
+  <p>easy-crud scanne les Admin <code>#[AsAdmin]</code>, lit l'alias de la ressource depuis le <code>#[AsResource]</code> du modèle (par réflexion), et alimente la config <code>sylius_resource</code> en <code>prepend()</code>. Sylius la transforme ensuite en paramètre <code>sylius.resources</code> puis en services via sa machinerie habituelle. Aucune décoration de service : on réutilise Sylius tel quel.</p>
 
   <!-- ============================================ -->
-  <h2 id="api">3. L'API : l'attribut + la configuration</h2>
+  <h2 id="blocage">2bis. ⚠ Pourquoi <code>prepend()</code> et pas un compiler pass</h2>
+  <p>C'est <b>le</b> point qui a dicté toute l'architecture. La tentation naturelle (et l'idée initiale) était&nbsp;: laisser <code>#[AsResource]</code> enregistrer la ressource nativement, puis l'<b>enrichir après coup dans un compiler pass</b> (réécrire <code>controller</code>/<code>form</code>/<code>repository</code> dans le paramètre <code>sylius.resources</code>). <b>Ça ne marche pas</b>, et on l'a vérifié dans le conteneur.</p>
 
-  <h3><code>src/Metadata/AsEasyCrudAdmin.php</code> <span class="tag t-ren">renommé</span> <span class="tag t-new">+ contenu</span></h3>
-  <p>Attribut de classe (<code>#[\Attribute(TARGET_CLASS)]</code>). Initialement nommé <code>AsEasyCrudResource</code> et posé sur l'entité, il a été <b>renommé et déplacé sur l'Admin</b> (cf. doc d'architecture). Il porte la <b>donnée</b> de la ressource :</p>
-  <p><code>entity</code>, <code>alias</code>, <code>section</code>, <code>prefix</code>, <code>templates</code>, <code>controller</code>, <code>grid</code>, <code>defaultSort</code>, <code>defaultSortOrder</code>, <code>limits</code>, <code>permission</code>, <code>except</code>, <code>only</code>, <code>redirect</code>, <code>icon</code>, <code>header</code>, <code>subheader</code>, <code>breadcrumb</code>, <code>vars</code> (passthrough libre), <code>path</code>. Tout est optionnel et retombe sur les défauts easy-crud.</p>
+  <h3>Ce que fait <code>#[AsResource]</code> nativement</h3>
+  <p>Pendant le <code>load()</code> du resource-bundle, <code>autoRegisterResources()</code> scanne <code>sylius_resource.mapping.paths</code> et, pour chaque <code>#[AsResource]</code>, écrit une entrée avec les <b>défauts</b>&nbsp;: <code>controller = ResourceController</code>, <code>form = DefaultResourceType</code>. Puis — <b>toujours dans le <code>load()</code></b> — le <em>driver</em> de ressource <b>matérialise les services par-ressource</b> (le service contrôleur avec sa classe, le repository, et la <b>sous-ressource de traduction</b>).</p>
+
+  <h3>La fenêtre de temps</h3>
+  <div class="flow">
+    <div class="box b-factory"><b>prepend()</b><small>tous les bundles<br><b>✅ seul endroit</b> où l'on peut injecter dans la config <code>sylius_resource</code></small></div>
+    <div class="arrow">→</div>
+    <div class="box b-ctrl"><b>load() du resource-bundle</b><small>autoRegister + le <b>driver crée les services</b> (contrôleur, repo, traduction) à partir de la config <b>figée ici</b></small></div>
+    <div class="arrow">→</div>
+    <div class="box"><b>compiler passes</b><small>❌ trop tard&nbsp;: les services existent déjà</small></div>
+  </div>
+  <div class="note warn">
+    <b>Résultat empirique d'un override en compiler pass</b> (testé puis abandonné — la classe <code>RegisterEasyCrudAdminsPass</code> a été créée puis supprimée)&nbsp;:
+    <ul>
+      <li>le service contrôleur reste de classe <code>Sylius\…\ResourceController</code> → <b>toute la logique easy-crud est court-circuitée</b> (le <code>$context</code>, les actions <code>ca:</code>, la construction du form en <code>showAction</code>, l'autocomplete) ;</li>
+      <li>le repository reste le générique (pas le <code>PostRepository</code> du projet) ;</li>
+      <li>la <b>sous-ressource de traduction n'est jamais créée</b> (les modèles traduisibles cassent).</li>
+    </ul>
+    Modifier le <em>paramètre</em> <code>sylius.resources</code> dans un pass corrige bien le <em>registre</em> et le <em>routage</em>, mais <b>pas les services déjà matérialisés</b> par le driver.
+  </div>
+
+  <h3>La solution&nbsp;: <code>prepend()</code> + alias déjà déclaré</h3>
+  <p>Le seul hook qui influence la config <em>au moment du <code>load()</code></em> est le <code>prepend()</code> des extensions (il tourne avant tous les <code>load()</code>). easy-crud y déclare l'<b>entrée complète</b> (contrôleur <code>SyliusCrudResourceController</code>, form = l'Admin, repository, traduction) via <code>prependExtensionConfig('sylius_resource', …)</code>, sous l'alias lu sur <code>#[AsResource]</code>. Et — détail décisif — <code>autoRegisterResources()</code> <b>ignore tout alias déjà présent</b> dans la config. Donc easy-crud « gagne » proprement&nbsp;: c'est lui qui possède l'entrée, et le driver matérialise les bons services dès le <code>load()</code>.</p>
+  <div class="note good"><b>Le rôle réel de <code>#[AsResource]</code> ici.</b> Il fournit l'<b>identité déclarative</b> (l'alias) qu'easy-crud lit par réflexion. Son auto-enregistrement natif est court-circuité par notre prepend pour ces ressources précises — mais le modèle reste une ressource Sylius standard, déclarée avec l'attribut standard. C'est ce qui justifie les <b>deux</b> listes de chemins (<code>attributes.paths</code> pour les Admin, <code>sylius_resource.mapping.paths</code> pour les modèles).</div>
+
+  <!-- ============================================ -->
+  <h2 id="api">3. L'API : les attributs + la configuration</h2>
+
+  <h3><code>#[\Sylius\Resource\Metadata\AsResource]</code> sur le modèle <span class="tag t-new">natif Sylius</span></h3>
+  <p>L'attribut Sylius&nbsp;2 standard. On l'utilise pour déclarer l'<b>identité</b> de la ressource — principalement son <code>alias</code> (à conserver à l'identique lors d'une migration pour garder les noms de routes/URLs). Aucune <code>operations:</code> n'est nécessaire (easy-crud fournit son propre routage).</p>
+
+  <h3><code>src/Metadata/AsAdmin.php</code> <span class="tag t-ren">renommé</span> (ex-<code>AsEasyCrudAdmin</code>)</h3>
+  <p>Attribut de classe (<code>#[\Attribute(TARGET_CLASS)]</code>) posé sur l'<b>Admin</b>. Il pointe sur le modèle via <code>resourceClass</code> (la classe porteuse de <code>#[AsResource]</code>, plus forcément une entité) et porte la <b>donnée</b> admin :</p>
+  <p><code>resourceClass</code>, <code>alias</code> (optionnel — défaut&nbsp;: l'alias du <code>#[AsResource]</code>), <code>section</code>, <code>prefix</code>, <code>templates</code>, <code>controller</code>, <code>grid</code>, <code>defaultSort</code>, <code>defaultSortOrder</code>, <code>limits</code>, <code>repositoryMethod</code>, <code>repositoryArguments</code>, <code>permission</code>, <code>except</code>, <code>only</code>, <code>redirect</code>, <code>icon</code>, <code>header</code>, <code>subheader</code>, <code>breadcrumb</code>, <code>vars</code> (passthrough libre), <code>path</code>. Tout est optionnel et retombe sur les défauts easy-crud.</p>
 
   <h3><code>src/DependencyInjection/Configuration.php</code> <span class="tag t-mod">modifié</span></h3>
   <ul>
     <li>Correction d'un bug latent : la racine était <code>adeliom_sylius_easy_crud</code> (incohérente avec l'alias d'extension) → <code>sylius_easy_crud</code>.</li>
     <li>Ajout de l'arbre <code>attributes: { enabled: false, paths: [] }</code>. <code>enabled</code> est l'unique interrupteur (scan runtime <em>et</em> sortie du maker).</li>
+    <li>Côté projet, en plus&nbsp;: <code>sylius_resource.mapping.paths</code> (chemin des modèles <code>#[AsResource]</code>, config native Sylius — vide par défaut).</li>
   </ul>
 
   <!-- ============================================ -->
   <h2 id="moteur">4. Le moteur de traduction</h2>
 
   <h3><code>src/Metadata/EasyCrudResourceFactory.php</code> <span class="tag t-mod">modifié</span></h3>
-  <p>Helper pur (sans DI). <code>build(array $paths)</code> scanne les classes des dossiers d'Admin, garde celles qui sont des <code>AdminInterface</code> portant l'attribut, et produit pour chacune :</p>
+  <p>Helper pur (sans DI). <code>build(array $paths)</code> scanne les classes des dossiers d'Admin, garde celles qui sont des <code>AdminInterface</code> portant <code>#[AsAdmin]</code>, et produit pour chacune :</p>
   <pre><code>$alias => [
   'registry' => [ <span class="cmt">// = bloc sylius_resource.resources.&lt;alias&gt;</span>
      'driver' => 'doctrine/orm',
@@ -167,12 +211,12 @@ final class PostAdmin extends AbstractAdmin
      alias, section, templates, redirect, permission, grid, form{type,options.context}, vars, except/only, path?
   ]],
 ]</code></pre>
-  <p>Tout vient directement de l'Admin : l'entité via <code>Admin::getEntityFqcn()</code>, la grille via <code>Admin::getName()</code>, le form = la classe Admin elle-même. Le repository est lu sur l'entité (<code>#[ORM\Entity(repositoryClass:)]</code>), la traduction si l'entité est <code>TranslatableInterface</code>. <b>Aucune résolution entité→Admin</b> (c'était le cas quand l'attribut était sur l'entité — supprimé).</p>
+  <p>Le modèle vient de <code>#[AsAdmin]->resourceClass</code>, la grille de <code>Admin::getName()</code>, le form = la classe Admin. Le repository est lu sur le modèle (<code>#[ORM\Entity(repositoryClass:)]</code>), la traduction si le modèle est <code>TranslatableInterface</code>. <b>L'alias est lu sur le <code>#[AsResource]</code> du modèle</b> (<code>AsResource::toMetadata()->getAlias()</code>, sinon dérivé <code>&lt;app&gt;.&lt;snake(short - "Resource")&gt;</code>, comme Sylius). <code>#[AsResource]</code> est <b>requis</b> (exception claire sinon, sauf <code>alias</code> explicite sur <code>#[AsAdmin]</code>).</p>
 
   <h3><code>src/DependencyInjection/SyliusEasyCrudExtension.php</code> <span class="tag t-mod">modifié</span></h3>
   <ul>
     <li><code>load()</code> : traite la config, expose les paramètres <code>sylius_easy_crud.attributes.enabled|paths</code>.</li>
-    <li><code>prepend()</code> : si activé, appelle la Factory puis <code>prependExtensionConfig('sylius_resource', ['resources' =&gt; ...])</code> et stocke deux paramètres : <code>...attributes.routing</code> (pour le loader) et <code>...attributes.declared_aliases</code> (pour exclure ces alias de la dépréciation). Résout <code>%kernel.project_dir%</code> et ignore les dossiers inexistants.</li>
+    <li><code>prepend()</code> : si activé, appelle la Factory puis <code>prependExtensionConfig('sylius_resource', ['resources' =&gt; ...])</code> (cf. §2bis — c'est ce qui fait gagner easy-crud sur l'auto-enregistrement natif) et stocke deux paramètres : <code>...attributes.routing</code> (pour le loader) et <code>...attributes.declared_aliases</code> (pour exclure ces alias de la dépréciation). Résout <code>%kernel.project_dir%</code> et ignore les dossiers inexistants.</li>
   </ul>
 
   <h3><code>src/Routing/EasyCrudAttributesRoutesLoader.php</code> <span class="tag t-new">nouveau</span> + <code>config/routes.yaml</code> / <code>config/services.yaml</code> <span class="tag t-mod">modifiés</span></h3>
@@ -188,7 +232,7 @@ final class PostAdmin extends AbstractAdmin
 
   <h3><code>src/Admin/AbstractAdmin.php</code> <span class="tag t-mod">modifié</span></h3>
   <p>Les méthodes statiques deviennent <b>concrètes et lisent l'attribut par défaut</b> (le pattern « défaut = attribut, surcharge = méthode ») :</p>
-  <pre><code>public static function getEntityFqcn(): string   <span class="cmt">// = attribut->entity (sinon exception claire)</span>
+  <pre><code>public static function getEntityFqcn(): string   <span class="cmt">// = attribut->resourceClass (sinon exception claire)</span>
 public static function getName(): string          <span class="cmt">// = attribut->grid ?? "admin_&lt;snake(NomSansAdmin)&gt;"</span>
 public static function getDefaultSortColumn()      <span class="cmt">// = attribut->defaultSort ?? ''</span>
 public static function getDefaultSortOrder()        <span class="cmt">// = attribut->defaultSortOrder ?? 'asc'</span>
@@ -205,7 +249,7 @@ public static function getLimits()                  <span class="cmt">// = attri
   <h3><code>src/Maker/CreateEasyCrud.php</code> + <code>src/Services/CrudMakerService.php</code> + <code>src/Resources/skeleton/Admin.tpl.php</code> <span class="tag t-mod">modifiés</span></h3>
   <p><code>make:easy-crud:create-crud</code> se branche sur <code>attributes.enabled</code> :</p>
   <ul>
-    <li><b>activé</b> → ajoute <code>#[AsEasyCrudAdmin]</code> sur l'Admin généré (méthode <code>addEasyCrudAttributeToClass()</code>), et n'écrit <b>aucun</b> bloc YAML.</li>
+    <li><b>activé</b> → ajoute <code>#[AsResource]</code> sur l'entité (<code>addAsResourceAttributeToEntity()</code>) <em>et</em> <code>#[AsAdmin]</code> sur l'Admin généré (<code>addEasyCrudAttributeToClass()</code>), et n'écrit <b>aucun</b> bloc YAML.</li>
     <li><b>désactivé</b> → comportement historique (génère les YAML) <b>+ une dépréciation</b> (cf. section suivante).</li>
   </ul>
   <p>Le skeleton ne génère plus <code>ServiceSubscriberInterface</code> ni <code>implements AdminInterface</code> (portés par le parent).</p>
@@ -228,8 +272,9 @@ public static function getLimits()                  <span class="cmt">// = attri
   <h2 id="fichiers">8. Récapitulatif des fichiers</h2>
   <table>
     <tr><th>Fichier</th><th></th><th>Rôle</th></tr>
-    <tr><td><code>src/Metadata/AsEasyCrudAdmin.php</code></td><td><span class="tag t-ren">renommé</span></td><td>l'attribut (ex-<code>AsEasyCrudResource</code>, ex-sur-l'entité)</td></tr>
-    <tr><td><code>src/Metadata/EasyCrudResourceFactory.php</code></td><td><span class="tag t-mod">mod</span></td><td>scan des Admin → config legacy (registre + routage)</td></tr>
+    <tr><td><code>src/Metadata/AsAdmin.php</code></td><td><span class="tag t-ren">renommé</span></td><td>l'attribut easy-crud (ex-<code>AsEasyCrudAdmin</code>) — <code>resourceClass:</code></td></tr>
+    <tr><td><code>#[AsResource]</code> (sur le modèle)</td><td><span class="tag t-new">natif</span></td><td>identité/alias de la ressource (Sylius&nbsp;2)</td></tr>
+    <tr><td><code>src/Metadata/EasyCrudResourceFactory.php</code></td><td><span class="tag t-mod">mod</span></td><td>scan des Admin → lit l'alias <code>#[AsResource]</code> → config legacy (registre + routage)</td></tr>
     <tr><td><code>src/Routing/EasyCrudAttributesRoutesLoader.php</code></td><td><span class="tag t-new">new</span></td><td>rejoue les routes via le loader Sylius</td></tr>
     <tr><td><code>src/Admin/AbstractAdmin.php</code></td><td><span class="tag t-mod">mod</span></td><td>statiques lisent l'attribut (défaut/override)</td></tr>
     <tr><td><code>src/Admin/AbstractFormType.php</code></td><td><span class="tag t-mod">mod</span></td><td><code>ServiceSubscriberInterface</code> par défaut</td></tr>
@@ -246,10 +291,19 @@ public static function getLimits()                  <span class="cmt">// = attri
 
   <!-- ============================================ -->
   <h2 id="qa">9. Vérification effectuée</h2>
+  <p class="sub">Via Docker (<code>docker compose run --rm -e APP_ENV=dev php vendor/bin/console …</code>), dans la test-application du plugin (Sylius 2.2.3).</p>
   <ul>
     <li><b>PHPStan</b> (niveau max) et <b>ECS</b> : verts sur tout le code ajouté/modifié.</li>
-    <li><b>End-to-end</b> dans la test-application du plugin (Sylius 2.2.3 booté) : un Admin minimal (<code>extends AbstractAdmin</code> + <code>#[AsEasyCrudAdmin]</code>, sans aucune méthode ni interface) génère bien les routes <code>app_admin_*</code> (préfixe <code>/admin</code>, <code>except</code> respecté), routées vers <code>SyliusCrudResourceController</code>, avec <code>_sylius</code> (grid/section/vars) identiques au YAML.</li>
-    <li><b>Coexistence</b> : avec <code>enabled: false</code>, la ressource YAML existante conserve ses 6 routes ; la dépréciation remonte (1 occurrence, traductions exclues) via <code>debug:container --deprecations</code>.</li>
+    <li><b>End-to-end</b> : un Admin (<code>extends AbstractAdmin</code> + <code>#[AsAdmin(resourceClass: …)]</code>) avec <code>#[AsResource]</code> sur l'entité génère <b>6 routes byte-identiques</b> à l'ancien YAML (noms/paths/méthodes), avec&nbsp;:
+      <ul>
+        <li>service contrôleur = <code>Adeliom\…\SyliusCrudResourceController</code> (✅ pas le <code>ResourceController</code> natif) ;</li>
+        <li>repository = le vrai <code>PostRepository</code> du projet ;</li>
+        <li><b>sous-ressource de traduction présente</b> ;</li>
+        <li><code>_sylius</code> (grid/section/template easy-crud/vars) identique au YAML ;</li>
+        <li>HTTP <b>302</b> (redirection firewall, pas 404).</li>
+      </ul>
+    </li>
+    <li><b>Coexistence</b> : les ressources YAML existantes conservent leurs routes ; la dépréciation remonte pour le YAML legacy (attributs exclus, traductions exclues) via <code>debug:container --deprecations</code>.</li>
   </ul>
 
   <div class="note">
