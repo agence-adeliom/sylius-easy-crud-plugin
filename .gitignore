@@ -23,4 +23,6 @@
 
 .idea/*
 .claude/*
+# but ship the distributable skills with the package
+!.claude/skills/
 .ddev/*

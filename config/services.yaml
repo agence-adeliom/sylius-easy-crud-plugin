@@ -134,3 +134,11 @@ services:
             - '@event_dispatcher'
             - '@webpack_encore.tag_renderer'
             - '@assets.packages'
+
+    Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader:
+        autoconfigure: false
+        arguments:
+            - '%sylius_easy_crud.attributes.routing%'
+            - '@sylius.routing.loader.resource'
+        tags:
+            - { name: routing.route_loader }

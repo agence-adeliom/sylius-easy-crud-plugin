@@ -26,9 +26,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Webmozart\Assert\Assert;
 
-abstract class AbstractFormType extends AbstractGridType
+abstract class AbstractFormType extends AbstractGridType implements ServiceSubscriberInterface
 {
     private ?object $resource = null;
 
@@ -84,6 +85,18 @@ abstract class AbstractFormType extends AbstractGridType
         );
         $this->user = $security->getUser();
         $this->resourceAlias = $this->crudAdminFactory->initContext($this->getResourceClass());
+    }
+
+    /**
+     * Default service-subscriber declaration so every Admin can be autowired the
+     * base service locator without repeating the boilerplate. Override to subscribe
+     * to additional services.
+     *
+     * @return array<int|string, string>
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [];
     }
 
     public function configureOptions(OptionsResolver $resolver): void
