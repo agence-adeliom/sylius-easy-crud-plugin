@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsEasyCrudAdmin;
 use Doctrine\Persistence\ManagerRegistry;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Sylius\Resource\Model\ResourceInterface;
@@ -398,6 +399,52 @@ class CrudMakerService
         $this->namespaces[strtolower($templateName)] = $file->getFullName();
 
         return $file;
+    }
+
+    /**
+     * Adds a #[AsEasyCrudAdmin] attribute to an Admin class file, as an
+     * alternative to the legacy config/routes.yaml + sylius_resource.yaml blocks.
+     *
+     * The bare attribute relies on easy-crud's defaults (admin section, easy-crud
+     * templates, "update" redirect) and on the Admin's own getEntityFqcn()/getName()
+     * for the entity and grid, reproducing the same resource the YAML blocks produced.
+     *
+     * @throws \RuntimeException when the class file cannot be found
+     */
+    public function addEasyCrudAttributeToClass(string $filePath, string $shortClassName): string
+    {
+        if (!is_file($filePath)) {
+            throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsEasyCrudAdmin] attribute.', $filePath));
+        }
+
+        $content = file_get_contents($filePath) ?: '';
+
+        // Idempotent: do nothing if the attribute is already declared.
+        if (str_contains($content, '#[AsEasyCrudAdmin')) {
+            return $filePath;
+        }
+
+        // 1. Import the attribute class (after the existing use block, else after the namespace).
+        $useLine = sprintf('use %s;', AsEasyCrudAdmin::class);
+        if (!str_contains($content, $useLine)) {
+            if (preg_match('/(?:^use [^;]+;\R)+/m', $content)) {
+                $content = preg_replace('/((?:^use [^;]+;\R)+)/m', '$1' . $useLine . "\n", $content, 1) ?? $content;
+            } else {
+                $content = preg_replace('/^(namespace [^;]+;\R)/m', "$1\n" . $useLine . "\n", $content, 1) ?? $content;
+            }
+        }
+
+        // 2. Add the attribute right above the class declaration.
+        $content = preg_replace(
+            '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
+            "#[AsEasyCrudAdmin]\n" . '$1',
+            $content,
+            1,
+        ) ?? $content;
+
+        file_put_contents($filePath, $content);
+
+        return $filePath;
     }
 
     public function generateRoute(bool $returnContent = false, ?string $entityName = null): string

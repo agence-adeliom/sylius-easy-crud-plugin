@@ -145,28 +145,60 @@ final class CreateEasyCrud extends AbstractMaker
                 $io->success(sprintf('Created: %s', $menuListenerFqcn));
             }
 
-            // Generate/Update routes
-            $route = $resourceConfigGenerator->generateRoute(
-                entityName: $entryClassName,
-            );
+            if ($this->isAttributeModeEnabled()) {
+                // Attribute mode: declare the resource via #[AsEasyCrudAdmin] on
+                // the Admin class instead of the config/routes.yaml + sylius_resource.yaml blocks.
+                $annotatedPath = $resourceConfigGenerator->addEasyCrudAttributeToClass(
+                    $adminFilePath,
+                    $adminClassDetails->getShortName(),
+                );
 
-            $io->comment(sprintf(
-                '%s: %s',
-                '<fg=yellow>updated</>',
-                $route,
-            ));
+                $io->comment(sprintf(
+                    '%s: %s (#[AsEasyCrudAdmin])',
+                    '<fg=yellow>updated</>',
+                    $annotatedPath,
+                ));
 
-            // Generate/Update resource configuration
-            $resource = $resourceConfigGenerator->generateResource(
-                entityName: $entryClassName,
-                entityTranslationName: $entryTranslationClassName,
-            );
+                $this->warnIfClassOutsideScannedPaths($io, $annotatedPath);
+            } else {
+                // Legacy mode: declare the resource through the generated YAML blocks.
+                trigger_deprecation(
+                    'agence-adeliom/sylius-easy-crud-plugin',
+                    '2.1',
+                    'Declaring easy-crud resources through the generated "config/routes.yaml" and ' .
+                    '"config/packages/sylius_resource.yaml" blocks is deprecated and will be removed in 3.0. ' .
+                    'Enable "sylius_easy_crud.attributes" and declare the resource with the #[AsEasyCrudAdmin] ' .
+                    'attribute on the Admin class instead.',
+                );
 
-            $io->comment(sprintf(
-                '%s: %s',
-                '<fg=yellow>updated</>',
-                $resource,
-            ));
+                $io->warning(
+                    'Resource declared via YAML (deprecated). Set "sylius_easy_crud.attributes.enabled: true" ' .
+                    '(with "paths" pointing to your Admin directory) to declare it with #[AsEasyCrudAdmin] instead.',
+                );
+
+                // Generate/Update routes
+                $route = $resourceConfigGenerator->generateRoute(
+                    entityName: $entryClassName,
+                );
+
+                $io->comment(sprintf(
+                    '%s: %s',
+                    '<fg=yellow>updated</>',
+                    $route,
+                ));
+
+                // Generate/Update resource configuration
+                $resource = $resourceConfigGenerator->generateResource(
+                    entityName: $entryClassName,
+                    entityTranslationName: $entryTranslationClassName,
+                );
+
+                $io->comment(sprintf(
+                    '%s: %s',
+                    '<fg=yellow>updated</>',
+                    $resource,
+                ));
+            }
 
             $this->writeSuccessMessage($io);
         } catch (\Exception $exception) {
@@ -182,6 +214,41 @@ final class CreateEasyCrud extends AbstractMaker
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
         // No dependencies needed
+    }
+
+    private function isAttributeModeEnabled(): bool
+    {
+        return $this->parameterBag->has('sylius_easy_crud.attributes.enabled') &&
+            true === $this->parameterBag->get('sylius_easy_crud.attributes.enabled');
+    }
+
+    /**
+     * Warns when the Admin class is not located under one of the scanned attribute
+     * paths, in which case the #[AsEasyCrudAdmin] attribute would be ignored.
+     */
+    private function warnIfClassOutsideScannedPaths(ConsoleStyle $io, string $classPath): void
+    {
+        if (!$this->parameterBag->has('sylius_easy_crud.attributes.paths')) {
+            return;
+        }
+
+        /** @var list<string> $paths */
+        $paths = $this->parameterBag->get('sylius_easy_crud.attributes.paths');
+        $realClassPath = realpath($classPath) ?: $classPath;
+
+        foreach ($paths as $path) {
+            $realPath = realpath($path) ?: $path;
+            if (str_starts_with($realClassPath, $realPath)) {
+                return;
+            }
+        }
+
+        $io->warning(sprintf(
+            'The Admin class "%s" is not under any "sylius_easy_crud.attributes.paths" directory (%s), ' .
+            'so its #[AsEasyCrudAdmin] attribute will not be discovered. Add its directory to the paths.',
+            $classPath,
+            implode(', ', $paths) ?: '(none configured)',
+        ));
     }
 
     /**

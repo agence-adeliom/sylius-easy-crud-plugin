@@ -1,38 +1,3 @@
 sylius_easy_crud:
     resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 
-admin_tests_adeliom_sylius_easy_crud_plugin_entity_post:
-    resource: |
-        alias: tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post
-        section: admin
-        templates: "@SyliusEasyCrudPlugin\\crud"
-        redirect: update
-        grid: admin_tests_adeliom_sylius_easy_crud_plugin_entity_post
-        form:
-            type: Tests\Adeliom\SyliusEasyCrudPlugin\Admin\PostAdmin
-            options:
-                context: $context
-        vars:
-            all:
-                icon: 'file'
-                subheader: sylius_easy_crud_plugin.admin.ui.default.subheader
-                breadcrumb: sylius_easy_crud_plugin.admin.ui.default.index
-                templates:
-                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-            index:
-                header: sylius_easy_crud_plugin.admin.ui.default.index
-            create:
-                header: sylius_easy_crud_plugin.admin.ui.default.create
-            update:
-                header: sylius_easy_crud_plugin.admin.ui.default.update
-                redirect:
-                    route: update
-                    parameters:
-                        context: $context
-                        id: $id
-                route:
-                    parameters:
-                        context: $context
-                        id: $id
-    type: sylius.resource
-    prefix: admin

@@ -33,9 +33,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Webmozart\Assert\Assert;
 
-abstract class AbstractFormType extends AbstractGridType
+abstract class AbstractFormType extends AbstractGridType implements ServiceSubscriberInterface
 {
     private const CRUD_VIEW_BUILDER_ATTRIBUTE = 'easy_crud_view_builder';
 
@@ -103,6 +104,18 @@ abstract class AbstractFormType extends AbstractGridType
     protected function getResourceContext(): ?ResourceContext
     {
         return $this->resourceContext;
+    }
+
+    /**
+     * Default service-subscriber declaration so every Admin can be autowired the
+     * base service locator without repeating the boilerplate. Override to subscribe
+     * to additional services.
+     *
+     * @return array<int|string, string>
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [];
     }
 
     public function configureOptions(OptionsResolver $resolver): void

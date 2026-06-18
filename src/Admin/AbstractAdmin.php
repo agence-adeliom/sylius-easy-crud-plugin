@@ -7,19 +7,74 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsEasyCrudAdmin;
 use Doctrine\ORM\Mapping\Entity;
 use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 {
+    /** @var array<class-string, AsEasyCrudAdmin|null> */
+    private static array $easyCrudAttributeCache = [];
+
     public function getResourceClass(): string
     {
         return static::getEntityFqcn();
     }
 
-    abstract public static function getEntityFqcn(): string;
+    /**
+     * Entity FQCN. Read from #[AsEasyCrudAdmin(entity: ...)] by default;
+     * override this method to set it explicitly.
+     */
+    public static function getEntityFqcn(): string
+    {
+        $entity = static::easyCrudAttribute()?->entity;
+        if (null !== $entity) {
+            return $entity;
+        }
 
-    abstract public static function getDefaultSortColumn(): string;
+        throw new \LogicException(sprintf(
+            'No entity defined for "%s": set #[AsEasyCrudAdmin(entity: YourEntity::class)] or override getEntityFqcn().',
+            static::class,
+        ));
+    }
+
+    /**
+     * Grid name (also used as route prefix). Read from #[AsEasyCrudAdmin(grid: ...)]
+     * by default, otherwise derived from the Admin class name ("PostAdmin" => "admin_post").
+     */
+    public static function getName(): string
+    {
+        return static::easyCrudAttribute()?->grid ?? self::deriveEasyCrudGridName();
+    }
+
+    public static function getDefaultSortColumn(): string
+    {
+        return static::easyCrudAttribute()?->defaultSort ?? '';
+    }
+
+    /**
+     * Returns the #[AsEasyCrudAdmin] attribute declared on the concrete Admin, if any.
+     */
+    protected static function easyCrudAttribute(): ?AsEasyCrudAdmin
+    {
+        $class = static::class;
+
+        if (!array_key_exists($class, self::$easyCrudAttributeCache)) {
+            $attributes = (new \ReflectionClass($class))->getAttributes(AsEasyCrudAdmin::class);
+            self::$easyCrudAttributeCache[$class] = [] === $attributes ? null : $attributes[0]->newInstance();
+        }
+
+        return self::$easyCrudAttributeCache[$class];
+    }
+
+    private static function deriveEasyCrudGridName(): string
+    {
+        $shortName = (new \ReflectionClass(static::class))->getShortName();
+        $shortName = preg_replace('/Admin$/', '', $shortName) ?? $shortName;
+        $snake = preg_replace('/(?<!^)[A-Z]/', '_$0', $shortName) ?? $shortName;
+
+        return 'admin_' . mb_strtolower($snake);
+    }
 
     /**
      * @return array<string, mixed>
@@ -39,12 +94,12 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     public static function getLimits(): array
     {
-        return [10, 25, 50];
+        return static::easyCrudAttribute()?->limits ?? [10, 25, 50];
     }
 
     public static function getDefaultSortOrder(): string
     {
-        return 'asc';
+        return static::easyCrudAttribute()?->defaultSortOrder ?? 'asc';
     }
 
     public function configureActions(string $pageName): Actions
