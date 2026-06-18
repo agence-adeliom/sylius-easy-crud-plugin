@@ -54,26 +54,42 @@ Follow documentation [here](https://docs.sylius.com/en/latest/customization/menu
 ## Declaring resources with attributes (alternative to YAML)
 
 Instead of the two generated YAML blocks (`config/routes.yaml` + `config/packages/sylius_resource.yaml`),
-a resource can be declared with a single `#[AsEasyCrudAdmin]` attribute on its **Admin class** — the
-layer that already holds the fields, grid and form. The entity stays a pure domain model.
+a resource is declared with **two attributes**: the native `#[\Sylius\Resource\Metadata\AsResource]` on the
+**model** (the resource identity / alias), and `#[AsAdmin]` on the **Admin class** (the easy-crud layer that
+already holds the fields, grid and form, and points back to the model).
 
-#### 1. Enable attribute discovery
+#### 1. Enable discovery (two path lists)
 
 ```yaml
 # config/packages/sylius_easy_crud.yaml
 sylius_easy_crud:
     attributes:
         enabled: true                              # gates the runtime scan AND the maker output
-        paths: ['%kernel.project_dir%/src/Admin']  # where the annotated Admin classes live
+        paths: ['%kernel.project_dir%/src/Admin']  # where the #[AsAdmin] classes live
+
+# config/packages/sylius_resource.yaml
+sylius_resource:
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity'] # where the #[AsResource] models live
 ```
 
-#### 2. Annotate the Admin class
+#### 2. Declare the model and annotate the Admin
 
 ```php
-use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
-use Adeliom\SyliusEasyCrudPlugin\Metadata\AsEasyCrudAdmin;
+// src/Entity/Post.php
+use Sylius\Resource\Metadata\AsResource;
 
-#[AsEasyCrudAdmin(entity: Post::class, icon: 'newspaper', except: ['show'])]
+#[ORM\Entity(repositoryClass: PostRepository::class)]
+#[AsResource(alias: 'app.post')]
+class Post implements ResourceInterface { /* ... */ }
+```
+
+```php
+// src/Admin/PostAdmin.php
+use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
+
+#[AsAdmin(resourceClass: Post::class, icon: 'newspaper', except: ['show'])]
 final class PostAdmin extends AbstractAdmin
 {
     public function configureFields(string $pageName, ?string $context = null): iterable
@@ -84,23 +100,30 @@ final class PostAdmin extends AbstractAdmin
 }
 ```
 
-The attribute carries the resource **data** (which entity, section, icon, routing behaviour…), while the
-Admin methods keep the **logic** (`configureFields`/`configureActions`/`configureFilters`). `AbstractAdmin`
-reads the attribute as the default for `getEntityFqcn()`, `getName()` (grid, derived from the class name when
-omitted — `PostAdmin` → `admin_post`), `getDefaultSortColumn()`, `getDefaultSortOrder()` and `getLimits()` —
-**override any of these static methods to win over the attribute**. Other arguments: `alias`, `section`,
-`header`, `redirect`, the free-form `vars` passthrough, `path`…
+`#[AsResource]` carries the resource **identity** (alias). `#[AsAdmin]` carries the admin **data** (section,
+icon, routing behaviour…), while the Admin methods keep the **logic**
+(`configureFields`/`configureActions`/`configureFilters`). `AbstractAdmin` reads `#[AsAdmin]` as the default
+for `getEntityFqcn()` (= `resourceClass`), `getName()` (grid, derived from the class name when omitted —
+`PostAdmin` → `admin_post`), `getDefaultSortColumn()`, `getDefaultSortOrder()`, `getLimits()` and
+`getRepositoryMethod()` — **override any of these static methods to win over the attribute**. Other arguments:
+`alias` (defaults to the model's `#[AsResource]` alias), `section`, `header`, `redirect`, the free-form `vars`
+passthrough, `path`…
 
-> **Migrating an existing resource:** route names and URLs are fully determined by `alias` + `section`. Set
-> `alias:` explicitly to the legacy value (e.g. `#[AsEasyCrudAdmin(entity: Cron::class, alias: 'app.log_cron')]`)
-> to keep them byte-identical, then remove the old `routes.yaml` and `sylius_resource.yaml` blocks. YAML-declared
-> resources keep working alongside attribute ones, so you can migrate one at a time.
+> **How it's wired:** easy-crud contributes the full resource (controller `SyliusCrudResourceController`,
+> form = Admin, repository, translation) in its bundle `prepend()`, keyed by the `#[AsResource]` alias. This
+> is required because Sylius materializes the resource's services during the container `load()` phase, before
+> any compiler pass could patch them. Sylius' own auto-registration skips an already-declared alias, so
+> easy-crud cleanly owns the entry. Route names/URLs are fully determined by `alias` + `section`.
+
+> **Migrating an existing resource:** set `#[AsResource(alias:)]` to the legacy alias (e.g. `'app.log_cron'`)
+> to keep route names/URLs byte-identical, then remove the old `routes.yaml` and `sylius_resource.yaml` blocks.
+> YAML-declared resources keep working alongside attribute ones, so you can migrate one at a time.
 
 #### 3. Generate with the maker
 
-When `attributes.enabled` is `true`, `php bin/console make:easy-crud:create-crud Post` writes the
-`#[AsEasyCrudAdmin]` attribute on the generated **Admin class** instead of the YAML blocks (everything else
-is unchanged).
+When `attributes.enabled` is `true`, `php bin/console make:easy-crud:create-crud Post` writes `#[AsResource]`
+on the generated entity **and** `#[AsAdmin]` on the generated Admin class instead of the YAML blocks
+(everything else is unchanged).
 
 #### Coexistence & deprecation
 
@@ -109,8 +132,8 @@ The two systems coexist — the configuration only switches which one easy-crud 
 - `attributes.enabled: false` (default): resources keep being declared the legacy way (the generated
   `config/routes.yaml` + `config/packages/sylius_resource.yaml` blocks). **This style is deprecated** and the
   maker emits a deprecation when it generates those blocks.
-- `attributes.enabled: true`: the maker and the runtime use `#[AsEasyCrudAdmin]`. Any resource still declared
-  with the legacy YAML blocks keeps working, so you can migrate one resource at a time.
+- `attributes.enabled: true`: the maker and the runtime use `#[AsResource]` + `#[AsAdmin]`. Any resource still
+  declared with the legacy YAML blocks keeps working, so you can migrate one resource at a time.
 
 ## Next Steps
 

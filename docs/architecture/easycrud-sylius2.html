@@ -98,7 +98,7 @@ class Post implements ResourceInterface { … }
     <div class="arrow">→</div>
     <div class="box b-ctrl"><b>Routes</b><small>toutes vers <code>sylius.main_controller</code></small></div>
   </div>
-  <div class="note">Bonne nouvelle côté API : ton attribut <code>#[AsEasyCrudAdmin]</code> peut rester la <b>façade</b> publique. Seul change ce qu'il <em>produit</em> en interne : des métadonnées natives au lieu de la config legacy. Les développeurs ne changent rien.</div>
+  <div class="note">Bonne nouvelle côté API : ton attribut <code>#[AsAdmin]</code> peut rester la <b>façade</b> publique. Seul change ce qu'il <em>produit</em> en interne : des métadonnées natives au lieu de la config legacy. Les développeurs ne changent rien.</div>
 
   <h2>3. Le cycle d'une requête (cible)</h2>
 
@@ -152,7 +152,7 @@ class Post implements ResourceInterface { … }
   <div class="mono">
 <span class="c"># Déclaration</span>
 Entité  #[AsResource] #[Index/Create/Update/Delete/Show]
-   │           (façade possible : #[AsEasyCrudAdmin])
+   │           (façade possible : #[AsAdmin])
    ▼
 AttributesResourceMetadataCollectionFactory ──► opérations ──► routes
    │
