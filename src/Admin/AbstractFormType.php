@@ -84,6 +84,11 @@ abstract class AbstractFormType extends AbstractGridType implements ServiceSubsc
             $validationGroups,
         );
         $this->user = $security->getUser();
+        $this->initializeCrudContext();
+    }
+
+    protected function initializeCrudContext(): void
+    {
         $this->resourceAlias = $this->crudAdminFactory->initContext($this->getResourceClass());
     }
 
@@ -116,6 +121,8 @@ abstract class AbstractFormType extends AbstractGridType implements ServiceSubsc
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $this->initializeCrudContext();
+
         $context = $options['context'];
         $pageName = $options['page_name'];
         Assert::string($options['data_class']);
@@ -282,6 +289,8 @@ abstract class AbstractFormType extends AbstractGridType implements ServiceSubsc
      */
     public function buildDetail(ResourceInterface $resource): array
     {
+        $this->initializeCrudContext();
+
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_DETAIL),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),
@@ -351,6 +360,8 @@ abstract class AbstractFormType extends AbstractGridType implements ServiceSubsc
 
     public function buildGrid(GridBuilderInterface $gridBuilder): void
     {
+        $this->initializeCrudContext();
+
         $fields = FieldCollection::new(
             $this->configureFields(Crud::PAGE_INDEX),
             $this->crudAdminFactory->getFieldConfiguratorCollection(),

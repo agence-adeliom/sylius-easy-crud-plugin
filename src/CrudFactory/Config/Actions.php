@@ -208,12 +208,21 @@ final class Actions
             )->setSyliusAction(ShowAction::create([]));
         }
 
-        if (Action::INDEX === $actionName && $this->requestConfiguration) {
+        if (Action::INDEX === $actionName) {
+            $routeName = $this->requestConfiguration?->getRouteName('index');
+            if (null === $routeName && null !== $this->dto->getRoutePrefix()) {
+                $routeName = $this->dto->getRoutePrefix() . '_index';
+            }
+
+            if (null === $routeName) {
+                throw new \InvalidArgumentException(sprintf('The "%s" action cannot be created because neither the request configuration nor the route prefix is available.', $actionName));
+            }
+
             $action = SyliusAction::create(Action::INDEX, 'easy_crud_main_action')
                 ->setLabel(\sprintf('%s.%s.admin.action.index', $applicationName, $name))
                 ->setOptions([
                     'link' => [
-                        'route' => $this->requestConfiguration->getRouteName('index'),
+                        'route' => $routeName,
                     ],
                 ])
                 ->setIcon('tabler:list');

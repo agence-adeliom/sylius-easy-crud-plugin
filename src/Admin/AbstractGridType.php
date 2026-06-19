@@ -71,6 +71,8 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
             'subitem' => [],
         ];
         if ($this instanceof AbstractAdmin) {
+            $this->initializeCrudContext();
+
             $actions = $this->configureActions(
                 $pageName,
             );

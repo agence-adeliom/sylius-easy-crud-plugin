@@ -57,6 +57,14 @@ class CrudAdminFactory
 
     public function initContext(string $model): ?string
     {
+        $this->metadata = null;
+        $this->requestConfiguration = null;
+
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return null;
+        }
+
         try {
             /** @var array<mixed> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
@@ -66,16 +74,15 @@ class CrudAdminFactory
 
         foreach ($resources as $alias => $configuration) {
             if (
-                $this->requestStack->getCurrentRequest() &&
                 is_array($configuration) &&
-                is_array($configuration['classes']) &&
-                $configuration['classes']['model'] === $model
+                is_array($configuration['classes'] ?? null) &&
+                ($configuration['classes']['model'] ?? null) === $model
             ) {
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
                 $this->requestConfiguration = $this->requestConfigurationFactory
                     ->create(
                         $this->metadata,
-                        $this->requestStack->getCurrentRequest(),
+                        $request,
                     );
 
                 return $alias;
