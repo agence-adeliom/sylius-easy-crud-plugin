@@ -77,6 +77,12 @@ services:
     adeliom.sylius.field.configurator.collection:
         alias: Adeliom\SyliusEasyCrudPlugin\CrudFactory\Collection\FieldConfiguratorCollection
         public: true
+
+    Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser:
+        alias: form.type_guesser.doctrine
+
+    Symfony\Component\PropertyAccess\PropertyAccessor:
+        alias: property_accessor
     
     adeliom.sylius.form.type.field_resource_translations:
         public: true
@@ -100,21 +106,15 @@ services:
         public: true
         alias: adeliom.sylius.form.type.resource_choice
     
-    adeliom.sylius.crud.admin.factory:
-        class: Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory
-        public: true
+    Adeliom\SyliusEasyCrudPlugin\CrudFactory\View\CrudViewBuilderFactory:
         arguments:
-            - "@form.type_guesser.doctrine"
-            - "@adeliom.sylius.field.configurator.collection"
             - "@knp_menu.factory"
-            - "@property_accessor"
-            - "@sylius.resource_controller.request_configuration_factory"
-            - "@request_stack"
+
+    Adeliom\SyliusEasyCrudPlugin\CrudFactory\Resource\ResourceContextResolver:
+        arguments:
             - "@parameter_bag"
-    
-    Adeliom\SyliusEasyCrudPlugin\CrudFactory\CrudAdminFactory:
-        public: true
-        alias: adeliom.sylius.crud.admin.factory
+            - "@request_stack"
+            - "@sylius.resource_controller.request_configuration_factory"
     
     'assets._package_sylius.easy_crud':
         class: Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage
@@ -134,3 +134,11 @@ services:
             - '@event_dispatcher'
             - '@webpack_encore.tag_renderer'
             - '@assets.packages'
+
+    Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader:
+        autoconfigure: false
+        arguments:
+            - '%sylius_easy_crud.attributes.routing%'
+            - '@sylius.routing.loader.resource'
+        tags:
+            - { name: routing.route_loader }

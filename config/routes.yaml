@@ -6,3 +6,9 @@ sylius_admin_ajax_resources:
     controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController::autocompleteAction
     path: /admin/autocomplete/
 
+# Loads the routes for resources declared with #[AsAdmin] (no-op when
+# sylius_easy_crud.attributes.enabled is false — the loader yields an empty collection).
+sylius_easy_crud_attributes:
+    resource: 'Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader'
+    type: service
+

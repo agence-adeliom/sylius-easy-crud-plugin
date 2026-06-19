@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>easy-crud — Architecture actuelle (legacy Sylius)</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#181f2e; --panel2:#1f2839; --ink:#e7ecf5; --muted:#9fb0c8;
+    --line:#33415c; --accent:#5db0ff; --admin:#7c5cff; --ctrl:#ff8a5b; --factory:#37c9a8;
+    --grid:#f2c14e; --legacy:#ff6b8b; --green:#5bd6a0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+  h1{font-size:30px;margin:0 0 6px}
+  h2{font-size:22px;margin:46px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h3{font-size:17px;margin:26px 0 8px;color:var(--accent)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);margin-top:0}
+  code{background:#0b0f18;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:13px;color:#cfe3ff}
+  .tag{display:inline-block;background:#0b0f18;border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--muted);margin:2px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+  .legend span{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .note{border-left:3px solid var(--accent);background:var(--panel2);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .warn{border-left:3px solid var(--legacy);background:#241823}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:18px 0}
+  .box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:140px;flex:1;position:relative}
+  .box b{display:block;font-size:14px;margin-bottom:3px}
+  .box small{color:var(--muted);font-size:12px;line-height:1.4;display:block}
+  .arrow{align-self:center;color:var(--muted);font-size:22px;padding:0 10px;flex:0 0 auto}
+  .col{display:flex;flex-direction:column;gap:10px}
+  .b-admin{border-color:var(--admin);box-shadow:inset 0 0 0 1px rgba(124,92,255,.25)}
+  .b-ctrl{border-color:var(--ctrl)}
+  .b-factory{border-color:var(--factory)}
+  .b-grid{border-color:var(--grid)}
+  .b-legacy{border-color:var(--legacy)}
+  .b-green{border-color:var(--green)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--accent)}
+  td code{font-size:12px}
+  .pill{font-size:11px;padding:1px 8px;border-radius:20px;border:1px solid var(--legacy);color:var(--legacy)}
+  .mono{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:12.5px;background:#0b0f18;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;color:#cfe3ff}
+  .mono .c{color:#6f88ad}
+  .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:720px){.three{grid-template-columns:1fr}}
+  .roles span{display:block;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>easy-crud — comment ça marche <em>aujourd'hui</em></h1>
+  <p class="sub">Architecture actuelle, basée sur l'ancienne pile Sylius (« legacy » : <code>ResourceController</code> + routage <code>type: sylius.resource</code>).</p>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--admin)"></i> Classe Admin (ton code)</span>
+    <span><i class="dot" style="background:var(--ctrl)"></i> Contrôleur</span>
+    <span><i class="dot" style="background:var(--factory)"></i> CrudAdminFactory</span>
+    <span><i class="dot" style="background:var(--grid)"></i> Grille</span>
+    <span><i class="dot" style="background:var(--legacy)"></i> Brique legacy Sylius</span>
+  </div>
+
+  <h2>1. L'idée centrale : une seule classe pour tout</h2>
+  <p>Quand tu crées un écran d'admin, tu écris <b>une</b> classe <code>PostAdmin extends AbstractAdmin</code>. Cette classe joue <b>trois rôles à la fois</b> :</p>
+
+  <div class="three">
+    <div class="card b-admin"><b>1 · Type de formulaire</b><span class="roles">Elle hérite de <code>AbstractFormType</code> → <code>AbstractResourceType</code>. C'est elle que Symfony instancie comme <em>form type</em>.</span></div>
+    <div class="card b-grid"><b>2 · Définition de grille</b><span class="roles">Elle implémente <code>ResourceAwareGridInterface</code>. Sylius Grid la reconnaît automatiquement comme une grille.</span></div>
+    <div class="card b-admin"><b>3 · Config des champs/UI</b><span class="roles"><code>configureFields()</code>, <code>configureActions()</code>, <code>configureFilters()</code> décrivent l'écran (onglets, colonnes, champs).</span></div>
+  </div>
+
+  <div class="note">La chaîne d'héritage : <code>PostAdmin</code> → <code>AbstractAdmin</code> → <code>AbstractFormType</code> → <code>AbstractGridType</code> → <code>AbstractResourceType</code> (Sylius). C'est pour ça qu'une seule classe peut être à la fois formulaire <em>et</em> grille.</p></div>
+
+  <h2>2. Le branchement (au démarrage / compilation du conteneur)</h2>
+  <div class="flow">
+    <div class="box b-admin"><b>PostAdmin</b><small>tes champs + <code>getEntityFqcn()</code> + <code>getName()</code> (= nom de grille)</small></div>
+    <div class="arrow">→</div>
+    <div class="box"><b>2 tags auto</b><small><span class="tag">sylius_easy_crud_admin</span><span class="tag">sylius.grid</span></small></div>
+    <div class="arrow">→</div>
+    <div class="box b-legacy"><b>RegisterAdminPass</b><small>injecte le FQCN de l'entité + autowire l'admin</small></div>
+  </div>
+
+  <div class="flow">
+    <div class="box b-legacy"><b>Déclaration ressource</b><small>2 blocs YAML <em>(déprécié)</em> <em>ou</em> l'attribut <code>#[AsAdmin]</code> sur la classe Admin <em>(recommandé)</em></small></div>
+    <div class="arrow">→</div>
+    <div class="box b-legacy"><b>sylius_resource</b><small>registre : model / controller / repository / form</small></div>
+    <div class="arrow">+</div>
+    <div class="box b-legacy"><b>type: sylius.resource</b><small>routes via <code>ResourceLoader</code> : templates, grid, vars, redirect</small></div>
+  </div>
+  <p class="sub">Résultat : des routes <code>app_admin_post_{index,create,update,show,delete}</code> qui pointent vers <code>SyliusCrudResourceController::xxxAction</code>, en transportant des « <code>_sylius</code> » (grid, section, template, vars…).</p>
+
+  <h2>3. Le cycle d'une requête (runtime)</h2>
+
+  <h3>Affichage de la liste — <code>indexAction</code></h3>
+  <div class="flow">
+    <div class="box"><b>Route index</b><small>_sylius.grid = nom de l'admin</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-ctrl"><b>SyliusCrudResourceController</b><small>intercepte <code>?context</code> → action custom <code>ca:</code> sinon <code>parent::indexAction()</code></small></div>
+    <div class="arrow">→</div>
+    <div class="box b-grid"><b>PostAdmin::buildGrid()</b><small>parcourt les champs « index », ajoute colonnes / tri / actions / filtres</small></div>
+    <div class="arrow">→</div>
+    <div class="box"><b>Template grille</b></div>
+  </div>
+
+  <h3>Détail / création / édition — <code>showAction</code> &amp; formulaire</h3>
+  <div class="flow">
+    <div class="box b-ctrl"><b>Controller</b><small><code>showAction</code> : <code>findOr404</code>, crée le formulaire à partir de l'Admin</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-admin"><b>PostAdmin::buildForm()</b><small>parcourt les <em>FieldDto</em>, crée les champs Symfony, devine les types Doctrine, gère traductions</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-factory"><b>CrudAdminFactory</b><small>range les champs en onglets/colonnes (menu Knp), collecte les assets CSS/JS</small></div>
+    <div class="arrow">→</div>
+    <div class="box"><b>Template form</b><small>via <code>getViewVars()</code> : menu, colonnes, assets</small></div>
+  </div>
+  <p class="sub">Le create/update « standard » est géré par le <code>ResourceController</code> parent (Sylius) : il prend le formulaire (= l'Admin), valide, persiste, redirige.</p>
+
+  <h2>4. Le chef d'orchestre : <code>CrudAdminFactory</code></h2>
+  <div class="card b-factory">
+    <p style="margin-top:0">Service partagé, injecté dans chaque Admin. Il fait le lien entre le monde « Admin » et le monde « ressource Sylius » :</p>
+    <ul>
+      <li><b><code>initContext($model)</code></b> — cherche la ressource dans le paramètre <code>sylius.resources</code> par classe d'entité, et construit la <code>Metadata</code> + <code>RequestConfiguration</code> <em>legacy</em>. C'est ainsi que l'Admin sait « quelle ressource suis-je ».</li>
+      <li><b>Menu &amp; colonnes</b> — structure les onglets/colonnes du formulaire (Knp Menu).</li>
+      <li><b>Assets</b> — accumule les CSS/JS/Webpack déclarés par les champs.</li>
+      <li><b>Outils</b> — le <em>Doctrine type guesser</em> et le <em>property accessor</em>.</li>
+      <li><b><code>getViewVars()</code></b> — produit les variables Twig (menu, colonnes, assets, thèmes de formulaire).</li>
+    </ul>
+  </div>
+
+  <h2>5. Le système de champs</h2>
+  <div class="flow">
+    <div class="box b-admin"><b>configureFields()</b><small>yield TabField, ColumnField, Field, TranslationField…</small></div>
+    <div class="arrow">→</div>
+    <div class="box"><b>FieldCollection / FieldDto</b><small>chaque champ : propriété, label, type de form, template grille, pages d'affichage, assets</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-factory"><b>Field configurators</b><small><span class="tag">easy.fields.configurator</span> DateTime · Enum · Translation · ResourceChoice · ChoiceMask · SortableCollection</small></div>
+  </div>
+
+  <h2>6. Le mécanisme <code>$context</code></h2>
+  <div class="card">
+    <p style="margin-top:0">Un paramètre <code>?context=…</code> est transmis à travers les routes et les options du formulaire. Deux usages :</p>
+    <ul>
+      <li><b>Champs conditionnels</b> : <code>configureFields($pageName, $context)</code> affiche des champs différents selon le contexte.</li>
+      <li><b>Actions custom <code>ca:</code></b> : <code>?context=ca:maMethode</code> déclenche un appel dynamique à <code>maMethodeAction()</code> sur le contrôleur (dispatch dynamique).</li>
+    </ul>
+  </div>
+
+  <h2>7. Ce qui rend tout ça « legacy »</h2>
+  <table>
+    <tr><th>Brique</th><th>Dépendance Sylius ancienne</th></tr>
+    <tr><td>Contrôleur</td><td><code>SyliusCrudResourceController extends Sylius\Bundle\ResourceBundle\Controller\ResourceController</code> <span class="pill">legacy</span></td></tr>
+    <tr><td>Identité de la ressource</td><td><code>Metadata::fromAliasAndConfiguration()</code> + paramètre <code>sylius.resources</code> <span class="pill">legacy</span></td></tr>
+    <tr><td>Routes</td><td><code>type: sylius.resource</code> → <code>ResourceLoader</code> → <code>::xxxAction</code> + défauts <code>_sylius</code> <span class="pill">legacy</span></td></tr>
+    <tr><td>Requête courante</td><td><code>RequestConfiguration</code>, <code>resourcesCollectionProvider</code>, <code>findOr404</code> <span class="pill">legacy</span></td></tr>
+    <tr><td>Grille &amp; Formulaire</td><td><code>ResourceAwareGridInterface</code> / <code>AbstractResourceType</code> <span style="color:var(--green)">— compatibles Sylius 2, ne changent pas</span></td></tr>
+  </table>
+
+  <div class="note warn">
+    <b>Le verrou principal.</b> Tout le comportement « riche » d'easy-crud (le <code>$context</code>, les actions <code>ca:</code>, l'autocomplete, la construction du formulaire dans <code>showAction</code>) vit <em>dans</em> ce contrôleur legacy et s'appuie sur la <code>Metadata</code> legacy. C'est précisément ce qui doit être réécrit pour passer à la nouvelle mécanique Sylius 2 (voir le 2ᵉ document).
+  </div>
+
+  <h2>Vue d'ensemble (résumé visuel)</h2>
+  <div class="mono">
+<span class="c"># Déclaration</span>
+Entité  +  PostAdmin (champs/grille/form)
+        │
+        ▼  (2 blocs YAML [déprécié]  ou  #[AsAdmin] [recommandé])
+sylius_resource (registre)  +  routes type: sylius.resource
+        │
+        ▼
+<span class="c"># Runtime</span>
+Route ──► SyliusCrudResourceController::xxxAction        <span class="c">(legacy)</span>
+           │   ├─ ?context / ca:  → action custom
+           │   ├─ index  → PostAdmin::buildGrid()  ──► grille
+           │   └─ show   → PostAdmin::buildForm()  ──► formulaire
+           ▼
+        CrudAdminFactory (Metadata, menu, colonnes, assets, viewVars)
+           ▼
+        Templates @SyliusEasyCrudPlugin/crud/*.html.twig  (lisent _sylius.vars)
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+sylius_easy_crud:
+    attributes:
+        enabled: true
+        paths:
+            # The test-application kernel.project_dir is vendor/sylius/test-application,
+            # so we point back to the plugin's own Admin directory.
+            - '%kernel.project_dir%/../../../tests/TestApplication/src/Admin'

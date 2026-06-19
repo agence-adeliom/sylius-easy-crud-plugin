@@ -103,8 +103,6 @@ class SyliusCrudResourceController extends ResourceController
         assert($formType instanceof AbstractFormType, 'Form type must be an instance of AbstractFormType');
         assert($formType instanceof AbstractAdmin, 'Form type must be an instance of AbstractAdmin');
 
-        $formType->resetBuild();
-
         if ($configuration->isHtmlRequest()) {
             $formView = $form->createView();
 

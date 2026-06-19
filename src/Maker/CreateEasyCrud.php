@@ -64,27 +64,19 @@ final class CreateEasyCrud extends AbstractMaker
 
         assert(is_string($entryClassName), 'entity must be a string.');
 
-        $entryTranslationClassName = $entryClassName . 'Translation';
+        $namespace = \trim($generator->getRootNamespace(), '\\');
+        $entryClassName = $this->resolveEntityClassName($entryClassName, $generator);
 
         if (!class_exists($entryClassName)) {
-            $entryClassNameDetail = $generator->createClassNameDetails(
+            throw new RuntimeCommandException(sprintf(
+                'Entity class "%s" does not exist. Create it first with make:easy-crud:create-entity or pass an existing Doctrine entity.',
                 $entryClassName,
-                'Entity\\',
-            );
-            $entryClassName = $entryClassNameDetail->getFullName();
-        }
-        if (!class_exists($entryTranslationClassName)) {
-            $entryTranslationClassNameDetail = $generator->createClassNameDetails(
-                $entryClassName,
-                'Entity\\',
-                'Translation',
-            );
-            $entryTranslationClassName = $entryTranslationClassNameDetail->getFullName();
+            ));
         }
 
+        $entryTranslationClassName = class_exists($entryClassName . 'Translation') ? $entryClassName . 'Translation' : null;
         $entryShortClassName = Str::getShortClassName($entryClassName);
-
-        $namespace = \trim($generator->getRootNamespace(), '\\');
+        $attributeModeEnabled = $this->isAttributeModeEnabled();
 
         [$entity, $entityTranslation, $repository] = CrudMakerService::getEntity(
             $entryClassName,
@@ -102,15 +94,14 @@ final class CreateEasyCrud extends AbstractMaker
             );
 
             // Generate Admin class
-            $adminClassName = str_replace('Entity', 'Admin', $entryClassName) . 'Admin';
+            $adminClassName = $this->adminClassNameForEntity($entryClassName);
             $adminClassDetails = $generator->createClassNameDetails(
-                $entryShortClassName,
-                'Admin',
-                'Admin',
+                '\\' . $adminClassName,
+                'Admin\\',
             );
-            $adminFilePath = $generator->getRootDirectory() . '/' . $adminClassDetails->getRelativeName();
+            $adminFilePath = $this->getClassFilePath($adminClassName);
 
-            if (class_exists($adminClassName) || file_exists($adminFilePath)) {
+            if (class_exists($adminClassName) || ('' !== $adminFilePath && file_exists($adminFilePath))) {
                 $io->note(sprintf('Admin class already exists, skipping: %s', $adminClassName));
             } else {
                 $adminDetails = $resourceConfigGenerator->generateAdmin(
@@ -118,8 +109,11 @@ final class CreateEasyCrud extends AbstractMaker
                     variables: [
                        'entityShortName' => $entryShortClassName,
                        'namespace' => str_replace('Entity', 'Admin', $entryClassName),
+                       'useAttributeMetadata' => $attributeModeEnabled,
                     ],
+                    registerService: !$attributeModeEnabled,
                 );
+                $adminFilePath = $resourceConfigGenerator->getGeneratedClassPath($adminDetails->getFullName()) ?? $adminFilePath;
                 $io->success(sprintf('Created: %s', $adminDetails->getFullName()));
             }
 
@@ -145,28 +139,84 @@ final class CreateEasyCrud extends AbstractMaker
                 $io->success(sprintf('Created: %s', $menuListenerFqcn));
             }
 
-            // Generate/Update routes
-            $route = $resourceConfigGenerator->generateRoute(
-                entityName: $entryClassName,
-            );
+            if ($attributeModeEnabled) {
+                // Attribute mode: declare the resource natively with #[AsResource] on the entity
+                // and enrich it with #[AsAdmin] on the Admin class, instead of the
+                // config/routes.yaml + sylius_resource.yaml blocks.
 
-            $io->comment(sprintf(
-                '%s: %s',
-                '<fg=yellow>updated</>',
-                $route,
-            ));
+                // 1. Ensure the entity is a native Sylius resource (auto-registered into sylius.resources).
+                $entityFilePath = $this->getClassFilePath($entryClassName);
+                if ('' !== $entityFilePath) {
+                    $resourceConfigGenerator->addAsResourceAttributeToEntity(
+                        $entityFilePath,
+                        $entryShortClassName,
+                    );
+                    $io->comment(sprintf(
+                        '%s: %s (#[AsResource])',
+                        '<fg=yellow>updated</>',
+                        $entityFilePath,
+                    ));
+                }
 
-            // Generate/Update resource configuration
-            $resource = $resourceConfigGenerator->generateResource(
-                entityName: $entryClassName,
-                entityTranslationName: $entryTranslationClassName,
-            );
+                // 2. Enrich it with the easy-crud Admin. Carry over a convention-based custom
+                //    controller if one exists (legacy parity).
+                $conventionController = str_replace('Entity', 'Controller', $entryClassName) . 'Controller';
+                $customController = class_exists($conventionController) ? $conventionController : null;
 
-            $io->comment(sprintf(
-                '%s: %s',
-                '<fg=yellow>updated</>',
-                $resource,
-            ));
+                $annotatedPath = $resourceConfigGenerator->addEasyCrudAttributeToClass(
+                    $adminFilePath,
+                    $adminClassDetails->getShortName(),
+                    $customController,
+                    Str::asClassName($entryShortClassName),
+                    'admin_' . mb_strtolower(Str::asSnakeCase($entryClassName)),
+                );
+
+                $io->comment(sprintf(
+                    '%s: %s (#[AsAdmin])',
+                    '<fg=yellow>updated</>',
+                    $annotatedPath,
+                ));
+
+                $this->warnIfClassOutsideScannedPaths($io, $annotatedPath);
+            } else {
+                // Legacy mode: declare the resource through the generated YAML blocks.
+                trigger_deprecation(
+                    'agence-adeliom/sylius-easy-crud-plugin',
+                    '2.1',
+                    'Declaring easy-crud resources through the generated "config/routes.yaml" and ' .
+                    '"config/packages/sylius_resource.yaml" blocks is deprecated and will be removed in 3.0. ' .
+                    'Enable "sylius_easy_crud.attributes" and declare the resource with the #[AsAdmin] ' .
+                    'attribute on the Admin class instead.',
+                );
+
+                $io->warning(
+                    'Resource declared via YAML (deprecated). Set "sylius_easy_crud.attributes.enabled: true" ' .
+                    '(with "paths" pointing to your Admin directory) to declare it with #[AsAdmin] instead.',
+                );
+
+                // Generate/Update routes
+                $route = $resourceConfigGenerator->generateRoute(
+                    entityName: $entryClassName,
+                );
+
+                $io->comment(sprintf(
+                    '%s: %s',
+                    '<fg=yellow>updated</>',
+                    $route,
+                ));
+
+                // Generate/Update resource configuration
+                $resource = $resourceConfigGenerator->generateResource(
+                    entityName: $entryClassName,
+                    entityTranslationName: $entryTranslationClassName,
+                );
+
+                $io->comment(sprintf(
+                    '%s: %s',
+                    '<fg=yellow>updated</>',
+                    $resource,
+                ));
+            }
 
             $this->writeSuccessMessage($io);
         } catch (\Exception $exception) {
@@ -182,6 +232,41 @@ final class CreateEasyCrud extends AbstractMaker
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
         // No dependencies needed
+    }
+
+    private function isAttributeModeEnabled(): bool
+    {
+        return $this->parameterBag->has('sylius_easy_crud.attributes.enabled') &&
+            true === $this->parameterBag->get('sylius_easy_crud.attributes.enabled');
+    }
+
+    /**
+     * Warns when the Admin class is not located under one of the scanned attribute
+     * paths, in which case the #[AsAdmin] attribute would be ignored.
+     */
+    private function warnIfClassOutsideScannedPaths(ConsoleStyle $io, string $classPath): void
+    {
+        if (!$this->parameterBag->has('sylius_easy_crud.attributes.paths')) {
+            return;
+        }
+
+        /** @var list<string> $paths */
+        $paths = $this->parameterBag->get('sylius_easy_crud.attributes.paths');
+        $realClassPath = realpath($classPath) ?: $classPath;
+
+        foreach ($paths as $path) {
+            $realPath = realpath($path) ?: $path;
+            if (str_starts_with($realClassPath, $realPath)) {
+                return;
+            }
+        }
+
+        $io->warning(sprintf(
+            'The Admin class "%s" is not under any "sylius_easy_crud.attributes.paths" directory (%s), ' .
+            'so its #[AsAdmin] attribute will not be discovered. Add its directory to the paths.',
+            $classPath,
+            implode(', ', $paths) ?: '(none configured)',
+        ));
     }
 
     /**
@@ -204,5 +289,39 @@ final class CreateEasyCrud extends AbstractMaker
         }
 
         return $choices;
+    }
+
+    private function resolveEntityClassName(string $entity, Generator $generator): string
+    {
+        $entity = ltrim($entity, '\\');
+        if (class_exists($entity)) {
+            return $entity;
+        }
+
+        if (str_contains($entity, '\\')) {
+            return $entity;
+        }
+
+        return $generator->createClassNameDetails($entity, 'Entity\\')->getFullName();
+    }
+
+    /**
+     * @param class-string $entityClassName
+     */
+    private function adminClassNameForEntity(string $entityClassName): string
+    {
+        return str_replace('\\Entity\\', '\\Admin\\', $entityClassName) . 'Admin';
+    }
+
+    private function getClassFilePath(string $className): string
+    {
+        if (class_exists($className)) {
+            $fileName = (new \ReflectionClass($className))->getFileName();
+            if (is_string($fileName)) {
+                return $fileName;
+            }
+        }
+
+        return '';
     }
 }

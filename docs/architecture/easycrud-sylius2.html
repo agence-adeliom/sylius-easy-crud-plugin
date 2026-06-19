@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>easy-crud — Architecture cible (Sylius 2 natif)</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#181f2e; --panel2:#1f2839; --ink:#e7ecf5; --muted:#9fb0c8;
+    --line:#33415c; --accent:#5db0ff; --admin:#7c5cff; --ctrl:#ff8a5b; --factory:#37c9a8;
+    --grid:#f2c14e; --legacy:#ff6b8b; --green:#5bd6a0;
+    --prov:#5db0ff; --proc:#37c9a8; --resp:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+  h1{font-size:30px;margin:0 0 6px}
+  h2{font-size:22px;margin:46px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h3{font-size:17px;margin:26px 0 8px;color:var(--accent)}
+  .sub{color:var(--muted);margin-top:0}
+  code{background:#0b0f18;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:13px;color:#cfe3ff}
+  .tag{display:inline-block;background:#0b0f18;border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--muted);margin:2px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+  .legend span{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .note{border-left:3px solid var(--accent);background:var(--panel2);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+  .good{border-left:3px solid var(--green);background:#15241d}
+  .warn{border-left:3px solid var(--legacy);background:#241823}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:18px 0}
+  .box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:140px;flex:1;position:relative}
+  .box b{display:block;font-size:14px;margin-bottom:3px}
+  .box small{color:var(--muted);font-size:12px;line-height:1.4;display:block}
+  .arrow{align-self:center;color:var(--muted);font-size:22px;padding:0 10px;flex:0 0 auto}
+  .b-admin{border-color:var(--admin)}
+  .b-ctrl{border-color:var(--ctrl);box-shadow:inset 0 0 0 1px rgba(255,138,91,.25)}
+  .b-prov{border-color:var(--prov)}
+  .b-proc{border-color:var(--proc)}
+  .b-resp{border-color:var(--resp)}
+  .b-grid{border-color:var(--grid)}
+  .b-green{border-color:var(--green)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--accent)}
+  td code{font-size:12px}
+  .keep{color:var(--green);font-size:11px;border:1px solid var(--green);border-radius:20px;padding:1px 8px}
+  .new{color:var(--accent);font-size:11px;border:1px solid var(--accent);border-radius:20px;padding:1px 8px}
+  .mono{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:12.5px;background:#0b0f18;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;color:#cfe3ff}
+  .mono .c{color:#6f88ad}
+  .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:720px){.three{grid-template-columns:1fr}}
+  .roles span{display:block;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>easy-crud — la structure <em>cible</em> en Sylius 2 natif</h1>
+  <p class="sub">Comment l'architecture <b>communiquerait</b> si on abandonnait le contrôleur legacy au profit de la mécanique moderne : <code>#[AsResource]</code> + chaîne <b>Provider → Processor → Responder</b>.</p>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--admin)"></i> Classe Admin (inchangée)</span>
+    <span><i class="dot" style="background:var(--ctrl)"></i> main_controller (générique)</span>
+    <span><i class="dot" style="background:var(--prov)"></i> Provider (je lis)</span>
+    <span><i class="dot" style="background:var(--proc)"></i> Processor (j'écris)</span>
+    <span><i class="dot" style="background:var(--resp)"></i> Responder / twigContext</span>
+  </div>
+
+  <h2>1. Le changement de principe</h2>
+  <div class="card">
+    <p style="margin-top:0"><b>Avant :</b> chaque route → <em>ton</em> contrôleur, qui fait tout (lire, gérer le form, rendre).</p>
+    <p style="margin-bottom:0"><b>Après :</b> toutes les routes → <b>un seul</b> contrôleur générique (<code>sylius.main_controller</code>), qui orchestre une chaîne de petites briques spécialisées. Tu ne possèdes plus le contrôleur ; tu branches des briques dessus.</p>
+  </div>
+
+  <div class="flow">
+    <div class="box b-ctrl"><b>sylius.main_controller</b><small>le même pour toutes les opérations</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-prov"><b>Provider</b><small>va chercher la donnée (liste ou objet)</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-proc"><b>Processor</b><small>persiste (create / update / delete)</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-resp"><b>Responder</b><small>rend un template ou redirige</small></div>
+  </div>
+  <p class="sub">Plus un <code>twigContextFactory</code> par opération : il prépare les variables passées au template.</p>
+
+  <h2>2. La déclaration : des attributs natifs</h2>
+  <div class="mono">
+<span class="c">#[ORM\Entity]</span>
+#[AsResource(section: 'admin', formType: PostAdmin::class)]
+#[Index(grid: 'app_admin_post')]
+#[Create] #[Update] #[Delete] #[Show]
+class Post implements ResourceInterface { … }
+  </div>
+  <div class="flow">
+    <div class="box"><b>Attributs <code>#[AsResource]</code></b></div>
+    <div class="arrow">→</div>
+    <div class="box b-prov"><b>AttributesResourceMetadataCollectionFactory</b><small>construit les <em>ResourceMetadata</em> + opérations</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-ctrl"><b>Routes</b><small>toutes vers <code>sylius.main_controller</code></small></div>
+  </div>
+  <div class="note">Bonne nouvelle côté API : ton attribut <code>#[AsAdmin]</code> peut rester la <b>façade</b> publique. Seul change ce qu'il <em>produit</em> en interne : des métadonnées natives au lieu de la config legacy. Les développeurs ne changent rien.</div>
+
+  <h2>3. Le cycle d'une requête (cible)</h2>
+
+  <h3>Liste (index)</h3>
+  <div class="flow">
+    <div class="box b-ctrl"><b>main_controller</b></div>
+    <div class="arrow">→</div>
+    <div class="box b-prov"><b>Provider (collection)</b><small>Doctrine par défaut, ou custom pour le <code>$context</code></small></div>
+    <div class="arrow">→</div>
+    <div class="box b-grid"><b>Grille</b><small><code>PostAdmin::buildGrid()</code> — inchangé</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-resp"><b>Responder + twigContext</b></div>
+  </div>
+
+  <h3>Création / édition</h3>
+  <div class="flow">
+    <div class="box b-ctrl"><b>main_controller</b></div>
+    <div class="arrow">→</div>
+    <div class="box b-prov"><b>Provider (item)</b></div>
+    <div class="arrow">→</div>
+    <div class="box b-admin"><b>formType = PostAdmin</b><small><code>buildForm()</code> — inchangé</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-proc"><b>Processor</b><small>valide + persiste (Doctrine par défaut)</small></div>
+    <div class="arrow">→</div>
+    <div class="box b-resp"><b>Responder</b><small>redirige</small></div>
+  </div>
+
+  <h2>4. Ce qui reste vs ce qui change</h2>
+  <table>
+    <tr><th>Concept</th><th>Aujourd'hui</th><th>En Sylius 2</th><th></th></tr>
+    <tr><td>Classe Admin (champs)</td><td><code>configureFields()</code></td><td>identique</td><td><span class="keep">conservé</span></td></tr>
+    <tr><td>Grille</td><td><code>ResourceAwareGridInterface</code></td><td>identique</td><td><span class="keep">conservé</span></td></tr>
+    <tr><td>Formulaire</td><td>Admin = form type</td><td>Admin = <code>formType</code> de l'opération</td><td><span class="keep">conservé</span></td></tr>
+    <tr><td>Contrôleur</td><td><code>SyliusCrudResourceController</code></td><td><code>sylius.main_controller</code> + briques</td><td><span class="new">remplacé</span></td></tr>
+    <tr><td>Lecture donnée</td><td><code>parent::indexAction</code> / <code>findOr404</code></td><td><b>Provider</b></td><td><span class="new">nouveau</span></td></tr>
+    <tr><td>Écriture donnée</td><td>logique du ResourceController</td><td><b>Processor</b></td><td><span class="new">nouveau</span></td></tr>
+    <tr><td>Variables Twig (icon, header, menu, colonnes)</td><td><code>_sylius.vars</code> + <code>CrudAdminFactory::getViewVars()</code></td><td><b><code>twigContextFactory</code></b> / Responder</td><td><span class="new">à porter</span></td></tr>
+    <tr><td><code>$context</code> (champs conditionnels)</td><td>param transmis au form</td><td>contexte d'opération / query lu dans Provider + form</td><td><span class="new">à porter</span></td></tr>
+    <tr><td>Actions <code>ca:</code> (dispatch dynamique)</td><td>méthode appelée selon <code>?context=ca:</code></td><td><b>opérations explicites</b> (plus de dispatch dynamique)</td><td><span class="new">à repenser</span></td></tr>
+    <tr><td>Templates</td><td>lisent <code>_sylius.vars</code></td><td>lisent le contexte Twig moderne</td><td><span class="new">à adapter</span></td></tr>
+  </table>
+
+  <h2>5. Ce qu'easy-crud devrait fournir (le vrai travail)</h2>
+  <div class="three">
+    <div class="card b-prov"><b>Un Provider</b><span class="roles">Réutiliser le Provider Doctrine par défaut pour le CRUD standard ; en écrire un custom seulement pour injecter la logique <code>$context</code>.</span></div>
+    <div class="card b-proc"><b>Un Processor</b><span class="roles">Le Processor Doctrine par défaut suffit pour create/update/delete dans la plupart des cas.</span></div>
+    <div class="card b-resp"><b>Un twigContextFactory</b><span class="roles">La pièce clé : reconstruire les variables que les templates easy-crud attendent (menu, colonnes, assets, icon/header) — aujourd'hui produites par <code>CrudAdminFactory::getViewVars()</code>.</span></div>
+  </div>
+
+  <h2>6. Comment les éléments communiqueraient</h2>
+  <div class="mono">
+<span class="c"># Déclaration</span>
+Entité  #[AsResource] #[Index/Create/Update/Delete/Show]
+   │           (façade possible : #[AsAdmin])
+   ▼
+AttributesResourceMetadataCollectionFactory ──► opérations ──► routes
+   │
+   ▼
+<span class="c"># Runtime — une seule porte d'entrée</span>
+Route ──► sylius.main_controller
+            │
+            ├─ 1. Provider     ─► lit la donnée        <span class="c">(Doctrine ou custom $context)</span>
+            ├─ 2. formType      = PostAdmin             <span class="c">(inchangé)</span>
+            ├─ 3. Processor    ─► écrit la donnée       <span class="c">(Doctrine par défaut)</span>
+            └─ 4. Responder + twigContextFactory
+                        │
+                        ▼  (rebuild menu/colonnes/assets/vars)
+                 Templates easy-crud (adaptés au contexte Twig moderne)
+
+  Grille : PostAdmin::buildGrid()  ── inchangée, branchée sur l'opération Index
+  </div>
+
+  <div class="note good">
+    <b>En résumé :</b> la moitié « UI » d'easy-crud (Admin, champs, grille, formulaire) <b>ne bouge presque pas</b>. Tout l'effort se concentre sur le remplacement du contrôleur unique par les briques Provider/Processor/Responder, et sur la reconstruction des variables Twig via un <code>twigContextFactory</code>. Les cas délicats sont le <code>$context</code> et les actions <code>ca:</code> (dispatch dynamique → opérations explicites).
+  </div>
+
+  <div class="note warn">
+    <b>Stratégie recommandée :</b> migration <em>incrémentale</em>, opération par opération (commencer par <code>index</code>), protégée par des tests fonctionnels figeant le comportement actuel, et en gardant la <b>coexistence</b> legacy/moderne pendant la transition.
+  </div>
+
+</div>
+</body>
+</html>

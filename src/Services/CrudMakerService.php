@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
 use Doctrine\Persistence\ManagerRegistry;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Sylius\Resource\Model\ResourceInterface;
@@ -24,6 +25,9 @@ class CrudMakerService
 
     /** @var array<string, \ReflectionClass<ResourceInterface>|\ReflectionClass<RepositoryInterface>|string|null> */
     protected array $namespaces;
+
+    /** @var array<string, string> */
+    private array $generatedClassPaths = [];
 
     protected string $yamlRoutesFile;
 
@@ -97,15 +101,21 @@ class CrudMakerService
         ?string $className = null,
         ?string $templatePath = null,
         ?array $variables = [],
+        bool $registerService = true,
     ): ClassNameDetails {
         $adminDetails = $this->generateFileFromTpm('Admin', $suffix, $className, $templatePath, $variables);
 
-        // Register the Admin service with sylius_easy_crud tag
-        $this->registerAdminService(
-            str_replace('Entity', 'Admin', $adminDetails->getRelativeName()),
-        );
+        if ($registerService) {
+            // Legacy YAML mode needs an explicit service tag. Attribute mode relies on app autoconfiguration.
+            $this->registerAdminService($adminDetails->getFullName());
+        }
 
         return $adminDetails;
+    }
+
+    public function getGeneratedClassPath(string $className): ?string
+    {
+        return $this->generatedClassPaths[$className] ?? null;
     }
 
     /**
@@ -370,13 +380,21 @@ class CrudMakerService
         if (null === $suffix) {
             $suffix = $templateName;
         }
-        $file = $this->generator->createClassNameDetails(
-            $className ?? ($this->entity ? $this->entity->getShortName() : ''),
-            $templateName,
-            $suffix,
-        );
+        if (null === $className) {
+            $fullClassName = $this->generator->createClassNameDetails(
+                $this->entity ? $this->entity->getShortName() : '',
+                $templateName,
+                $suffix,
+            )->getFullName();
+        } else {
+            $fullClassName = str_replace('Entity', $templateName, $className) . $templateName;
+        }
 
-        $fullClassName = str_replace('Entity', $templateName, $className ?: '') . $templateName;
+        $file = $this->generator->createClassNameDetails(
+            '\\' . ltrim($fullClassName, '\\'),
+            $templateName,
+            '',
+        );
 
         // Check if class already exists
         if (class_exists($fullClassName)) {
@@ -386,7 +404,7 @@ class CrudMakerService
             return $file;
         }
 
-        $this->generator->generateClass(
+        $generatedPath = $this->generator->generateClass(
             $fullClassName,
             (is_string($templatePath) && file_exists($templatePath)) ? $templatePath : __DIR__ . '/../Resources/skeleton/' . $templateName . '.tpl.php',
             array_merge([
@@ -396,8 +414,124 @@ class CrudMakerService
         );
         $this->generator->writeChanges();
         $this->namespaces[strtolower($templateName)] = $file->getFullName();
+        $this->generatedClassPaths[$file->getFullName()] = $generatedPath;
 
         return $file;
+    }
+
+    /**
+     * Adds a #[AsAdmin] attribute to an Admin class file, as an
+     * alternative to the legacy config/routes.yaml + sylius_resource.yaml blocks.
+     *
+     * The attribute relies on easy-crud's defaults (admin section, easy-crud
+     * templates, "update" redirect) and stores entity/grid metadata directly when
+     * the generated Admin does not override getEntityFqcn()/getName().
+     *
+     * When a convention-based custom controller exists, it is referenced via the
+     * "controller:" argument (mirroring the legacy resource generator).
+     *
+     * @param class-string|null $controller custom controller FQCN to reference, if any
+     *
+     * @throws \RuntimeException when the class file cannot be found
+     */
+    public function addEasyCrudAttributeToClass(
+        string $filePath,
+        string $shortClassName,
+        ?string $controller = null,
+        ?string $entityShortClassName = null,
+        ?string $grid = null,
+    ): string {
+        if (!is_file($filePath)) {
+            throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsAdmin] attribute.', $filePath));
+        }
+
+        $content = file_get_contents($filePath) ?: '';
+
+        // Idempotent: do nothing if the attribute is already declared.
+        if (str_contains($content, '#[AsAdmin')) {
+            return $filePath;
+        }
+
+        // 1. Import the attribute class (after the existing use block, else after the namespace).
+        $useLine = sprintf('use %s;', AsAdmin::class);
+        if (!str_contains($content, $useLine)) {
+            if (preg_match('/(?:^use [^;]+;\R)+/m', $content)) {
+                $content = preg_replace('/((?:^use [^;]+;\R)+)/m', '$1' . $useLine . "\n", $content, 1) ?? $content;
+            } else {
+                $content = preg_replace('/^(namespace [^;]+;\R)/m', "$1\n" . $useLine . "\n", $content, 1) ?? $content;
+            }
+        }
+
+        // 2. Add the attribute right above the class declaration.
+        $attributeArguments = [];
+        if (null !== $entityShortClassName) {
+            $attributeArguments[] = sprintf('resourceClass: %s::class', $entityShortClassName);
+        }
+        if (null !== $grid) {
+            $attributeArguments[] = sprintf("grid: '%s'", $grid);
+        }
+        if (null !== $controller) {
+            $attributeArguments[] = sprintf('controller: \\%s::class', ltrim($controller, '\\'));
+        }
+
+        $attribute = [] === $attributeArguments
+            ? '#[AsAdmin]'
+            : "#[AsAdmin(\n    " . implode(",\n    ", $attributeArguments) . ",\n)]";
+        $content = preg_replace(
+            '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
+            $attribute . "\n" . '$1',
+            $content,
+            1,
+        ) ?? $content;
+
+        file_put_contents($filePath, $content);
+
+        return $filePath;
+    }
+
+    /**
+     * Ensures the resource model carries the native #[\Sylius\Resource\Metadata\AsResource]
+     * attribute, which auto-registers it into sylius.resources. #[AsAdmin] then enriches
+     * that entry (controller/form) — so the resource must exist first.
+     *
+     * Idempotent: does nothing when the class already declares #[AsResource].
+     *
+     * @throws \RuntimeException when the class file cannot be found
+     */
+    public function addAsResourceAttributeToEntity(string $filePath, string $shortClassName): string
+    {
+        if (!is_file($filePath)) {
+            throw new \RuntimeException(sprintf('Unable to find the class file "%s" to add the #[AsResource] attribute.', $filePath));
+        }
+
+        $content = file_get_contents($filePath) ?: '';
+
+        // Idempotent: do nothing if the resource attribute is already declared.
+        if (preg_match('/#\[\s*(?:\\\\?Sylius\\\\Resource\\\\Metadata\\\\)?AsResource\b/', $content)) {
+            return $filePath;
+        }
+
+        // 1. Import the attribute class (after the existing use block, else after the namespace).
+        $useLine = 'use Sylius\\Resource\\Metadata\\AsResource;';
+        if (!str_contains($content, $useLine)) {
+            if (preg_match('/(?:^use [^;]+;\R)+/m', $content)) {
+                $content = preg_replace('/((?:^use [^;]+;\R)+)/m', '$1' . $useLine . "\n", $content, 1) ?? $content;
+            } else {
+                $content = preg_replace('/^(namespace [^;]+;\R)/m', "$1\n" . $useLine . "\n", $content, 1) ?? $content;
+            }
+        }
+
+        // 2. Add the attribute right above the class declaration (stacks with the ORM attributes).
+        $content = preg_replace(
+            '/^((?:final |abstract |readonly )*class\s+' . preg_quote($shortClassName, '/') . ')/m',
+            "#[AsResource]\n" . '$1',
+            $content,
+            1,
+        ) ?? $content;
+
+        file_put_contents($filePath, $content);
+
+        return $filePath;
     }
 
     public function generateRoute(bool $returnContent = false, ?string $entityName = null): string

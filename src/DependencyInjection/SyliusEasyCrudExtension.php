@@ -6,6 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\DependencyInjection;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\EasyCrudResourceFactory;
 use Sylius\Bundle\CoreBundle\DependencyInjection\PrependDoctrineMigrationsTrait;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceExtension;
 use Symfony\Component\Config\FileLocator;
@@ -20,6 +21,11 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
+        $container->setParameter('sylius_easy_crud.attributes.enabled', $config['attributes']['enabled']);
+        $container->setParameter('sylius_easy_crud.attributes.paths', $config['attributes']['paths']);
+
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('services_maker.yaml');
         $loader->load('services.yaml');
@@ -52,6 +58,98 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
     public function prepend(ContainerBuilder $container): void
     {
         $this->prependDoctrineMigrations($container);
+        $this->prependAttributeResources($container);
+    }
+
+    /**
+     * Scans #[AsAdmin] admins and contributes, for each, the full legacy Sylius resource
+     * (registered through sylius_resource) plus the routing config replayed by
+     * EasyCrudAttributesRoutesLoader. Done in prepend() — before SyliusResourceExtension::load()
+     * materializes per-resource services — so the easy-crud controller/form/translation are
+     * applied. The resource alias comes from the native #[AsResource] on the model;
+     * autoRegisterResources skips any alias we declare here, so easy-crud owns the entry.
+     */
+    private function prependAttributeResources(ContainerBuilder $container): void
+    {
+        $attributes = $this->resolveAttributesConfig($container);
+
+        // These parameters are always consumed downstream (the route loader argument
+        // and the legacy-deprecation compiler pass), so they must exist even when the
+        // attribute discovery is disabled.
+        if (!$attributes['enabled'] || [] === $attributes['paths']) {
+            $container->setParameter('sylius_easy_crud.attributes.routing', []);
+            $container->setParameter('sylius_easy_crud.attributes.declared_aliases', []);
+
+            return;
+        }
+
+        $descriptors = EasyCrudResourceFactory::build($attributes['paths']);
+
+        $resources = [];
+        $routing = [];
+        foreach ($descriptors as $descriptor) {
+            $resources[$descriptor['alias']] = $descriptor['registry'];
+            $routing[] = $descriptor['routing'];
+        }
+
+        if ([] !== $resources) {
+            $container->prependExtensionConfig('sylius_resource', ['resources' => $resources]);
+        }
+
+        $container->setParameter('sylius_easy_crud.attributes.routing', $routing);
+        $container->setParameter('sylius_easy_crud.attributes.declared_aliases', array_keys($resources));
+    }
+
+    /**
+     * Reads the raw (not-yet-processed) bundle config in prepend() and resolves
+     * %parameter% placeholders / non-existent directories in the paths.
+     *
+     * @return array{enabled: bool, paths: list<string>}
+     */
+    private function resolveAttributesConfig(ContainerBuilder $container): array
+    {
+        $enabled = false;
+        $paths = [];
+
+        foreach ($container->getExtensionConfig('sylius_easy_crud') as $config) {
+            $attributes = $config['attributes'] ?? null;
+            if (!is_array($attributes)) {
+                continue;
+            }
+            if (array_key_exists('enabled', $attributes)) {
+                // last block wins, like Symfony's scalar config merge
+                $enabled = (bool) $attributes['enabled'];
+            }
+            if (array_key_exists('paths', $attributes) && is_array($attributes['paths'])) {
+                // merge across all config blocks (packages/, env, plugin overrides) instead of
+                // letting the last one overwrite the others, mirroring Symfony's list merge
+                $paths = array_merge($paths, array_values($attributes['paths']));
+            }
+        }
+
+        return [
+            'enabled' => $enabled,
+            'paths' => $this->resolveExistingDirectories($container, array_values(array_unique($paths))),
+        ];
+    }
+
+    /**
+     * @param list<string> $paths
+     *
+     * @return list<string>
+     */
+    private function resolveExistingDirectories(ContainerBuilder $container, array $paths): array
+    {
+        $resolved = [];
+        foreach ($paths as $path) {
+            /** @var string $real */
+            $real = $container->getParameterBag()->resolveValue($path);
+            if (is_dir($real)) {
+                $resolved[] = $real;
+            }
+        }
+
+        return $resolved;
     }
 
     protected function getMigrationsNamespace(): string
