@@ -594,12 +594,13 @@ class CrudMakerService
             /** @var \ReflectionClass<RepositoryInterface> $repository */
             $repository = new \ReflectionClass($managerRegistry->getRepository($entity->getName()));
 
-            if (method_exists($entity, 'createTranslation')) {
-                $object = get_class($entity->createTranslation());
-                if (is_string($object)) {
-                    /** @var \ReflectionClass<ResourceInterface> $entityTranslation */
-                    $entityTranslation = new \ReflectionClass($object);
-                }
+            $metadata = $managerRegistry->getManagerForClass($class)?->getClassMetadata($class);
+            $translationClass = null !== $metadata && $entity->implementsInterface(TranslatableInterface::class)
+                ? $metadata->getAssociationTargetClass('translations')
+                : null;
+            if (null !== $translationClass) {
+                /** @var \ReflectionClass<ResourceInterface> $entityTranslation */
+                $entityTranslation = new \ReflectionClass($translationClass);
             }
         }
 

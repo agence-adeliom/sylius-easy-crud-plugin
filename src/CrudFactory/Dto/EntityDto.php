@@ -8,8 +8,13 @@ use Sylius\Resource\Model\ResourceInterface;
 
 final class EntityDto
 {
+    public function __construct(
+        private readonly ?ResourceInterface $instance = null,
+    ) {
+    }
+
     public function getInstance(): ?ResourceInterface
     {
-        return null;
+        return $this->instance;
     }
 }
