@@ -10,12 +10,12 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2 || ^8.3 || ^8.4 || ^8.5",
+        "php": "^8.4 || ^8.5",
         "ext-intl": "*",
         "ext-json": "*",
         "embed/embed": "^4.4",
-        "sylius/sylius": "^2.0",
-        "symfony/uid": "^6.4 || ^7.1"
+        "sylius/sylius": "^v2.3.0-alpha.1",
+        "symfony/uid": "^^7.4 || ^8.2"
     },
     "require-dev": {
         "behat/behat": "^3.16",
@@ -39,15 +39,15 @@
         "sylius-labs/coding-standard": "^4.4",
         "sylius-labs/suite-tags-extension": "~0.2",
         "sylius/sylius-rector": "^2.0",
-        "sylius/test-application": "^v2.0.0-ALPHA.7 || ^v2.1.0-ALPHA.6 || ^v2.2.0-ALPHA.1",
-        "symfony/browser-kit": "^6.4 || ^7.1",
-        "symfony/debug-bundle": "^6.4 || ^7.1",
-        "symfony/dotenv": "^6.4 || ^7.1",
-        "symfony/http-client": "^6.4 || ^7.1",
-        "symfony/intl": "^6.4 || ^7.1",
-        "symfony/maker-bundle": "^1.65",
-        "symfony/runtime": "^6.4 || ^7.1",
-        "symfony/web-profiler-bundle": "^6.4 || ^7.1",
+        "sylius/test-application": "^v2.3.0-ALPHA.2",
+        "symfony/browser-kit": "^^7.4 || ^8.2",
+        "symfony/debug-bundle": "^^7.4 || ^8.2",
+        "symfony/dotenv": "^^7.4 || ^8.2",
+        "symfony/http-client": "^^7.4 || ^8.2",
+        "symfony/intl": "^^7.4 || ^8.2",
+        "symfony/maker-bundle": "^1.66",
+        "symfony/runtime": "^^7.4 || ^8.2",
+        "symfony/web-profiler-bundle": "^^7.4 || ^8.2",
         "symfony/webpack-encore-bundle": "^2.2"
     },
     "config": {
@@ -65,7 +65,7 @@
             "dev-master": "2.0-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^^7.4 || ^8.2"
         },
         "public-dir": "vendor/sylius/test-application/public"
     },
