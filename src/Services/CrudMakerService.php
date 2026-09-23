@@ -595,10 +595,15 @@ class CrudMakerService
             $repository = new \ReflectionClass($managerRegistry->getRepository($entity->getName()));
 
             $metadata = $managerRegistry->getManagerForClass($class)?->getClassMetadata($class);
-            $translationClass = null !== $metadata && $entity->implementsInterface(TranslatableInterface::class)
-                ? $metadata->getAssociationTargetClass('translations')
-                : null;
-            if (null !== $translationClass) {
+            $translationClass = null;
+            if ($entity->implementsInterface(TranslatableInterface::class)) {
+                // Sylius maps "translations" only once the entity is registered as a resource,
+                // so fall back on the "{Entity}Translation" naming convention
+                $translationClass = null !== $metadata && $metadata->hasAssociation('translations')
+                    ? $metadata->getAssociationTargetClass('translations')
+                    : $class . 'Translation';
+            }
+            if (null !== $translationClass && \class_exists($translationClass)) {
                 /** @var \ReflectionClass<ResourceInterface> $entityTranslation */
                 $entityTranslation = new \ReflectionClass($translationClass);
             }
