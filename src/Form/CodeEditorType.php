@@ -39,7 +39,7 @@ class CodeEditorType extends AbstractType implements CodeEditorTypeInterface
         ];
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
         $resolver->setDefaults([
