@@ -19,10 +19,10 @@
     },
     "require-dev": {
         "behat/behat": "^3.16 || ^4.0@alpha",
+        "behat/mink": "^1.13",
         "dmore/behat-chrome-extension": "^1.4 || dev-main@dev",
         "dmore/chrome-mink-driver": "^2.9",
-        "friends-of-behat/mink": "^1.11",
-        "friends-of-behat/mink-browserkit-driver": "^1.6",
+        "friends-of-behat/mink-browserkit-driver": "^1.6.3",
         "friends-of-behat/mink-debug-extension": "^2.1",
         "friends-of-behat/mink-extension": "^2.7 || ^3.0@alpha",
         "friends-of-behat/page-object-extension": "^0.3",
