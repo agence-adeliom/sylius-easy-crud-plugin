@@ -1,0 +1,58 @@
+/* Overrides for iconpicker-1.5.0.css (vendored) so the modal follows the Sylius admin (Tabler) light/dark theme */
+div#IconPickerModal .ip-icons-content,
+div#IconPickerLoading {
+    background: var(--tblr-bg-surface, #fff);
+    color: var(--tblr-body-color, #1e1e1e);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search,
+div#IconPickerModal .ip-icons-content .ip-icons-footer {
+    border-color: var(--tblr-border-color, #e8e8e8);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search > input#IconPickerSearch {
+    background: var(--tblr-bg-forms, #fff);
+    border-color: var(--tblr-border-color, #f4f4f4);
+    color: var(--tblr-body-color, #1e1e1e);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search > input#IconPickerSearch:focus,
+div#IconPickerModal .ip-icons-content .ip-icons-area > a.ip-show-all-icons:hover,
+div#IconPickerModal .ip-icons-content .ip-icons-footer a.cancel:hover {
+    border-color: var(--tblr-body-color, #1e1e1e);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search > i.placeholder-icon {
+    color: var(--tblr-border-color, #eaeaea);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search > input#IconPickerSearch:focus + i.placeholder-icon {
+    color: var(--tblr-body-color, #1e1e1e);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search-results p.ip-no-results-found,
+div#IconPickerModal .ip-icons-content .ip-icons-area > a.ip-show-all-icons,
+div#IconPickerModal .ip-icons-content .ip-icons-footer a.cancel {
+    color: var(--tblr-secondary, #9b9b9b);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-area > a.ip-show-all-icons,
+div#IconPickerModal .ip-icons-content .ip-icons-footer a.cancel {
+    background: var(--tblr-bg-surface, #fff);
+    border-color: var(--tblr-border-color, #bcbcbc);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-area > a.ip-show-all-icons:hover,
+div#IconPickerModal .ip-icons-content .ip-icons-footer a.cancel:hover {
+    background: var(--tblr-body-color, #1e1e1e);
+    color: var(--tblr-bg-surface, #fff);
+}
+
+div#IconPickerModal .ip-icons-content .ip-icons-search-results > * > i:hover,
+div#IconPickerModal .ip-icons-content .ip-icons-area > i:hover {
+    background: var(--tblr-bg-surface, #fff);
+}
+
+[data-bs-theme="dark"] div#IconPickerModal .ip-icons-content .ip-icons-area:before {
+    background: rgba(0, 0, 0, 0.6);
+}

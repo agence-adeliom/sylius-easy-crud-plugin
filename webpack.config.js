@@ -22,6 +22,7 @@ Encore
   .addEntry('field-image', './assets/admin/js/field-image.js')
   .addEntry('field-choice-mask', './assets/admin/js/field-choice-mask.js')
   .addEntry('text-editor', './assets/admin/js/text-editor.js')
+  .addStyleEntry('form-type-autocomplete', './assets/admin/css/form-type-autocomplete.css')
 ;
 
 module.exports = Encore.getWebpackConfig();

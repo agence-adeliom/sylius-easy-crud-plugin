@@ -22,6 +22,7 @@ final class ResourceChoiceField implements FieldInterface
             ->setFormTypeOption('persist_into_an_array', false)
             ->setFormTypeOption('multiple', false)
             ->setFormTypeOption('autocomplete', true)
+            ->addAssets(ResourceChoiceType::configureAdminAssets())
             ->setLabel($label);
     }
 

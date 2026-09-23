@@ -4,20 +4,22 @@
     display: none;
 }
 .ea-text-editor-wrapper {
-    --white: #fff;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-600: #475569;
     --font-family-monospace: "JetBrains Mono",ui-monospace,"Roboto Mono",SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-    --form-control-bg: var(--white);
-    --form-input-border-color:  rgba(34, 36, 38, 0.1);
+    /* Tabler (Sylius admin) tokens, so the editor follows the light/dark theme */
+    --form-control-bg: var(--tblr-bg-forms, #fff);
+    --form-input-border-color: var(--tblr-border-color, rgba(34, 36, 38, 0.1));
     --form-input-shadow: 0 2px 4px 0 rgba(34, 36, 38, 0.03);
-    --form-type-text-editor-toolbar-bg: var(--white);
-    --form-type-text-editor-toolbar-button-color: var(--gray-600);
-    --form-type-text-editor-toolbar-button-active-color: var(--gray-700);
-    --form-type-text-editor-dialog-bg: var(--white);
-    --form-type-text-editor-content-pre-bg: #e0e1e2;
-    --form-type-text-editor-content-pre-color: #636364;
+    --form-input-focus-border-color: var(--tblr-primary, #ebebeb);
+    --form-input-focus-shadow-color: var(--tblr-bg-surface-secondary, #f6f6f6);
+    --form-type-text-editor-toolbar-bg: var(--tblr-bg-surface, #fff);
+    --form-type-text-editor-toolbar-button-color: var(--tblr-secondary, #475569);
+    --form-type-text-editor-toolbar-button-active-color: var(--tblr-body-color, #334155);
+    --form-type-text-editor-toolbar-button-hover-bg: var(--tblr-bg-surface-secondary, #e0e1e2);
+    --form-type-text-editor-toolbar-button-active-bg: var(--tblr-bg-surface-tertiary, #cacbcd);
+    --form-type-text-editor-dialog-bg: var(--tblr-bg-surface, #fff);
+    --form-type-text-editor-dialog-shadow-color: var(--tblr-border-color, #e8e8e8);
+    --form-type-text-editor-content-pre-bg: var(--tblr-bg-surface-secondary, #e0e1e2);
+    --form-type-text-editor-content-pre-color: var(--tblr-body-color, #636364);
     --border-radius: 4px;
     background: var(--form-control-bg);
     border: 1px solid var(--form-input-border-color);
@@ -27,8 +29,8 @@
 }
 .ea-text-editor-wrapper:focus,
 .ea-text-editor-wrapper:focus-within {
-    border-color: #ebebeb;
-    box-shadow: 0 0 0 4px #f6f6f6;
+    border-color: var(--form-input-focus-border-color);
+    box-shadow: 0 0 0 4px var(--form-input-focus-shadow-color);
     outline: 0;
 }
 trix-toolbar {
@@ -56,10 +58,10 @@ trix-toolbar .trix-button:not(:first-child) {
     border-left: 0;
 }
 trix-toolbar .trix-button:hover {
-    background: #E0E1E2;
+    background: var(--form-type-text-editor-toolbar-button-hover-bg);
 }
 trix-toolbar .trix-button.trix-active {
-    background: #cacbcd;
+    background: var(--form-type-text-editor-toolbar-button-active-bg);
     color: var(--form-type-text-editor-toolbar-button-active-color);
 }
 trix-toolbar .trix-button.trix-button--icon {
@@ -74,6 +76,7 @@ trix-toolbar .trix-button.trix-button--icon::before {
     width: 32px;
     text-indent: -999em;
 }
+[data-bs-theme="dark"] trix-toolbar .trix-button.trix-button--icon::before,
 .ea-dark-scheme trix-toolbar .trix-button.trix-button--icon::before {
     filter:  invert(1);
 }
@@ -84,7 +87,7 @@ trix-editor {
 
 trix-toolbar .trix-dialog {
     background: var(--form-type-text-editor-dialog-bg);
-    box-shadow: 0 2px 4px 0 #e8e8e8;
+    box-shadow: 0 2px 4px 0 var(--form-type-text-editor-dialog-shadow-color);
     border: 0;
     font-size:  12px;
     top: 4px;

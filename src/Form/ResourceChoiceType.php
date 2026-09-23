@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -182,7 +183,11 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
      */
     public static function configureAdminAssets(): array
     {
-        return [];
+        return [
+            'css' => [
+                (Asset::new('form-type-autocomplete.css'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
+            ],
+        ];
     }
 
     /**
