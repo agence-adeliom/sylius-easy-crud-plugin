@@ -157,6 +157,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                                         if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
                                             $value = $actualValue::normalizeFormData($value);
                                         }
+
                                         try {
                                             $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
                                                 AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,

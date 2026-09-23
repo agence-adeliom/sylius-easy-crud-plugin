@@ -15,6 +15,7 @@ on:
 jobs:
     tests:
         runs-on: ubuntu-latest
+        continue-on-error: ${{ matrix.experimental == true }}
 
         name: "Sylius ${{ matrix.sylius }}, PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, MySQL ${{ matrix.mysql }}"
 
@@ -22,10 +23,20 @@ jobs:
             fail-fast: false
             matrix:
                 php: ["8.4", "8.5"]
-                symfony: ["^7.4", "^8.2"]
+                symfony: ["^7.4", "^8.0"]
                 sylius: ["^v2.3.0-alpha.1"]
                 node: ["22.x"]
                 mysql: ["8.4"]
+                include:
+                    # Symfony 8.2 pas encore stable : job non bloquant sur la branche dev.
+                    # À supprimer (et passer la matrice à "^8.2") une fois Symfony 8.2.0 publié.
+                    -
+                        php: "8.5"
+                        symfony: "8.2.*"
+                        sylius: "^v2.3.0-alpha.1"
+                        node: "22.x"
+                        mysql: "8.4"
+                        experimental: true
 
         env:
             APP_ENV: test
@@ -86,6 +97,13 @@ jobs:
                     composer global require --no-progress --no-scripts --no-plugins "symfony/flex:^2.4"
                     composer global config --no-plugins allow-plugins.symfony/flex true
                     composer config extra.symfony.require "${{ matrix.symfony }}"
+
+            -
+                name: Allow unstable dependencies
+                if: matrix.experimental == true
+                run: |
+                    composer config minimum-stability dev
+                    composer config prefer-stable true
 
             -
                 name: Restrict Sylius version
