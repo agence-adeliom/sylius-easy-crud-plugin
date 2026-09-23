@@ -435,7 +435,7 @@ trait FieldTrait
         return $this->dto;
     }
 
-    public static function create(string $propertyName, ?string $label = null): \Sylius\Bundle\GridBundle\Builder\Field\FieldInterface
+    public static function create(string $propertyName, ?string $label = null): \Sylius\Component\Grid\Builder\Field\FieldInterface
     {
         $field = self::new($propertyName, $label);
         $syliusField = TwigField::create($propertyName, 'twig');

@@ -15,7 +15,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
-use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
+use Sylius\Component\Grid\Builder\GridBuilderInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Component\Resource\ResourceActions;
 use Sylius\Resource\Model\ResourceInterface;

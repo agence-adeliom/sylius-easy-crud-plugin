@@ -25,10 +25,11 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Webmozart\Assert\Assert;
 
 final class FieldResourceTranslationsType extends AbstractType implements AdminFormTypeInterface
@@ -144,30 +145,28 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                         $reflectionExtractor->getProperties($className);
                         foreach ($data as $property => $value) {
                             $actualValue = $this->propertyAccessor->getValue($translation, $property);
+                            $propertyType = $reflectionExtractor->getType($className, $property);
+                            if ($propertyType instanceof NullableType) {
+                                $propertyType = $propertyType->getWrappedType();
+                            }
                             if (
                                 !is_array($actualValue) &&
                                 $reflectionExtractor->isWritable($className, $property) &&
-                                ($types = $reflectionExtractor->getTypes($className, $property)) &&
-                                $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
+                                $propertyType instanceof ObjectType
                             ) {
-                                $type = $reflectionExtractor->getTypes($className, $property);
-                                if (is_array($type)) {
-                                    $objectClassName = $type[0]->getClassName();
-                                    if (is_string($objectClassName)) {
-                                        if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
-                                            $value = $actualValue::normalizeFormData($value);
-                                        }
+                                $objectClassName = $propertyType->getClassName();
+                                if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
+                                    $value = $actualValue::normalizeFormData($value);
+                                }
 
-                                        try {
-                                            $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
-                                                AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                                AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
-                                            ]);
-                                            $this->propertyAccessor->setValue($translation, $property, $objectValue);
-                                        } catch (\Symfony\Component\Serializer\Exception\NotNormalizableValueException $e) {
-                                            // some data cannot be denormalized, skip it
-                                        }
-                                    }
+                                try {
+                                    $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
+                                        AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
+                                        AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+                                    ]);
+                                    $this->propertyAccessor->setValue($translation, $property, $objectValue);
+                                } catch (\Symfony\Component\Serializer\Exception\NotNormalizableValueException $e) {
+                                    // some data cannot be denormalized, skip it
                                 }
                             } elseif (
                                 $reflectionExtractor->isWritable($className, $property)

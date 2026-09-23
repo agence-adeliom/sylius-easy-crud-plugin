@@ -8,7 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Doctrine\ORM\Mapping\Entity;
-use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
+use Sylius\Component\Grid\Builder\Filter\FilterInterface;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 {

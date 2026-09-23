@@ -6,7 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
-use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
+use Sylius\Component\Grid\Builder\Filter\FilterInterface;
 
 interface AdminInterface
 {
