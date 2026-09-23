@@ -195,6 +195,7 @@ Configure your fields in the `configureFields()` or your filters with `configure
 
 Navigate to your Sylius admin panel and find your new "Posts" menu entry. You now have a fully functional CRUD interface!
 
+
 ---
 
 ## Documentation
