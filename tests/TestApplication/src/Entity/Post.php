@@ -301,7 +301,7 @@ class Post implements ResourceInterface, TranslatableInterface
 
     public function __toString(): string
     {
-        return $this->getName();
+        return $this->getName() ?? '';
     }
 
 

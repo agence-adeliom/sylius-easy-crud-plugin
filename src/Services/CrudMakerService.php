@@ -6,7 +6,9 @@ namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Sylius\Resource\Factory\TranslatableFactory;
 use Sylius\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
@@ -556,6 +558,10 @@ class CrudMakerService
                 ],
             ];
         if (null !== $entityTranslationName) {
+            // TranslatableFactory sets the current/fallback locale on new resources
+            if (is_a($entityName, TranslatableInterface::class, true)) {
+                $resources[$alias]['classes']['factory'] = TranslatableFactory::class;
+            }
             $resources[$alias]['translation'] = [
                 'classes' => [
                     'model' => $entityTranslationName,

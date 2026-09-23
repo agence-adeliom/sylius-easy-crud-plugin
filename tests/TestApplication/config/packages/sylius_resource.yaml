@@ -8,6 +8,7 @@ sylius_resource:
         repository: Tests\Adeliom\SyliusEasyCrudPlugin\Repository\PostRepository
         controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
         form: Tests\Adeliom\SyliusEasyCrudPlugin\Admin\PostAdmin
+        factory: Sylius\Resource\Factory\TranslatableFactory
       translation:
         classes:
           model: Tests\Adeliom\SyliusEasyCrudPlugin\Entity\PostTranslation
