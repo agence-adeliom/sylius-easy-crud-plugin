@@ -32,7 +32,7 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Cache of instances of the Enum class.
      *
-     * @var array<string, array>
+     * @var array<string, array<int|string, static>>
      */
     protected static array $instances = [];
 
@@ -118,7 +118,7 @@ abstract class Enum implements \JsonSerializable, \Stringable
     /**
      * Returns instances of the Enum class of all Enum constants.
      *
-     * @return array<int, mixed>
+     * @return array<static>
      */
     public static function values(): array
     {
@@ -204,7 +204,7 @@ abstract class Enum implements \JsonSerializable, \Stringable
      *
      * @param array<mixed> $arguments
      */
-    public static function __callStatic(int|string $name, array $arguments): self
+    public static function __callStatic(int|string $name, array $arguments): static
     {
         $class = static::class;
         if (!isset(self::$instances[$class][$name])) {

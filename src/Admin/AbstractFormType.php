@@ -15,6 +15,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
+use Sylius\Component\Grid\Builder\Field\FieldInterface as GridFieldInterface;
 use Sylius\Component\Grid\Builder\GridBuilderInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Component\Resource\ResourceActions;
@@ -58,10 +59,10 @@ abstract class AbstractFormType extends AbstractGridType
 
         assert(isset($resources['sylius.locale']) && is_array($resources['sylius.locale']), 'Sylius locale resource is not properly configured.');
 
-        /** @var class-string<ResourceInterface> $modelClass */
-        $modelClass = $resources['sylius.locale']['classes']['model'];
+        $localeClasses = $resources['sylius.locale']['classes'] ?? null;
+        $modelClass = is_array($localeClasses) ? ($localeClasses['model'] ?? null) : null;
 
-        if (class_exists($modelClass)) {
+        if (is_string($modelClass) && class_exists($modelClass)) {
             return $this->entityManager->getRepository($modelClass)->findAll();
         }
 
@@ -356,6 +357,9 @@ abstract class AbstractFormType extends AbstractGridType
 
                 if ($fieldDto->getFieldFqcn() && method_exists($fieldDto->getFieldFqcn(), 'create')) {
                     $field = $fieldDto->getFieldFqcn()::create($fieldDto->getProperty());
+                    if (!$field instanceof GridFieldInterface) {
+                        continue;
+                    }
 
                     $field->setLabel($fieldDto->getLabel());
                     $field->setSortable($fieldDto->isSortable() ?? true, $fieldDto->getSortablePath());

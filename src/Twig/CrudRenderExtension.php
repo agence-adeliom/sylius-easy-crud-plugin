@@ -60,7 +60,7 @@ class CrudRenderExtension extends AbstractExtension
         $actionTemplates =
             $this->parameterBag->get('sylius.grid.templates.action');
 
-        if (!is_array($actionTemplates) || !isset($actionTemplates[$type])) {
+        if (!is_array($actionTemplates) || !isset($actionTemplates[$type]) || !is_string($actionTemplates[$type])) {
             throw new \InvalidArgumentException(sprintf('Missing template for action type "%s".', $type));
         }
 
@@ -70,13 +70,14 @@ class CrudRenderExtension extends AbstractExtension
             $data,
         );
 
+        $routeParams = $requestConfiguration->getRequest()->attributes->get('_route_params');
         if (
-            is_array($requestConfiguration->getRequest()->get('_route_params')) &&
-            $requestConfiguration->getRequest()->get('_route_params')['id'] &&
+            is_array($routeParams) &&
+            !empty($routeParams['id']) &&
             'index' !== $action->getName() &&
             'new' !== $action->getName()
         ) {
-            $data['id'] = $requestConfiguration->getRequest()->get('_route_params')['id'];
+            $data['id'] = $routeParams['id'];
         }
 
         return $this->twig->render($actionTemplates[$type], [
@@ -90,9 +91,9 @@ class CrudRenderExtension extends AbstractExtension
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<mixed> $data
      *
-     * @return array<string, mixed>
+     * @return array<mixed>
      */
     public function flattenArray(array $data, ?string $parentKey = null): array
     {
@@ -143,17 +144,18 @@ class CrudRenderExtension extends AbstractExtension
             return sprintf('Array (%d items)', \count($value));
         }
 
-        if (\is_object($value)) {
-            if (method_exists($value, '__toString')) {
-                return (string) $value;
-            }
-
-            if (method_exists($value, 'getId')) {
-                return sprintf('%s #%s', $value::class, $value->getId());
-            }
-
-            return sprintf('%s #%s', $value::class, substr(md5(spl_object_hash($value)), 0, 7));
+        if (method_exists($value, '__toString')) {
+            return (string) $value;
         }
+
+        if (method_exists($value, 'getId')) {
+            $id = $value->getId();
+            if (\is_scalar($id) || $id instanceof \Stringable) {
+                return sprintf('%s #%s', $value::class, (string) $id);
+            }
+        }
+
+        return sprintf('%s #%s', $value::class, substr(md5(spl_object_hash($value)), 0, 7));
     }
 
     /**

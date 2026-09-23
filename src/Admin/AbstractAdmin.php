@@ -95,8 +95,10 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
             $reflectionClass = new \ReflectionClass(self::getResourceClass());
             foreach ($reflectionClass->getAttributes() as $attribute) {
                 if ($attribute->getName() === Entity::class) {
-                    if ($attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0] ?? null) {
-                        return $attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0];
+                    $arguments = $attribute->getArguments();
+                    $repositoryClass = $arguments['repositoryClass'] ?? $arguments[0] ?? null;
+                    if (is_string($repositoryClass) && class_exists($repositoryClass)) {
+                        return $repositoryClass;
                     }
                 }
             }

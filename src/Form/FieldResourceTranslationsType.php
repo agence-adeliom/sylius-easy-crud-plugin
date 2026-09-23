@@ -140,10 +140,16 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                         $className = get_class($translation);
                         $objectNormalizer = new ObjectNormalizer();
                         $data = $translationsByLocale[$localeCode] ?? [];
+                        if (!is_array($data)) {
+                            $data = [];
+                        }
 
                         $reflectionExtractor = new ReflectionExtractor();
                         $reflectionExtractor->getProperties($className);
                         foreach ($data as $property => $value) {
+                            if (!is_string($property)) {
+                                continue;
+                            }
                             $actualValue = $this->propertyAccessor->getValue($translation, $property);
                             $propertyType = $reflectionExtractor->getType($className, $property);
                             if ($propertyType instanceof NullableType) {

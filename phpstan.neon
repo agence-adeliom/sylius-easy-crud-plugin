@@ -9,6 +9,9 @@ parameters:
         # Makes PHPStan crash
         - 'src/DependencyInjection/Configuration.php'
 
+        # MakerBundle skeletons (templates rendered with dynamic variables, not real code)
+        - 'src/Resources/skeleton/*'
+
         # Test dependencies
         - 'tests/Application/app/**.php'
         - 'tests/Application/src/**.php'
@@ -17,3 +20,6 @@ parameters:
         - '/Parameter #1 \$configuration of method Symfony\\Component\\DependencyInjection\\Extension\\Extension::processConfiguration\(\) expects Symfony\\Component\\Config\\Definition\\ConfigurationInterface, Symfony\\Component\\Config\\Definition\\ConfigurationInterface\|null given\./'
         -
             identifier: missingType.iterableValue
+        # Traits are provided to plugin users and are not used inside the plugin itself
+        -
+            identifier: trait.unused

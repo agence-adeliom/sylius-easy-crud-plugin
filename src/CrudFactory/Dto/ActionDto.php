@@ -386,8 +386,6 @@ class ActionDto
             return $this->getSyliusAction();
         }
         if ([] !== $this->getSubActions()) {
-            assert(is_string($this->getName()), 'The action name must be a string to create the Action config object.');
-
             $subItemWrapper = SyliusAction::create(
                 $this->getName(),
                 'easy_crud_' . $this->getType() . '_sub_action',
@@ -431,8 +429,6 @@ class ActionDto
             ['link' => $route],
             $actionOptions,
         );
-
-        assert(is_string($this->getName()), 'The action name must be a string to create the Action config object.');
 
         return SyliusAction::create($this->getName(), 'easy_crud_' . $this->getType() . '_action')
             ->setLabel($this->getLabel())

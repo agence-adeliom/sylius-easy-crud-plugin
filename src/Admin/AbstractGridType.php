@@ -13,7 +13,6 @@ use Sylius\Bundle\GridBundle\Builder\ActionGroup\SubItemActionGroup;
 use Sylius\Bundle\GridBundle\Grid\ResourceAwareGridInterface;
 use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
 use Sylius\Component\Grid\Builder\Action\ActionInterface;
-use Sylius\Component\Grid\Builder\Filter\FilterInterface;
 use Sylius\Component\Grid\Builder\GridBuilder;
 use Sylius\Component\Grid\Builder\GridBuilderInterface;
 use Sylius\Resource\Model\TranslatableInterface;
@@ -174,9 +173,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
 
             if ($gridBuilder instanceof GridBuilderInterface) {
                 foreach ($filters as $filter) {
-                    if ($filter instanceof FilterInterface) {
-                        $gridBuilder->addFilter($filter);
-                    }
+                    $gridBuilder->addFilter($filter);
                 }
             }
         }

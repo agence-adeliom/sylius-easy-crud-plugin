@@ -298,20 +298,23 @@ final class IntlFormatter
             return null;
         }
 
+        // "false" means the date must not be converted
+        if (false === $timezone) {
+            return $date;
+        }
+
         if (null === $timezone) {
             $timezone = new DateTimeZone(date_default_timezone_get());
-        } elseif (!$timezone instanceof DateTimeZone && is_string($timezone)) {
+        } elseif (is_string($timezone)) {
             $timezone = new DateTimeZone($timezone);
         }
 
-        if ($date instanceof \DateTimeImmutable && $timezone) {
+        if ($date instanceof \DateTimeImmutable) {
             return $date->setTimezone($timezone);
         }
 
         $date = clone $date;
-        if (method_exists($date, 'setTimezone')) {
-            $date->setTimezone($timezone);
-        }
+        $date->setTimezone($timezone);
 
         return $date;
     }

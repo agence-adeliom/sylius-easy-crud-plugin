@@ -27,10 +27,10 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
      *     delete_empty: bool|callable,
      *     required: bool,
      *     entry_type: class-string<FormTypeInterface>,
-     *     prototype: string,
+     *     prototype: bool,
      *     prototype_name: string,
-     *     entry_options: array,
-     *     prototype_data: array,
+     *     entry_options: array<string, mixed>,
+     *     prototype_data: mixed,
      * } $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -105,13 +105,18 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         }
 
         foreach ($view as $entryView) {
-            array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, 'sortable_collection_entry');
+            $blockPrefixes = $entryView->vars['block_prefixes'];
+            if (\is_array($blockPrefixes)) {
+                array_splice($blockPrefixes, $prefixOffset, 0, 'sortable_collection_entry');
+                $entryView->vars['block_prefixes'] = $blockPrefixes;
+            }
         }
 
         /** @var ?FormInterface $prototype */
         $prototype = $form->getConfig()->getAttribute('prototype');
-        if (null !== $prototype) {
-            if ($view->vars['prototype']->vars['multipart']) {
+        $prototypeView = $view->vars['prototype'] ?? null;
+        if (null !== $prototype && $prototypeView instanceof FormView) {
+            if ($prototypeView->vars['multipart']) {
                 $view->vars['multipart'] = true;
             }
 
@@ -119,7 +124,11 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
                 --$prefixOffset;
             }
 
-            array_splice($view->vars['prototype']->vars['block_prefixes'], $prefixOffset, 0, 'sortable_collection_entry');
+            $blockPrefixes = $prototypeView->vars['block_prefixes'];
+            if (\is_array($blockPrefixes)) {
+                array_splice($blockPrefixes, $prefixOffset, 0, 'sortable_collection_entry');
+                $prototypeView->vars['block_prefixes'] = $blockPrefixes;
+            }
         }
     }
 
@@ -128,8 +137,10 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $entryOptionsNormalizer = static function (Options $options, $value) {
-            $value['block_name'] = 'entry';
+        $entryOptionsNormalizer = static function (Options $options, mixed $value): mixed {
+            if (\is_array($value)) {
+                $value['block_name'] = 'entry';
+            }
 
             return $value;
         };

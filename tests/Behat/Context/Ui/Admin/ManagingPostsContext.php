@@ -186,8 +186,7 @@ final class ManagingPostsContext implements Context
     #[Then('the post :name should have description :description')]
     public function thePostShouldHaveDescription(string $name, string $description): void
     {
-        // This would require checking in the database or detail page
-        Assert::true(true); // Placeholder
+        // @todo Placeholder: this would require checking in the database or detail page
     }
 
     #[Then('the post :name should be enabled')]
@@ -199,22 +198,19 @@ final class ManagingPostsContext implements Context
     #[Then('the post :name should have state :state')]
     public function thePostShouldHaveState(string $name, string $state): void
     {
-        // This would require checking in the database or detail page
-        Assert::true(true); // Placeholder
+        // @todo Placeholder: this would require checking in the database or detail page
     }
 
     #[Then('the post :name should have taxon :taxonName')]
     public function thePostShouldHaveTaxon(string $name, string $taxonName): void
     {
-        // This would require checking in the database or detail page
-        Assert::true(true); // Placeholder
+        // @todo Placeholder: this would require checking in the database or detail page
     }
 
     #[Then('the post :name should have :count products')]
     public function thePostShouldHaveProducts(string $name, int $count): void
     {
-        // This would require checking in the database or detail page
-        Assert::true(true); // Placeholder
+        // @todo Placeholder: this would require checking in the database or detail page
     }
 
     #[Then('I should see field :fieldName')]
