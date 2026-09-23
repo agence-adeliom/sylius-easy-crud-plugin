@@ -204,8 +204,8 @@ final class IntlFormatter
 
         $calendar = 'gregorian' === $calendarName ? \IntlDateFormatter::GREGORIAN : \IntlDateFormatter::TRADITIONAL;
 
-        $dateFormatValue = self::DATE_FORMATS[$dateFormat] ?? self::DATE_FORMATS['full'];
-        $timeFormatValue = self::DATE_FORMATS[$timeFormat] ?? self::DATE_FORMATS['full'];
+        $dateFormatValue = null !== $dateFormat ? self::DATE_FORMATS[$dateFormat] : self::DATE_FORMATS['full'];
+        $timeFormatValue = null !== $timeFormat ? self::DATE_FORMATS[$timeFormat] : self::DATE_FORMATS['full'];
 
         $hash = $locale . '|' . $dateFormatValue . '|' . $timeFormatValue . '|' . ($timezone?->getName() ?? '') . '|' . $calendar . '|' . $pattern;
 
