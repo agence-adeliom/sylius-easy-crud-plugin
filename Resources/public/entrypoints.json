@@ -12,7 +12,7 @@
     },
     "field-code-editor": {
       "css": [
-        "/bundles/syliuseasycrudplugin/field-code-editor.7006e473.css"
+        "/bundles/syliuseasycrudplugin/field-code-editor.4b01423b.css"
       ],
       "js": [
         "/bundles/syliuseasycrudplugin/field-code-editor.86f543b8.js"
@@ -35,7 +35,7 @@
     },
     "text-editor": {
       "css": [
-        "/bundles/syliuseasycrudplugin/text-editor.1830acff.css"
+        "/bundles/syliuseasycrudplugin/text-editor.797f5067.css"
       ],
       "js": [
         "/bundles/syliuseasycrudplugin/text-editor.757c1a45.js"

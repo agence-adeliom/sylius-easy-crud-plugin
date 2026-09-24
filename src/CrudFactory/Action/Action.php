@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\ActionDto;
-use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
+use Sylius\Component\Grid\Builder\Action\ActionInterface;
 use function Symfony\Component\String\u;
 
 class Action

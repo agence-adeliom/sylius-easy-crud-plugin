@@ -42,7 +42,7 @@ class SyliusCrudResourceController extends ResourceController
     private function processCustomAction(string $context, Request $request): ?Response
     {
         if (str_starts_with($context, 'ca:')) {
-            $controller = $this->metadata->getParameters()['classes']['controller'];
+            $controller = $this->metadata->getClass('controller');
             $method = str_replace('ca:', '', $context) . 'Action';
             $configuration = $this->requestConfigurationFactory
                 ->create($this->metadata, $request);
@@ -56,11 +56,15 @@ class SyliusCrudResourceController extends ResourceController
                 throw new HttpException(Response::HTTP_FORBIDDEN, 'Method ' . $method . ' not exists in file ' . $controller);
             }
 
-            return $this->$method(
+            $response = $this->$method(
                 $configuration,
                 $resources,
                 $request,
             );
+
+            assert(null === $response || $response instanceof Response, 'Custom action ' . $method . ' must return a Response or null');
+
+            return $response;
         }
 
         return null;
@@ -85,14 +89,13 @@ class SyliusCrudResourceController extends ResourceController
             return $eventResponse;
         }
 
-        /** @var ?FormFactoryInterface $formFactory */
-        $formFactory = $this->container->get('form.factory');
+        $formFactory = $this->getRequiredContainer()->get('form.factory');
 
         assert($formFactory instanceof FormFactoryInterface, 'form.factory service must be an instance of FormFactoryInterface');
 
         $form = $formFactory
             ->create(
-                $this->metadata->getParameters()['classes']['form'],
+                $this->metadata->getClass('form'),
                 null,
                 [
                     'page_name' => Crud::PAGE_DETAIL,

@@ -6,7 +6,9 @@ namespace Adeliom\SyliusEasyCrudPlugin\Services;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Sylius\Resource\Factory\TranslatableFactory;
 use Sylius\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
@@ -405,7 +407,7 @@ class CrudMakerService
         try {
             $yaml = [];
             if (null === $entityName) {
-                $entityName = is_object($this->namespaces['entity']) && method_exists($this->namespaces['entity'], 'getShortName') ?
+                $entityName = $this->namespaces['entity'] instanceof \ReflectionClass ?
                     $this->namespaces['entity']->getShortName()
                     :
                     ($this->entity ? $this->entity->getShortName() : '')
@@ -437,7 +439,7 @@ class CrudMakerService
     {
         try {
             if (null === $entityName) {
-                $entityName = is_object($this->namespaces['entity']) && method_exists($this->namespaces['entity'], 'getName') ?
+                $entityName = $this->namespaces['entity'] instanceof \ReflectionClass ?
                     $this->namespaces['entity']->getName()
                     :
                     ($this->entity ? $this->entity->getName() : '')
@@ -534,22 +536,18 @@ class CrudMakerService
     }
 
     /**
-     * @param array<string, array> $data
+     * @param array<mixed> $data
      */
     private function appendResourceConfig(array &$data, string $entityName, ?string $entityTranslationName = null): void
     {
         $alias = mb_strtolower(Str::asSnakeCase($this->namespace) . '.' . Str::asSnakeCase($entityName));
-        if (!isset($data['sylius_resource'])) {
-            $data['sylius_resource'] = [];
-        }
-        if (!isset($data['sylius_resource']['resources'])) {
-            $data['sylius_resource']['resources'] = [];
-        }
-        $data['sylius_resource']['resources'][] = YamlSourceManipulator::EMPTY_LINE_PLACEHOLDER_VALUE;
+        $syliusResource = is_array($data['sylius_resource'] ?? null) ? $data['sylius_resource'] : [];
+        $resources = is_array($syliusResource['resources'] ?? null) ? $syliusResource['resources'] : [];
+        $resources[] = YamlSourceManipulator::EMPTY_LINE_PLACEHOLDER_VALUE;
 
         $controller = str_replace('Entity', 'Controller', $entityName) . 'Controller';
 
-        $data['sylius_resource']['resources'][$alias] =
+        $resources[$alias] =
             [
                 'driver' => 'doctrine/orm',
                 'classes' => [
@@ -560,7 +558,11 @@ class CrudMakerService
                 ],
             ];
         if (null !== $entityTranslationName) {
-            $data['sylius_resource']['resources'][$alias]['translation'] = [
+            // TranslatableFactory sets the current/fallback locale on new resources
+            if (is_a($entityName, TranslatableInterface::class, true)) {
+                $resources[$alias]['classes']['factory'] = TranslatableFactory::class;
+            }
+            $resources[$alias]['translation'] = [
                 'classes' => [
                     'model' => $entityTranslationName,
                     'controller' => 'Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController',
@@ -568,6 +570,9 @@ class CrudMakerService
                 ],
             ];
         }
+
+        $syliusResource['resources'] = $resources;
+        $data['sylius_resource'] = $syliusResource;
     }
 
     /**
@@ -589,12 +594,18 @@ class CrudMakerService
             /** @var \ReflectionClass<RepositoryInterface> $repository */
             $repository = new \ReflectionClass($managerRegistry->getRepository($entity->getName()));
 
-            if (method_exists($entity, 'createTranslation')) {
-                $object = get_class($entity->createTranslation());
-                if (is_string($object)) {
-                    /** @var \ReflectionClass<ResourceInterface> $entityTranslation */
-                    $entityTranslation = new \ReflectionClass($object);
-                }
+            $metadata = $managerRegistry->getManagerForClass($class)?->getClassMetadata($class);
+            $translationClass = null;
+            if ($entity->implementsInterface(TranslatableInterface::class)) {
+                // Sylius maps "translations" only once the entity is registered as a resource,
+                // so fall back on the "{Entity}Translation" naming convention
+                $translationClass = null !== $metadata && $metadata->hasAssociation('translations')
+                    ? $metadata->getAssociationTargetClass('translations')
+                    : $class . 'Translation';
+            }
+            if (null !== $translationClass && \class_exists($translationClass)) {
+                /** @var \ReflectionClass<ResourceInterface> $entityTranslation */
+                $entityTranslation = new \ReflectionClass($translationClass);
             }
         }
 

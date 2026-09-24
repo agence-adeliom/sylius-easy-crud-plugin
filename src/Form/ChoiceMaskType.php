@@ -23,6 +23,9 @@ class ChoiceMaskType extends AbstractType
             foreach ($options['map'] as $value => $fieldNames) {
                 if (is_iterable($fieldNames)) {
                     foreach ($fieldNames as $fieldName) {
+                        if (!\is_scalar($fieldName)) {
+                            continue;
+                        }
                         $sanitizedFieldName = str_replace(['__', '.'], ['____', '__'], (string) $fieldName);
                         $sanitizedMap[$value][] = $sanitizedFieldName;
                         $allFieldNames[] = $sanitizedFieldName;

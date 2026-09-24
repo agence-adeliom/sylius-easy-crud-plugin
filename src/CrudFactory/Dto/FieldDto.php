@@ -36,7 +36,7 @@ final class FieldDto
 
     private ?string $textAlign = null;
 
-    private TranslatableInterface|string|null $help;
+    private TranslatableInterface|string|null $help = null;
 
     private string $cssClass = '';
 
@@ -58,7 +58,7 @@ final class FieldDto
 
     private ?string $showTemplatePath = null;
 
-    /** @var array<int, string> */
+    /** @var string[] */
     private array $formThemePaths = [];
 
     private AssetsDto $assets;
@@ -336,7 +336,7 @@ final class FieldDto
         $this->templatePath = $templatePath;
     }
 
-    public function getGridTemplatePath(): ?string
+    public function getGridTemplatePath(): string
     {
         // '@SyliusUi/grid/field/rawLabel.html.twig'
         return $this->gridTemplatePath ?? '@SyliusEasyCrudPlugin/field/default/grid.html.twig';
@@ -347,7 +347,7 @@ final class FieldDto
         $this->gridTemplatePath = $gridTemplatePath;
     }
 
-    public function getShowTemplatePath(): ?string
+    public function getShowTemplatePath(): string
     {
         // '@SyliusUi/grid/field/rawLabel.html.twig'
         return $this->showTemplatePath ?? '@SyliusEasyCrudPlugin/field/default/show.html.twig';

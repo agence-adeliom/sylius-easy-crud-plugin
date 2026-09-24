@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
+use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,22 +37,24 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
         // If this form type is used directly on a entity field set false
         // If this form type is used in sub form type collection and saved as array in database, set true
         if ($options['persist_into_an_array']) {
+            $choiceValue = $options['choice_value'];
+            Assert::string($choiceValue, 'The "choice_value" option must be a property name when "persist_into_an_array" is enabled.');
+
             if (!$options['multiple']) {
                 $builder->addModelTransformer(
                     new CallbackTransformer(
-                        function (string|int|null $tag) use ($options): ?ResourceInterface {
+                        function (string|int|null $tag) use ($options, $choiceValue): ?ResourceInterface {
                             if (null !== $tag) {
                                 return $options['repository']->findOneBy([
-                                                                             $options['choice_value'] => $tag,
+                                                                             $choiceValue => $tag,
                                                                          ]);
                             }
 
                             return null;
                         },
-                        function (?ResourceInterface $tagsAsResource) use ($options): string|int {
+                        function (?ResourceInterface $tagsAsResource) use ($choiceValue): string|int {
                             if (null !== $tagsAsResource) {
-                                $choiceValue = $options['choice_value'];
-                                if (is_string($choiceValue) && method_exists($tagsAsResource, 'get' . ucfirst($choiceValue))) {
+                                if (method_exists($tagsAsResource, 'get' . ucfirst($choiceValue))) {
                                     /** @phpstan-ignore-next-line */
                                     $return = call_user_func([$tagsAsResource, 'get' . ucfirst($choiceValue)]);
                                     assertTrue(is_string($return) || is_int($return));
@@ -68,7 +71,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                 $builder
                     ->addModelTransformer(
                         new CallbackTransformer(
-                            function (array|string|null $tagsAsArray) use ($options): Collection {
+                            function (array|string|null $tagsAsArray) use ($options, $choiceValue): Collection {
                                 $valueAsCollection = new ArrayCollection();
                                 if (is_string($tagsAsArray)) {
                                     // If you switch from non multiple value to multiple value, the value will be a string
@@ -77,7 +80,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                         $tagsAsArray = explode(',', $tagsAsArray);
                                     } else {
                                         $valueAsCollection->add($options['repository']->findOneBy([
-                                          $options['choice_value'] => $tagsAsArray,
+                                          $choiceValue => $tagsAsArray,
                                         ]));
                                     }
                                 }
@@ -86,7 +89,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                         if (is_string($tag) or is_int($tag)) {
                                             // If the tag is a string, we can assume it's an ID
                                             $valueAsCollection->add($options['repository']->findOneBy([
-                                                                                                          $options['choice_value'] => $tag,
+                                                                                                          $choiceValue => $tag,
                                                                                                       ]));
                                         }
                                     }
@@ -94,11 +97,10 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
 
                                 return $valueAsCollection;
                             },
-                            function (Collection $tagsAsCollection) use ($options): string {
+                            function (Collection $tagsAsCollection) use ($choiceValue): string {
                                 $valuesAsString = '';
                                 foreach ($tagsAsCollection as $key => $tag) {
-                                    $choiceValue = $options['choice_value'];
-                                    if (is_string($choiceValue) && is_object($tag) && method_exists($tag, 'get' . ucfirst($choiceValue))) {
+                                    if (is_object($tag) && method_exists($tag, 'get' . ucfirst($choiceValue))) {
                                         /** @phpstan-ignore-next-line */
                                         $return = call_user_func([$tag, 'get' . ucfirst($choiceValue)]);
                                         assertTrue(is_string($return) || is_int($return));
@@ -145,7 +147,7 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                   Assert::string($options['resource']);
                                   $repository = $this->resourceRepositoryRegistry->get($options['resource']);
 
-                                  if (isset($options['repositoryMethod']) && null !== $options['repositoryMethod'] && null !== $options['repositoryArguments']) {
+                                  if (isset($options['repositoryMethod']) && null !== $options['repositoryArguments']) {
                                       Assert::isArray($options['repositoryArguments']);
 
                                       /** @phpstan-ignore-next-line */
@@ -182,7 +184,11 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
      */
     public static function configureAdminAssets(): array
     {
-        return [];
+        return [
+            'css' => [
+                (Asset::new('form-type-autocomplete.css'))->package(AssetEasyCrudPackage::PACKAGE_NAME),
+            ],
+        ];
     }
 
     /**

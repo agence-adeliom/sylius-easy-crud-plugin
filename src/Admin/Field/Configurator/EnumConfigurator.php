@@ -55,13 +55,16 @@ final class EnumConfigurator implements FieldConfiguratorInterface
             return [];
         }
 
-        if (is_string($enum) && !class_exists($enum)) {
+        if (is_string($enum) && !is_subclass_of($enum, Enum::class)) {
             return [];
         }
 
         $choicesEnum = $enum::toArray();
         $choices = [];
         foreach ($choicesEnum as $v) {
+            if (!\is_scalar($v)) {
+                continue;
+            }
             $choices[sprintf('sylius_easy_crud_plugin.enum.%s.%s', $field->getProperty(), $v)] = $v;
         }
 

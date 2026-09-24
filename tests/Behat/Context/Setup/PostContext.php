@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Setup;
 
 use Behat\Behat\Context\Context;
+use Behat\Step\Given;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Core\Model\ProductInterface;
@@ -29,9 +30,7 @@ final class PostContext implements Context
     ) {
     }
 
-    /**
-     * @Given there are :count posts in the database
-     */
+    #[Given('there are :count posts in the database')]
     public function thereArePostsInTheDatabase(int $count): void
     {
         for ($i = 1; $i <= $count; $i++) {
@@ -39,17 +38,13 @@ final class PostContext implements Context
         }
     }
 
-    /**
-     * @Given there is a post named :name
-     */
+    #[Given('there is a post named :name')]
     public function thereIsAPostNamed(string $name): void
     {
         $this->createPost($name);
     }
 
-    /**
-     * @Given there are :count enabled posts
-     */
+    #[Given('there are :count enabled posts')]
     public function thereAreEnabledPosts(int $count): void
     {
         for ($i = 1; $i <= $count; $i++) {
@@ -57,9 +52,7 @@ final class PostContext implements Context
         }
     }
 
-    /**
-     * @Given there are :count disabled posts
-     */
+    #[Given('there are :count disabled posts')]
     public function thereAreDisabledPosts(int $count): void
     {
         for ($i = 1; $i <= $count; $i++) {
@@ -67,17 +60,13 @@ final class PostContext implements Context
         }
     }
 
-    /**
-     * @Given there is a taxon named :name
-     */
+    #[Given('there is a taxon named :name')]
     public function thereIsATaxonNamed(string $name): void
     {
         $this->createTaxon($name);
     }
 
-    /**
-     * @Given there is a product named :name
-     */
+    #[Given('there is a product named :name')]
     public function thereIsAProductNamed(string $name): void
     {
         $this->createProduct($name);

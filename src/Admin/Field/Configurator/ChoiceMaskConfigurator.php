@@ -57,7 +57,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array<mixed>
      */
     private function getChoices(mixed $choiceGenerator): array
     {
@@ -73,7 +73,7 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array<mixed>
      */
     private function getMap(mixed $mapGenerator): array
     {
@@ -92,19 +92,20 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
     private function getBadgeCssClass(mixed $badgeSelector, mixed $value, FieldDto $field): string
     {
         $commonBadgeCssClass = 'badge';
+        $badgeType = null;
 
         if (true === $badgeSelector) {
             $badgeType = 'badge-secondary';
         } elseif (\is_array($badgeSelector)) {
-            $badgeType = $badgeSelector[$value] ?? 'badge-secondary';
+            $badgeType = (\is_int($value) || \is_string($value)) ? ($badgeSelector[$value] ?? 'badge-secondary') : 'badge-secondary';
         } elseif (\is_callable($badgeSelector)) {
             $badgeType = $badgeSelector($value, $field);
             if (!\in_array($badgeType, ChoiceMaskField::VALID_BADGE_TYPES, true)) {
-                throw new \RuntimeException(sprintf('The value returned by the callable passed to the "renderAsBadges()" method must be one of the following valid badge types: "%s" ("%s" given).', implode(', ', ChoiceMaskField::VALID_BADGE_TYPES), $badgeType));
+                throw new \RuntimeException(sprintf('The value returned by the callable passed to the "renderAsBadges()" method must be one of the following valid badge types: "%s" ("%s" given).', implode(', ', ChoiceMaskField::VALID_BADGE_TYPES), get_debug_type($badgeType)));
             }
         }
 
-        $badgeTypeCssClass = empty($badgeType) ? '' : u($badgeType)->ensureStart('badge-')->toString();
+        $badgeTypeCssClass = \is_string($badgeType) && '' !== $badgeType ? u($badgeType)->ensureStart('badge-')->toString() : '';
 
         return $commonBadgeCssClass . ' ' . $badgeTypeCssClass;
     }
@@ -124,9 +125,17 @@ final class ChoiceMaskConfigurator implements FieldConfiguratorInterface
         assert(is_array($choices), 'The choices form option is not an array.');
 
         $selectedChoices = [];
-        $flippedChoices = array_flip($choices);
+        $flippedChoices = [];
+        foreach ($choices as $choiceLabel => $choice) {
+            if (\is_int($choice) || \is_string($choice)) {
+                $flippedChoices[$choice] = $choiceLabel;
+            }
+        }
         // $value is a scalar for single selections and an array for multiple selections
         foreach (array_values((array) $fieldValue) as $selectedValue) {
+            if (!\is_int($selectedValue) && !\is_string($selectedValue)) {
+                continue;
+            }
             if (null !== $selectedChoice = $flippedChoices[$selectedValue] ?? null) {
                 $choiceValue = $selectedChoice;
                 $selectedChoices[] = $isRenderedAsBadge

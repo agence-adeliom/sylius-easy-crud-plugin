@@ -6,7 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
-use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
+use Sylius\Component\Grid\Builder\Action\ActionInterface;
 
 final class ActionConfigDto
 {

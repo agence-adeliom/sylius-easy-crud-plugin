@@ -48,7 +48,6 @@ final class DateTimeConfigurator implements FieldConfiguratorInterface
         }
 
         // check if the property is immutable
-        $field->getCustomOption('immutable');
         // $isImmutableDateTime = \in_array($doctrineDataType, [Types::DATETIMETZ_IMMUTABLE,
         // Types::DATETIME_IMMUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE], true);
         if ($field->getCustomOption(DateField::IMMUTABLE)) {

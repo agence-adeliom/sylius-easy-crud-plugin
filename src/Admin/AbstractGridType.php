@@ -6,18 +6,27 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
-use Sylius\Bundle\GridBundle\Builder\Action\ActionInterface;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\BulkActionGroup;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\ItemActionGroup;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\MainActionGroup;
 use Sylius\Bundle\GridBundle\Builder\ActionGroup\SubItemActionGroup;
-use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
-use Sylius\Bundle\GridBundle\Builder\GridBuilder;
-use Sylius\Bundle\GridBundle\Builder\GridBuilderInterface;
 use Sylius\Bundle\GridBundle\Grid\ResourceAwareGridInterface;
 use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
+use Sylius\Component\Grid\Builder\Action\ActionInterface;
+use Sylius\Component\Grid\Builder\GridBuilder;
+use Sylius\Component\Grid\Builder\GridBuilderInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 
+/**
+ * @phpstan-type GridActionData array{
+ *     type: string,
+ *     options?: array<string, mixed>,
+ *     icon?: string,
+ *     enabled?: bool,
+ *     position?: int,
+ *     label?: string
+ * }
+ */
 abstract class AbstractGridType extends AbstractResourceType implements ResourceAwareGridInterface
 {
     /**
@@ -85,14 +94,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
     }
 
     /**
-     * @param array{
-     *     type: string,
-     *     options?: array<string, mixed>,
-     *     icon?: string,
-     *     enabled?: bool,
-     *     position?: int,
-     *     label?: string
-     * } $data
+     * @param GridActionData $data
      */
     protected function transformActionsAsGridDefinition(string $name, array $data): \Sylius\Component\Grid\Definition\Action
     {
@@ -121,12 +123,15 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
             'subitem' => [],
         ];
         foreach ($mainActions->toArray() as $name => $mainAction) {
+            /** @var GridActionData $mainAction */
             $actions['main'][] = $this->transformActionsAsGridDefinition($name, $mainAction);
         }
         foreach ($itemActions->toArray() as $name => $itemAction) {
+            /** @var GridActionData $itemAction */
             $actions['item'][] = $this->transformActionsAsGridDefinition($name, $itemAction);
         }
         foreach ($subItemActions->toArray() as $name => $subItemAction) {
+            /** @var GridActionData $subItemAction */
             $actions['subitem'][] = $this->transformActionsAsGridDefinition($name, $subItemAction);
         }
 
@@ -168,9 +173,7 @@ abstract class AbstractGridType extends AbstractResourceType implements Resource
 
             if ($gridBuilder instanceof GridBuilderInterface) {
                 foreach ($filters as $filter) {
-                    if ($filter instanceof FilterInterface) {
-                        $gridBuilder->addFilter($filter);
-                    }
+                    $gridBuilder->addFilter($filter);
                 }
             }
         }

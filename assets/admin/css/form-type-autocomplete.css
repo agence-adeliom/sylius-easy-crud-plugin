@@ -1,0 +1,81 @@
+/*
+ * Tom Select (Symfony UX Autocomplete) theme overrides.
+ *
+ * UX Autocomplete auto-imports "tom-select.default.css", which hardcodes light colors (#fff...)
+ * and may override the Sylius admin (Tabler) styles depending on the loading order.
+ * These rules rely on Tabler tokens so the fields follow the light/dark theme.
+ * The "html" prefix gives them precedence over tom-select.default.css whatever the loading order.
+ */
+
+html .ts-control,
+html .ts-wrapper.single .ts-control,
+html .ts-wrapper.single.input-active .ts-control,
+html .full .ts-control {
+    background: var(--tblr-bg-forms, #fff);
+    background-image: none;
+    border-color: var(--tblr-border-color, #d0d0d0);
+    box-shadow: var(--tblr-box-shadow-input, none);
+    color: var(--tblr-body-color, #303030);
+}
+
+/* keep the Sylius focus ring, which the rules above would otherwise override */
+html .ts-wrapper.focus .ts-control,
+html .ts-wrapper.single.focus .ts-control {
+    border-color: var(--tblr-focus-ring-color, #d0d0d0);
+    box-shadow: 0 0 0 1px var(--tblr-focus-ring-color, transparent);
+}
+
+html .ts-control input,
+html .ts-dropdown {
+    color: var(--tblr-body-color, #303030);
+}
+
+html .disabled .ts-control {
+    background-color: var(--tblr-bg-surface-secondary, #fafafa);
+}
+
+html .ts-dropdown,
+html .ts-dropdown .optgroup-header {
+    background: var(--tblr-bg-surface, #fff);
+    border-color: var(--tblr-border-color, #d0d0d0);
+}
+
+html .ts-dropdown .optgroup-header {
+    color: var(--tblr-secondary, #303030);
+}
+
+html .ts-dropdown .optgroup {
+    border-top-color: var(--tblr-border-color, #f0f0f0);
+}
+
+html .ts-dropdown .active {
+    background-color: var(--tblr-bg-surface-secondary, #f5fafd);
+    color: var(--tblr-body-color, #495c68);
+}
+
+html .ts-dropdown .create,
+html .ts-dropdown .no-results {
+    color: var(--tblr-secondary, rgba(48, 48, 48, 0.5));
+}
+
+html .ts-dropdown [data-selectable] .highlight {
+    background: rgba(var(--tblr-primary-rgb, 125, 168, 208), 0.2);
+}
+
+html .ts-dropdown .spinner::after {
+    border-color: var(--tblr-border-color, #d0d0d0) transparent var(--tblr-border-color, #d0d0d0) transparent;
+}
+
+html .plugin-dropdown_input .dropdown-input,
+html .plugin-dropdown_input.focus.dropdown-active .ts-control,
+html .ts-wrapper .dropdown-header {
+    border-color: var(--tblr-border-color, #d0d0d0);
+}
+
+html .plugin-dropdown_input .dropdown-input {
+    color: var(--tblr-body-color, #303030);
+}
+
+html .ts-wrapper .dropdown-header {
+    background: var(--tblr-bg-surface-secondary, #f5f5f5);
+}

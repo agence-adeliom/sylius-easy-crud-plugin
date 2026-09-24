@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Component\Resource\Metadata\Metadata;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,21 +41,22 @@ trait ResourceAutocompleteTrait
             throw new HttpException(Response::HTTP_FORBIDDEN, $exception->getMessage());
         }
 
+        $container = $this->getRequiredContainer();
         foreach ($resources as $alias => $configuration) {
             if ($resourceName === $alias) {
                 $this->metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
                 $syliusRepositoryService = str_replace('sylius.', 'sylius.repository.', $alias);
-                if ($this->container->has($syliusRepositoryService)) {
-                    $containerRepository = $this->container->get($syliusRepositoryService);
+                if ($container->has($syliusRepositoryService)) {
+                    $containerRepository = $container->get($syliusRepositoryService);
                     assert($containerRepository instanceof RepositoryInterface, 'Repository from container must implement RepositoryInterface');
                     $this->repository = $containerRepository;
                 } else {
-                    $doctrine = $this->container->get('doctrine');
-                    assert($doctrine instanceof EntityManagerInterface, 'Doctrine service must implement EntityManagerInterface');
-                    /** @phpstan-ignore-next-line */
-                    $repository = $doctrine
-                        ->getRepository($configuration['classes']['model']);
-                    /** @phpstan-ignore-next-line */
+                    $doctrine = $container->get('doctrine');
+                    assert($doctrine instanceof ManagerRegistry, 'Doctrine service must implement ManagerRegistry');
+                    $modelClass = $this->metadata->getClass('model');
+                    assert(class_exists($modelClass), 'Resource model class must exist');
+                    $repository = $doctrine->getRepository($modelClass);
+                    assert($repository instanceof RepositoryInterface, 'Repository of the resource model must implement RepositoryInterface');
                     $this->repository = $repository;
                 }
             }
@@ -74,5 +76,14 @@ trait ResourceAutocompleteTrait
         ]);
 
         return $this->indexAction($request);
+    }
+
+    private function getRequiredContainer(): ContainerInterface
+    {
+        if (!$this->container instanceof ContainerInterface) {
+            throw new \LogicException('The service container is not available in the controller.');
+        }
+
+        return $this->container;
     }
 }

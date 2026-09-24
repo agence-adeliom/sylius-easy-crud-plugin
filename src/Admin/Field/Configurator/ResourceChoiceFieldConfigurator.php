@@ -46,10 +46,11 @@ final class ResourceChoiceFieldConfigurator implements FieldConfiguratorInterfac
              *  }
              * }> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
-            if (isset($resources[$field->getFormTypeOption('resource')]['classes']['model'])) {
+            $resource = $field->getFormTypeOption('resource');
+            if (is_string($resource) && isset($resources[$resource]['classes']['model'])) {
                 $field->setFormTypeOption(
                     'class',
-                    $resources[$field->getFormTypeOption('resource')]['classes']['model'],
+                    $resources[$resource]['classes']['model'],
                 );
             }
         }

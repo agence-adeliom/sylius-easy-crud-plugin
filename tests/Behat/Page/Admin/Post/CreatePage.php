@@ -149,6 +149,9 @@ class CreatePage extends SymfonyPage implements CreatePageInterface
         }
     }
 
+    /**
+     * @param string[] $productNames
+     */
     public function selectProducts(array $productNames): void
     {
         // Similar to selectTaxon but for multiple selection

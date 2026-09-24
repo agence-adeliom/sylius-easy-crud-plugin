@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12{{ horizontal ? '' : ' col-lg-3' }}">
             <div id="side-nav" class="sticky-md-top" style="top: 7.6rem;">
-                <div class="list-group{{ horizontal ? ' list-group-horizontal' : '' }} bg-white mb-5" id="crudTab" role="tablist">
+                <div class="list-group{{ horizontal ? ' list-group-horizontal' : '' }} bg-surface mb-5" id="crudTab" role="tablist">
                     {% for item in menu.children %}
                         {{ block('item') }}
                     {% endfor %}

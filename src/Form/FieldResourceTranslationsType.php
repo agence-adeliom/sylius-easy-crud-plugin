@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Sylius\Component\Resource\Translation\Provider\TranslationLocaleProviderInterface;
 use Sylius\Resource\Model\TranslatableInterface;
@@ -25,10 +25,11 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Webmozart\Assert\Assert;
 
 final class FieldResourceTranslationsType extends AbstractType implements AdminFormTypeInterface
@@ -39,6 +40,17 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
     private string $defaultLocaleCode;
 
     private PropertyAccessor $propertyAccessor;
+
+    /**
+     * Translation field can be submitted twice, so submitted data is merged by locale
+     * and kept between submissions (the form type is a shared service).
+     *
+     * @var array<array-key, mixed>
+     */
+    private array $translationsByLocale = [];
+
+    /** @var array<array-key, object> */
+    private array $translationsObjectsByLocale = [];
 
     public function __construct(
         TranslationLocaleProviderInterface $localeProvider,
@@ -51,19 +63,6 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // Translation field can be submitted twice
-        // So we need do merge all parts on translations submission
-        // To do that we store data by local into global var $translationsByLocale and persist data for next loop
-        global $translationsByLocale;
-        if (!isset($translationsByLocale)) {
-            $translationsByLocale = [];
-        }
-
-        global $translationsFormTypes;
-        if (!isset($translationsFormTypes)) {
-            $translationsFormTypes = [];
-        }
-
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             /** @var array<string, mixed> $translations */
             $translations = $event->getData();
@@ -71,15 +70,13 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
             $parentForm = $event->getForm()->getParent();
             Assert::notNull($parentForm);
 
-            global $translationsByLocale;
-
             if (!empty($translations)) {
                 foreach ($translations as $localeCode => $translation) {
-                    if (!isset($translationsByLocale[$localeCode])) {
-                        $translationsByLocale[$localeCode] = $translation;
-                    } elseif (is_array($translationsByLocale[$localeCode]) && is_array($translation)) {
-                        $translationsByLocale[$localeCode] = array_merge(
-                            $translationsByLocale[$localeCode],
+                    if (!isset($this->translationsByLocale[$localeCode])) {
+                        $this->translationsByLocale[$localeCode] = $translation;
+                    } elseif (is_array($this->translationsByLocale[$localeCode]) && is_array($translation)) {
+                        $this->translationsByLocale[$localeCode] = array_merge(
+                            $this->translationsByLocale[$localeCode],
                             $translation,
                         );
                     }
@@ -87,8 +84,8 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                     if (null === $translation) {
                         // Apply previous data in case of null
                         // This trick fix non persistence of translations in case of translations multiple form parts
-                        if (isset($translationsByLocale[$localeCode])) {
-                            $translations[$localeCode] = $translationsByLocale[$localeCode];
+                        if (isset($this->translationsByLocale[$localeCode])) {
+                            $translations[$localeCode] = $this->translationsByLocale[$localeCode];
                         } else {
                             unset($translations[$localeCode]);
                         }
@@ -100,33 +97,28 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            /** @var PersistentCollection<string, TranslationInterface|null>|array|ArrayCollection<string, TranslationInterface|null> $translations */
             $translations = $event->getData();
+            if (!is_array($translations) && !$translations instanceof Collection) {
+                return;
+            }
 
             if ($translations instanceof PersistentCollection) {
                 $translations->initialize();
             }
 
-            global $translationsByLocale;
-
             $parentForm = $event->getForm()->getParent();
             Assert::notNull($parentForm);
-
-            global $translationsObjectsByLocale;
-            if (!isset($translationsObjectsByLocale)) {
-                $translationsObjectsByLocale = [];
-            }
 
             /** @var TranslatableInterface $translatable */
             $translatable = $parentForm->getData();
 
-            $count = is_array($translations) ? count($translations) : $translations->count();
+            $count = count($translations);
 
             if ($count) {
                 foreach ($translations as $localeCode => $translation) {
                     if (null === $translation) {
-                        if (isset($translationsObjectsByLocale[$localeCode])) {
-                            $translations[$localeCode] = $translationsObjectsByLocale[$localeCode];
+                        if (isset($this->translationsObjectsByLocale[$localeCode])) {
+                            $translations[$localeCode] = $this->translationsObjectsByLocale[$localeCode];
 
                             continue;
                         }
@@ -138,36 +130,40 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                     if (is_object($translation)) {
                         $className = get_class($translation);
                         $objectNormalizer = new ObjectNormalizer();
-                        $data = $translationsByLocale[$localeCode] ?? [];
+                        $data = $this->translationsByLocale[$localeCode] ?? [];
+                        if (!is_array($data)) {
+                            $data = [];
+                        }
 
                         $reflectionExtractor = new ReflectionExtractor();
                         $reflectionExtractor->getProperties($className);
                         foreach ($data as $property => $value) {
+                            if (!is_string($property)) {
+                                continue;
+                            }
                             $actualValue = $this->propertyAccessor->getValue($translation, $property);
+                            $propertyType = $reflectionExtractor->getType($className, $property);
+                            if ($propertyType instanceof NullableType) {
+                                $propertyType = $propertyType->getWrappedType();
+                            }
                             if (
                                 !is_array($actualValue) &&
                                 $reflectionExtractor->isWritable($className, $property) &&
-                                ($types = $reflectionExtractor->getTypes($className, $property)) &&
-                                $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
+                                $propertyType instanceof ObjectType
                             ) {
-                                $type = $reflectionExtractor->getTypes($className, $property);
-                                if (is_array($type)) {
-                                    $objectClassName = $type[0]->getClassName();
-                                    if (is_string($objectClassName)) {
-                                        if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
-                                            $value = $actualValue::normalizeFormData($value);
-                                        }
+                                $objectClassName = $propertyType->getClassName();
+                                if ((is_string($actualValue) || is_object($actualValue)) && method_exists($actualValue, 'normalizeFormData')) {
+                                    $value = $actualValue::normalizeFormData($value);
+                                }
 
-                                        try {
-                                            $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
-                                                AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
-                                                AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
-                                            ]);
-                                            $this->propertyAccessor->setValue($translation, $property, $objectValue);
-                                        } catch (\Symfony\Component\Serializer\Exception\NotNormalizableValueException $e) {
-                                            // some data cannot be denormalized, skip it
-                                        }
-                                    }
+                                try {
+                                    $objectValue = $objectNormalizer->denormalize($value, $objectClassName, null, [
+                                        AbstractNormalizer::OBJECT_TO_POPULATE => $actualValue,
+                                        AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+                                    ]);
+                                    $this->propertyAccessor->setValue($translation, $property, $objectValue);
+                                } catch (\Symfony\Component\Serializer\Exception\NotNormalizableValueException $e) {
+                                    // some data cannot be denormalized, skip it
                                 }
                             } elseif (
                                 $reflectionExtractor->isWritable($className, $property)
@@ -180,8 +176,8 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
                             $translation->setLocale($localeCode);
                             $translation->setTranslatable($translatable);
                         }
-                        if (!isset($translationsObjectsByLocale[$localeCode])) {
-                            $translationsObjectsByLocale[$localeCode] = $translation;
+                        if (!isset($this->translationsObjectsByLocale[$localeCode])) {
+                            $this->translationsObjectsByLocale[$localeCode] = $translation;
                         }
                     }
                 }

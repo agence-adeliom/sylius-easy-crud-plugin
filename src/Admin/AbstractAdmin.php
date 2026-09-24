@@ -8,7 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Doctrine\ORM\Mapping\Entity;
-use Sylius\Bundle\GridBundle\Builder\Filter\FilterInterface;
+use Sylius\Component\Grid\Builder\Filter\FilterInterface;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 {
@@ -95,8 +95,10 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
             $reflectionClass = new \ReflectionClass(self::getResourceClass());
             foreach ($reflectionClass->getAttributes() as $attribute) {
                 if ($attribute->getName() === Entity::class) {
-                    if ($attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0] ?? null) {
-                        return $attribute->getArguments()['repositoryClass'] ?? $attribute->getArguments()[0];
+                    $arguments = $attribute->getArguments();
+                    $repositoryClass = $arguments['repositoryClass'] ?? $arguments[0] ?? null;
+                    if (is_string($repositoryClass) && class_exists($repositoryClass)) {
+                        return $repositoryClass;
                     }
                 }
             }

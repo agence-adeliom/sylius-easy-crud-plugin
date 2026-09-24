@@ -127,28 +127,20 @@ class CrudAdminFactory
 
     public function manageFieldAssets(FieldDto $fieldDto): void
     {
-        if (is_array($fieldDto->getFormThemes())) {
-            foreach ($fieldDto->getFormThemes() as $theme) {
-                $this->formThemes[$theme] = $theme;
-            }
+        foreach ($fieldDto->getFormThemes() as $theme) {
+            $this->formThemes[$theme] = $theme;
         }
 
-        if (is_array($fieldDto->getAssets()->getCssAssets())) {
-            foreach ($fieldDto->getAssets()->getCssAssets() as $path) {
-                $this->cssAssets[$path->getValue()] = $path;
-            }
+        foreach ($fieldDto->getAssets()->getCssAssets() as $path) {
+            $this->cssAssets[$path->getValue()] = $path;
         }
 
-        if (is_array($fieldDto->getAssets()->getJsAssets())) {
-            foreach ($fieldDto->getAssets()->getJsAssets() as $path) {
-                $this->jsAssets[$path->getValue()] = $path;
-            }
+        foreach ($fieldDto->getAssets()->getJsAssets() as $path) {
+            $this->jsAssets[$path->getValue()] = $path;
         }
 
-        if (is_array($fieldDto->getAssets()->getWebpackEncoreAssets())) {
-            foreach ($fieldDto->getAssets()->getWebpackEncoreAssets() as $path) {
-                $this->webpackEncoreAssets[$path->getValue()] = $path;
-            }
+        foreach ($fieldDto->getAssets()->getWebpackEncoreAssets() as $path) {
+            $this->webpackEncoreAssets[$path->getValue()] = $path;
         }
     }
 

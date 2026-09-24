@@ -51,9 +51,7 @@ class AssetRenderer
                         $attributes['href'],
                         $attributes,
                     );
-                    if (null !== $this->eventDispatcher) {
-                        $event = $this->eventDispatcher->dispatch($event);
-                    }
+                    $event = $this->eventDispatcher->dispatch($event);
                     $attributes = $event->getAttributes();
 
                     $html .= sprintf(
@@ -86,9 +84,7 @@ class AssetRenderer
                     $attributes['src'],
                     $attributes,
                 );
-                if (null !== $this->eventDispatcher) {
-                    $event = $this->eventDispatcher->dispatch($event);
-                }
+                $event = $this->eventDispatcher->dispatch($event);
                 $attributes = $event->getAttributes();
 
                 $html .= sprintf(
@@ -128,27 +124,25 @@ class AssetRenderer
 
                         continue;
                     }
-                    if (is_string($webpackAsset)) {
-                        $html .= $this->tagRenderer
-                            ->renderWebpackScriptTags(
-                                $webpackAsset,
-                                null,
-                                null,
-                                [
-                                    'nonce' => $nonce ?: '',
-                                ],
-                                true,
-                            );
-                        $html .= $this->tagRenderer
-                            ->renderWebpackLinkTags(
-                                $webpackAsset,
-                                null,
-                                null,
-                                [
-                                    'nonce' => $nonce ?: '',
-                                ],
-                            );
-                    }
+                    $html .= $this->tagRenderer
+                        ->renderWebpackScriptTags(
+                            $webpackAsset,
+                            null,
+                            null,
+                            [
+                                'nonce' => $nonce ?: '',
+                            ],
+                            true,
+                        );
+                    $html .= $this->tagRenderer
+                        ->renderWebpackLinkTags(
+                            $webpackAsset,
+                            null,
+                            null,
+                            [
+                                'nonce' => $nonce ?: '',
+                            ],
+                        );
                 } catch (\Exception $exception) {
                     $html .= '';
                 }
@@ -172,7 +166,7 @@ class AssetRenderer
                     return $key;
                 }
 
-                return sprintf('%s="%s"', $key, htmlentities($value));
+                return sprintf('%s="%s"', $key, htmlentities(\is_scalar($value) ? (string) $value : ''));
             },
             array_keys($attributesMap),
             $attributesMap,

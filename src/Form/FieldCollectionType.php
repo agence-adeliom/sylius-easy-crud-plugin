@@ -37,7 +37,6 @@ final class FieldCollectionType extends AbstractType
             $entryOptions = $options['entry_options']($entry);
             $entryType = $options['entry_type']($entry);
 
-            Assert::string($entryName);
             Assert::isArray($entryOptions);
             Assert::string($entryType);
 
