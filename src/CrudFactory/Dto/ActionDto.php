@@ -36,7 +36,7 @@ class ActionDto
 
     private ?string $routeName = null;
 
-    /** @var array<string>|callable */
+    /** @var array<string, mixed>|callable */
     private $routeParameters = [];
 
     private mixed $url = null;
@@ -224,7 +224,7 @@ class ActionDto
     }
 
     /**
-     * @return array<string>|callable
+     * @return array<string, mixed>|callable
      */
     public function getRouteParameters(): array|callable
     {
@@ -232,7 +232,7 @@ class ActionDto
     }
 
     /**
-     * @param array<string>|callable $routeParameters
+     * @param array<string, mixed>|callable $routeParameters
      */
     public function setRouteParameters(array|callable $routeParameters): void
     {

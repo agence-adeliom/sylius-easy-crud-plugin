@@ -398,7 +398,7 @@ final class FieldDto
     }
 
     /**
-     * @param array<string, array<string, string|Asset>|null> $assets
+     * @param array<string, array<array-key, string|Asset>|null> $assets
      */
     public function addAssets(array $assets): void
     {
