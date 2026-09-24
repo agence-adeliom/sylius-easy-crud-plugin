@@ -101,6 +101,16 @@ It does not fully comply (yet) with last Sylius guidelines, so please use this p
 
 Alongside this plugin, we migrated our other EasyAdmin-based bundles — which provided content management (CMS) features — into a separate plugin called [Happy CMS](https://github.com/agence-adeliom/sylius-happy-cms-plugin). It is an alternative for building CMS features in Sylius.
 
+## Versions
+
+| Plugin Version | Sylius         | Php           | Symfony  |
+|----------------|----------------|---------------|----------|
+| 1.13, 1.14     | 1.13, 1.14     | 8.2, 8.3, 8.4 | 6.4, 7.x |
+| ^2.0.0         | ^2.0.0         | 8.2, 8.3, 8.4 | 6.4, 7.x |
+| ^2.1.0         | ^2.1.0, ^2.2.0 | 8.3, 8.4, 8.5 | 6.4, 7.x |
+| ^2.3.0         | ^2.3.0         | 8.4, 8.5      | 7.4, 8.x |
+
+
 ---
 
 ## Installation
