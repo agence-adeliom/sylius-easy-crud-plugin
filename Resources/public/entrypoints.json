@@ -40,6 +40,11 @@
       "js": [
         "/bundles/syliuseasycrudplugin/text-editor.757c1a45.js"
       ]
+    },
+    "form-type-autocomplete": {
+      "css": [
+        "/bundles/syliuseasycrudplugin/form-type-autocomplete.211145bb.css"
+      ]
     }
   }
 }
