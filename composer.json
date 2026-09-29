@@ -14,7 +14,7 @@
         "ext-intl": "*",
         "ext-json": "*",
         "embed/embed": "^4.4",
-        "sylius/sylius": "^v2.3.0-alpha.1",
+        "sylius/sylius": "^2.3",
         "symfony/uid": "^7.4 || ^8.0"
     },
     "require-dev": {
@@ -37,7 +37,7 @@
         "robertfausk/behat-panther-extension": "^1.1 || ^2.0",
         "sylius-labs/coding-standard": "^4.4",
         "sylius-labs/suite-tags-extension": "~0.2",
-        "sylius/test-application": "^v2.3.0-ALPHA.2",
+        "sylius/test-application": "^2.3.0@alpha",
         "symfony/browser-kit": "^7.4 || ^8.0",
         "symfony/debug-bundle": "^7.4 || ^8.0",
         "symfony/dotenv": "^7.4 || ^8.0",

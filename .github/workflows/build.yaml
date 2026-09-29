@@ -24,7 +24,7 @@ jobs:
             matrix:
                 php: ["8.4", "8.5"]
                 symfony: ["^7.4", "^8.1"]
-                sylius: ["^v2.3.0-alpha.1"]
+                sylius: ["^2.3"]
                 node: ["22.x"]
                 mysql: ["8.4"]
                 include:
@@ -33,7 +33,7 @@ jobs:
                     -
                         php: "8.5"
                         symfony: "8.2.*"
-                        sylius: "^v2.3.0-alpha.1"
+                        sylius: "^2.3"
                         node: "22.x"
                         mysql: "8.4"
                         experimental: true
