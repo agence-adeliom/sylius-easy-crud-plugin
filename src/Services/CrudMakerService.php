@@ -531,7 +531,7 @@ class CrudMakerService
             [
                 'resource' => $resourceDataBlock,
                 'type' => 'sylius.resource',
-                'prefix' => 'admin',
+                'prefix' => '/%sylius_admin.path_name%',
             ];
     }
 
