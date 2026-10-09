@@ -1,0 +1,42 @@
+# Files and folders left out of the archive Composer downloads (dist).
+# Keep everything a project needs at runtime: src/, config/, templates/,
+# translations/, Resources/public/ (compiled assets), assets/, index.js,
+# package.json, docs/, README.md and the licences.
+
+# Local environment and tooling home folders
+/.env.local         export-ignore
+/.env.*.local       export-ignore
+/.config            export-ignore
+/.local             export-ignore
+
+# Git, CI and editor files
+/.github            export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/.editorconfig      export-ignore
+/.dockerignore      export-ignore
+
+# Docker / local development environment
+/compose.yml                export-ignore
+/compose.override.dist.yml  export-ignore
+/Makefile                   export-ignore
+/etc                        export-ignore
+
+# Tests and QA configuration
+/tests              export-ignore
+/features           export-ignore
+/behat.dist.php     export-ignore
+/phpunit.xml.dist   export-ignore
+/phpstan.neon       export-ignore
+/ecs.php            export-ignore
+
+# Asset build tooling (compiled output ships in Resources/public)
+/webpack.config.js  export-ignore
+/yarn.lock          export-ignore
+
+# Contributor / AI agent guides
+/AGENTS.md                  export-ignore
+/CLAUDE.md                  export-ignore
+/CLEANUP_GUIDE.md           export-ignore
+/COMPATIBILITY_GUIDE.md     export-ignore
+/RENAME_GUIDE.md            export-ignore
