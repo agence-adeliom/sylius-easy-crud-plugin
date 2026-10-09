@@ -45,6 +45,18 @@ sylius_easy_crud:
     resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
+This file imports the plugin admin routes (`config/routes/admin.yaml`) under the Sylius admin path,
+`/%sylius_admin.path_name%` (`/admin` unless you changed `SYLIUS_ADMIN_ROUTING_PATH_NAME`).
+
+If you need another prefix or a dedicated admin host, import the admin routes yourself; they carry no prefix:
+
+```yaml
+sylius_easy_crud_admin:
+    resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
+    prefix: '/%sylius_admin.path_name%'   # adapt, or remove when the admin has its own host
+    # host: '%admin_host%'
+```
+
 ### Step 5: Install Assets
 
 If your project uses frontend assets, install them:

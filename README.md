@@ -155,6 +155,16 @@ sylius_easy_crud:
     resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
+The plugin routes are then served under the Sylius admin path (`/%sylius_admin.path_name%`, `/admin` by default).
+If your admin uses another prefix or its own host, import the unprefixed admin routes instead:
+
+```yaml
+sylius_easy_crud_admin:
+    resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
+    prefix: /back-office        # or no prefix at all
+    host: '%admin_host%'        # optional
+```
+
 ### 5. Install Assets
 
 ```bash
