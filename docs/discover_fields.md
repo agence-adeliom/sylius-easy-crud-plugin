@@ -93,6 +93,12 @@ yield ResourceChoiceField::new('products')
 yield SortableCollectionField::new('data')
         ->setEntryType(SubType::class);
 
+// The submitted array is re-indexed as a list (stored as a JSON array, never as an object keyed by the form
+// names after a deletion). To keep the keys:
+yield SortableCollectionField::new('data')
+        ->setEntryType(SubType::class)
+        ->setFormTypeOption('keep_as_list', false);
+
 ```
 
 ### CMS Fields

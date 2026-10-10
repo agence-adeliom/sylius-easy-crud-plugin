@@ -21,3 +21,16 @@ The plugin admin routes (`sylius_easy_crud.get_oembed`, `sylius_admin_ajax_resou
 
 `make:easy-crud:create-crud` now generates `prefix: '/%sylius_admin.path_name%'` instead of
 `prefix: admin`. Routes generated before keep working as they are.
+
+### `SortableCollectionType`: the submitted array is a list
+
+`SortableCollectionType` (used by `SortableCollectionField`) now re-indexes the submitted array with
+`array_values()`: after an entry is removed, or added with a non-sequential index, the value is `["A", "C"]` instead
+of `{"0": "A", "2": "C"}`, so a JSON column stores an array (as EasyFields' sortable collection did). Order is unchanged;
+only the keys change. Collection objects (Doctrine collections) are not affected.
+
+To keep the keys (code that relies on them), set the new `keep_as_list` form option to `false`:
+
+```php
+SortableCollectionField::new('data')->setFormTypeOption('keep_as_list', false);
+```
