@@ -6,6 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\Asset\AssetEasyCrudPackage;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
+use Adeliom\SyliusEasyCrudPlugin\Form\EventListener\ReindexCollectionListener;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -31,6 +32,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
      *     prototype_name: string,
      *     entry_options: array<string, mixed>,
      *     prototype_data: mixed,
+     *     keep_as_list: bool,
      * } $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -64,6 +66,10 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         );
 
         $builder->addEventSubscriber($resizeListener);
+
+        if ($options['keep_as_list']) {
+            $builder->addEventSubscriber(new ReindexCollectionListener());
+        }
     }
 
     /**
@@ -159,6 +165,8 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             'entry_type' => TextType::class,
             'entry_options' => [],
             'delete_empty' => false,
+            // re-index the submitted array as a list (stored as a JSON array, not as an object keyed by form names)
+            'keep_as_list' => true,
             'invalid_message' => static fn (Options $options, $previousValue) => ($options['legacy_error_messages'] ?? true)
                 ? $previousValue
                 : 'The collection is invalid.',
@@ -167,6 +175,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
         $resolver->setAllowedTypes('allow_drag', 'bool');
+        $resolver->setAllowedTypes('keep_as_list', 'bool');
     }
 
     /**
