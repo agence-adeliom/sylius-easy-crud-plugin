@@ -49,7 +49,7 @@ You can execute without entity name `php bin/console make:easy-crud:create-crud`
 Follow documentation [here](https://docs.sylius.com/en/latest/customization/menu.html).
 
 - Do not forget to add new entity into [menu](https://docs.sylius.com/en/latest/customization/menu.html).
-- Navigate to /admin/posts/
+- Navigate to /admin/posts/ (the generated route is prefixed with `/%sylius_admin.path_name%`, `/admin` by default)
 
 ## Next Steps
 

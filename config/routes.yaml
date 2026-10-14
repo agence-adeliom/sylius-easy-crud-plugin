@@ -1,8 +1,8 @@
-sylius_easy_crud.get_oembed:
-    controller: Adeliom\SyliusEasyCrudPlugin\Controller\OembedController::index
-    path: /admin/oembed/
-
-sylius_admin_ajax_resources:
-    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController::autocompleteAction
-    path: /admin/autocomplete/
-
+# Backward compatible entry point: imports the admin routes of the plugin
+# under the Sylius admin path (`/admin` by default, see the
+# SYLIUS_ADMIN_ROUTING_PATH_NAME environment variable).
+# To choose the prefix or the host yourself, import
+# `@SyliusEasyCrudPlugin/config/routes/admin.yaml` instead.
+sylius_easy_crud_admin:
+    resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
+    prefix: '/%sylius_admin.path_name%'

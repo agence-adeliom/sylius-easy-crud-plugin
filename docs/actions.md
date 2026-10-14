@@ -241,7 +241,7 @@ If using a custom action outside the standard CRUD flow, add a route:
 **config/routes.yaml**:
 ```yaml
 app_admin_post_publish:
-    path: /admin/posts/{id}/publish
+    path: /%sylius_admin.path_name%/posts/{id}/publish
     methods: [POST]
     defaults:
         _controller: app.controller.post:publishAction
