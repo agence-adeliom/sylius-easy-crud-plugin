@@ -31,9 +31,11 @@ Welcome to the complete documentation for Sylius Easy CRUD Plugin. This guide wi
 
 [//]: # (    - Action permissions)
 
-[//]: # ()
-[//]: # ()
-[//]: # (5. **[Create a custom field]&#40;./create_your_own_fields.md&#41;** - For specific needs you can create your own field types)
+
+4. **[Create your own fields](./create_your_own_fields.md)** - For specific needs you can create your own field types
+    - Field class, form type, form theme and assets
+    - Example: `CharCounterField`
+
 
 [//]: # (## Optional)
 

@@ -223,6 +223,8 @@ Navigate to your Sylius admin panel and find your new "Posts" menu entry. You no
 ### 📚 User Guides
 
 - **[Getting Started Guide](./docs/README.md)**
+- **[Discover available fields](./docs/discover_fields.md)**
+- **[Create your own fields](./docs/create_your_own_fields.md)**
 
 ---
 
