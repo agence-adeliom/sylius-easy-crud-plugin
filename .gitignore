@@ -24,3 +24,11 @@
 .idea/*
 .claude/*
 .ddev/*
+
+# Local environment files: never commit them (they may hold credentials)
+/.env.local
+/.env.*.local
+
+# Composer home created by the Docker setup (HOME=/srv/sylius)
+/.config/
+/.local/
