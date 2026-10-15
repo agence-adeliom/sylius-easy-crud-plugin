@@ -76,21 +76,19 @@ class ResourceChoiceType extends AbstractType implements AdminFormTypeInterface
                                 if (is_string($tagsAsArray)) {
                                     // If you switch from non multiple value to multiple value, the value will be a string
                                     // If the tag have some separators, we need to split it
-                                    if (str_contains($tagsAsArray, ',')) {
-                                        $tagsAsArray = explode(',', $tagsAsArray);
-                                    } else {
-                                        $valueAsCollection->add($options['repository']->findOneBy([
-                                          $choiceValue => $tagsAsArray,
-                                        ]));
-                                    }
+                                    $tagsAsArray = str_contains($tagsAsArray, ',') ? explode(',', $tagsAsArray) : [$tagsAsArray];
                                 }
                                 if (is_array($tagsAsArray)) {
-                                    foreach ($tagsAsArray as $key => $tag) {
-                                        if (is_string($tag) or is_int($tag)) {
-                                            // If the tag is a string, we can assume it's an ID
-                                            $valueAsCollection->add($options['repository']->findOneBy([
-                                                                                                          $choiceValue => $tag,
-                                                                                                      ]));
+                                    foreach ($tagsAsArray as $tag) {
+                                        // An empty selection is persisted as '' : looking it up would fail on typed columns (PostgreSQL)
+                                        if ((!is_string($tag) && !is_int($tag)) || '' === trim((string) $tag)) {
+                                            continue;
+                                        }
+                                        // If the tag is a string, we can assume it's an ID
+                                        $resource = $options['repository']->findOneBy([$choiceValue => trim((string) $tag)]);
+                                        // A resource deleted since the last save is dropped instead of added as null
+                                        if (null !== $resource) {
+                                            $valueAsCollection->add($resource);
                                         }
                                     }
                                 }
