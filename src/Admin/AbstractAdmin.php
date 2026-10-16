@@ -7,28 +7,102 @@ namespace Adeliom\SyliusEasyCrudPlugin\Admin;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AdminDeclarationResolver;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Metadata\EasyCrudResourceFactory;
 use Doctrine\ORM\Mapping\Entity;
 use Sylius\Component\Grid\Builder\Filter\FilterInterface;
+use function Symfony\Component\String\u;
 
 abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
 {
-    public function getResourceClass(): string
-    {
-        return static::getEntityFqcn();
-    }
-
-    abstract public static function getEntityFqcn(): string;
-
-    abstract public static function getDefaultSortColumn(): string;
+    /** @var array<class-string, string> grid name by Admin class, see getName() */
+    private static array $easyCrudGridNames = [];
 
     /**
+     * The model of the Admin: #[AsAdmin(resourceClass:)] when set, otherwise getEntityFqcn(). Prefer it to
+     * static::getEntityFqcn() in the Admin code. See AdminDeclarationResolver.
+     */
+    public function getResourceClass(): string
+    {
+        return AdminDeclarationResolver::resolveResourceClass(static::class);
+    }
+
+    /**
+     * Resource model FQCN. Read from #[AsAdmin(resourceClass: ...)] by default; override this method instead of
+     * setting the attribute argument (when both are set, they must declare the same class, also when the method is
+     * inherited from a parent Admin: the compilation fails otherwise).
+     */
+    public static function getEntityFqcn(): string
+    {
+        $resourceClass = static::easyCrudAttribute()?->resourceClass;
+        if (null !== $resourceClass) {
+            return $resourceClass;
+        }
+
+        throw new \LogicException(sprintf(
+            'No resource class defined for "%s": set #[AsAdmin(resourceClass: YourResource::class)] or override getEntityFqcn().',
+            static::class,
+        ));
+    }
+
+    /**
+     * Grid name (also used as route prefix), under which Sylius registers the grid. Read from #[AsAdmin(grid: ...)],
+     * otherwise derived from the resource alias like the Sylius route names (alias "app.book", section "admin" =>
+     * "app_admin_book"). Without #[AsAdmin], derived from the Admin class name ("PostAdmin" => "admin_post").
+     * Override this method instead of setting the attribute argument (when both are set, they must be equal).
+     */
+    public static function getName(): string
+    {
+        // Called on every grid / form build: the derivation reads the attributes of the Admin and of its model.
+        return self::$easyCrudGridNames[static::class] ??= self::resolveEasyCrudGridName();
+    }
+
+    private static function resolveEasyCrudGridName(): string
+    {
+        $attribute = static::easyCrudAttribute();
+        if (null === $attribute) {
+            return self::deriveEasyCrudGridName();
+        }
+
+        return $attribute->grid ?? EasyCrudResourceFactory::deriveGridName(static::class, $attribute);
+    }
+
+    public static function getDefaultSortColumn(): string
+    {
+        return static::easyCrudAttribute()->defaultSort ?? '';
+    }
+
+    /**
+     * Returns the #[AsAdmin] attribute declared on the concrete Admin, if any.
+     */
+    protected static function easyCrudAttribute(): ?AsAdmin
+    {
+        return AdminDeclarationResolver::attribute(static::class);
+    }
+
+    private static function deriveEasyCrudGridName(): string
+    {
+        $shortName = (new \ReflectionClass(static::class))->getShortName();
+        $shortName = preg_replace('/Admin$/', '', $shortName) ?? $shortName;
+
+        // "FAQAdmin" => "admin_faq", like the aliases Sylius derives from the class names
+        return 'admin_' . u($shortName)->snake()->toString();
+    }
+
+    /**
+     * Grid data repository method. Read from #[AsAdmin(repositoryMethod: ..., repositoryArguments: ...)]
+     * by default, otherwise the translatable-friendly "createListQueryBuilder" with the current locale.
+     *
      * @return array<string, mixed>
      */
     public static function getRepositoryMethod(): array
     {
+        $attribute = static::easyCrudAttribute();
+
         return [
-            'method' => 'createListQueryBuilder',
-            'arguments' => [
+            'method' => $attribute->repositoryMethod ?? 'createListQueryBuilder',
+            'arguments' => $attribute->repositoryArguments ?? [
                 "expr:service('sylius.context.locale').getLocaleCode()",
             ],
         ];
@@ -39,20 +113,22 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     public static function getLimits(): array
     {
-        return [10, 25, 50];
+        return static::easyCrudAttribute()->limits ?? [10, 25, 50];
     }
 
     public static function getDefaultSortOrder(): string
     {
-        return 'asc';
+        return static::easyCrudAttribute()->defaultSortOrder ?? 'asc';
     }
 
     public function configureActions(string $pageName): Actions
     {
+        $resourceContext = $this->getResourceContext();
+
         $actions = Actions::new();
         $actions->setRoutePrefix($this->getName());
-        $actions->setRequestConfiguration($this->crudAdminFactory->getRequestConfiguration());
-        $actions->setMetadata($this->crudAdminFactory->getMetadata());
+        $actions->setRequestConfiguration($resourceContext?->getRequestConfiguration());
+        $actions->setMetadata($resourceContext?->getMetadata());
         $actions
             ->addBatchAction(Action::BATCH_DELETE)
 
@@ -121,7 +197,7 @@ abstract class AbstractAdmin extends AbstractFormType implements AdminInterface
      */
     protected function getResourceFieldValueInRequest(string $formName, string $fieldName, string $queryKey = 'id'): ?string
     {
-        $request = $this->crudAdminFactory->requestStack->getMainRequest();
+        $request = $this->requestStack->getMainRequest();
 
         if ($request) {
             $resourceValue = $request->query->get($queryKey) ?? $request->request->get(sprintf('%s[%s]', $formName, $fieldName));

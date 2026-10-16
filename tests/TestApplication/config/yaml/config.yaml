@@ -1,0 +1,32 @@
+# Variant of the test application where the Post resource is declared the legacy way (YAML) with an Admin written for
+# easy-crud 2.3 (no #[AsAdmin]), the attribute discovery being left disabled (the default): booted in the "test_yaml"
+# environment by the tests of tests/Integration/YamlMode, which also import yaml/routes.yaml.
+imports:
+    - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
+    - { resource: "sylius_resource.yaml" }
+    - { resource: "services.yaml" }
+
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+
+# A SQLite database, created by the tests, so that the admin pages can be served without a database server.
+doctrine:
+    dbal:
+        driver: pdo_sqlite
+        url: 'sqlite:///%kernel.cache_dir%/yaml_mode.db'
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    TestApplication:
+                        is_bundle: false
+                        type: attribute
+                        dir: '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
+                        prefix: Tests\Adeliom\SyliusEasyCrudPlugin
+
+twig:
+    paths:
+        '%kernel.project_dir%/../../../tests/TestApplication/templates': ~
+

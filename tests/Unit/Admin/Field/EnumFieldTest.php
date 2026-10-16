@@ -58,6 +58,7 @@ final class EnumFieldTest extends TestCase
     {
         $enumClass = new class('draft') extends Enum {
             public const DRAFT = 'draft';
+
             public const PUBLISHED = 'published';
         };
 

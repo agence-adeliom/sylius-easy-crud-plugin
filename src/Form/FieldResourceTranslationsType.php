@@ -23,7 +23,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -39,7 +39,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
 
     private string $defaultLocaleCode;
 
-    private PropertyAccessor $propertyAccessor;
+    private PropertyAccessorInterface $propertyAccessor;
 
     /**
      * Translation field can be submitted twice, so submitted data is merged by locale
@@ -54,7 +54,7 @@ final class FieldResourceTranslationsType extends AbstractType implements AdminF
 
     public function __construct(
         TranslationLocaleProviderInterface $localeProvider,
-        PropertyAccessor $propertyAccessor,
+        PropertyAccessorInterface $propertyAccessor,
     ) {
         $this->definedLocalesCodes = $localeProvider->getDefinedLocalesCodes();
         $this->defaultLocaleCode = $localeProvider->getDefaultLocaleCode();
