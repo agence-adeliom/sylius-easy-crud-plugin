@@ -123,7 +123,7 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
     {
         $aliases = [];
         foreach ($container->getExtensionConfig('sylius_resource') as $config) {
-            $resources = $config['resources'] ?? null;
+            $resources = self::configValue($config, 'resources');
             if (!is_array($resources)) {
                 continue;
             }
@@ -133,6 +133,15 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
         }
 
         return $aliases;
+    }
+
+    /**
+     * A key of one raw extension config block. Symfony 8.2 types these blocks `mixed` (a config tree may accept a
+     * non-array root), earlier versions `array<string, mixed>`.
+     */
+    private static function configValue(mixed $config, string $key): mixed
+    {
+        return is_array($config) ? ($config[$key] ?? null) : null;
     }
 
     /**
@@ -148,7 +157,7 @@ final class SyliusEasyCrudExtension extends AbstractResourceExtension implements
         $paths = [];
 
         foreach ($container->getExtensionConfig('sylius_easy_crud') as $config) {
-            $attributes = $config['attributes'] ?? null;
+            $attributes = self::configValue($config, 'attributes');
             if (!is_array($attributes)) {
                 continue;
             }

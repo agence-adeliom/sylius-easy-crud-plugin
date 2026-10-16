@@ -1,12 +1,21 @@
 # Upgrade
 
-## Unreleased (2.4)
+## 2.4.0
 
 ### Backward compatibility breaks
 
 These changes only affect code that extends the plugin classes: an Admin overriding the constructor or using
 `$this->crudAdminFactory`, a controller extending or replacing `SyliusCrudResourceController`, or services
 referencing the removed ones. Admins that only implement `configure*()` methods are not affected.
+
+#### Conflict with `agence-adeliom/sylius-happy-cms-plugin` < 2.4
+
+happy-cms before 2.4 uses `CrudAdminFactory` (removed below), so the plugin declares a Composer `conflict` with it.
+Update both packages together:
+
+```bash
+composer update agence-adeliom/sylius-easy-crud-plugin agence-adeliom/sylius-happy-cms-plugin
+```
 
 #### `CrudAdminFactory` removed, replaced by `CrudViewBuilder`
 

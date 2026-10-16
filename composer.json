@@ -48,6 +48,9 @@
         "symfony/web-profiler-bundle": "^7.4 || ^8.0",
         "symfony/webpack-encore-bundle": "^2.2"
     },
+    "conflict": {
+        "agence-adeliom/sylius-happy-cms-plugin": "<2.4"
+    },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
