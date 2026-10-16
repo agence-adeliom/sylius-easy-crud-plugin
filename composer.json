@@ -37,6 +37,7 @@
         "robertfausk/behat-panther-extension": "^1.1 || ^2.0",
         "sylius-labs/coding-standard": "^4.4",
         "sylius-labs/suite-tags-extension": "~0.2",
+        "sylius/sylius-mate-extension": "^0.9",
         "sylius/test-application": "^2.3.0@alpha",
         "symfony/browser-kit": "^7.4 || ^8.0",
         "symfony/debug-bundle": "^7.4 || ^8.0",
@@ -51,6 +52,9 @@
     "conflict": {
         "agence-adeliom/sylius-happy-cms-plugin": "<2.4"
     },
+    "suggest": {
+        "sylius/sylius-mate-extension": "Exposes the easy-crud resources to the Symfony AI Mate tools (easy_crud_list_admins, easy_crud_inspect_admin)"
+    },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
@@ -58,12 +62,22 @@
             "php-http/discovery": false,
             "phpstan/extension-installer": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "symfony/ai-mate-composer-plugin": false
         }
     },
     "extra": {
         "branch-alias": {
             "dev-master": "2.4.x-dev"
+        },
+        "ai-mate": {
+            "scan-dirs": [
+                "src/Mate/Tool"
+            ],
+            "includes": [
+                "config/mate/config.php"
+            ],
+            "instructions": "config/mate/INSTRUCTIONS.md"
         },
         "symfony": {
             "require": "^7.4 || ^8.0"
