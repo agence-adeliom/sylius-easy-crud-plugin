@@ -13,7 +13,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     Tests\Adeliom\SyliusEasyCrudPlugin\:
         resource: '../src/*'
-        exclude: '../src/{Entity,Kernel.php}'
+        exclude: '../src/{Entity,LegacyAdmin,Kernel.php}'
 
     tests_adeliom_syliuseasycrudplugin_menu.admin.menu_builder:
         class: Tests\Adeliom\SyliusEasyCrudPlugin\Menu\AdminMenuListener

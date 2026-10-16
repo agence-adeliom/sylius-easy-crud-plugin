@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\TaxonInterface;
+use Sylius\Resource\Metadata\AsResource;
 use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Model\TranslatableTrait;
@@ -17,6 +18,7 @@ use Tests\Adeliom\SyliusEasyCrudPlugin\Repository\PostRepository;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ORM\Table(name: 'post')]
+#[AsResource(alias: 'tests_adeliom_sylius_easy_crud_plugin.tests_adeliom_sylius_easy_crud_plugin_entity_post')]
 class Post implements ResourceInterface, TranslatableInterface
 {
     use TranslatableTrait {

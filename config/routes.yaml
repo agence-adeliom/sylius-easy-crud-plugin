@@ -6,3 +6,17 @@
 sylius_easy_crud_admin:
     resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
     prefix: '/%sylius_admin.path_name%'
+
+# Routes of the resources declared with #[AsAdmin] (empty collection when
+# sylius_easy_crud.attributes.enabled is false), under the Sylius admin path too.
+# When you import `config/routes/admin.yaml` directly, import this loader the same
+# way, with your own `prefix` / `host`:
+#
+#     sylius_easy_crud_attributes:
+#         resource: 'Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader'
+#         type: service
+#         host: '%admin_host%'
+sylius_easy_crud_attributes:
+    resource: 'Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader'
+    type: service
+    prefix: '/%sylius_admin.path_name%'
