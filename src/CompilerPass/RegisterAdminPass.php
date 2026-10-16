@@ -7,12 +7,20 @@ namespace Adeliom\SyliusEasyCrudPlugin\CompilerPass;
 use Adeliom\SyliusEasyCrudPlugin\Metadata\AdminDeclarationResolver;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class RegisterAdminPass implements CompilerPassInterface
 {
+    /**
+     * Public locator of the Admins indexed by class, for the tools inspecting the application from outside (the Mate
+     * tools): the Admins are private form types, reachable otherwise only by building their form.
+     */
+    public const ADMIN_LOCATOR = 'sylius_easy_crud.admin_locator';
+
     public function process(ContainerBuilder $container): void
     {
         // Absent when the pass runs without the extension: the attribute discovery is then considered enabled.
@@ -23,6 +31,8 @@ class RegisterAdminPass implements CompilerPassInterface
         $adminsByGridName = [];
         /** @var array<class-string, string> $ignoredAttributes grid name by Admin class */
         $ignoredAttributes = [];
+        /** @var array<class-string, ServiceClosureArgument> $admins */
+        $admins = [];
 
         // Register all services tagged with 'sylius_easy_crud_admin'
         // As a Sylius Grid admin with autowiring and entity FQCN argument
@@ -42,6 +52,7 @@ class RegisterAdminPass implements CompilerPassInterface
                 $definition->addArgument(AdminDeclarationResolver::resolveResourceClass($class));
                 $definition->addArgument([]);
                 $definition->setAutowired(true);
+                $admins[$class] = new ServiceClosureArgument(new Reference((string) $id));
                 // The Doctrine type guesser has no autowiring alias: bind it to the Admins only, instead of
                 // registering a global alias in the host application.
                 $definition->setBindings($definition->getBindings() + [
@@ -49,6 +60,11 @@ class RegisterAdminPass implements CompilerPassInterface
                 ]);
             }
         }
+
+        $container->register(self::ADMIN_LOCATOR, ServiceLocator::class)
+            ->setPublic(true)
+            ->setArguments([$admins])
+            ->addTag('container.service_locator');
 
         self::assertUniqueGridNames($adminsByGridName);
         self::reportIgnoredAttributes($ignoredAttributes);
