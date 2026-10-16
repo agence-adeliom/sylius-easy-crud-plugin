@@ -82,6 +82,43 @@ final class ResourceContextResolverTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_the_resource_of_the_admin_when_several_resources_share_the_model(): void
+    {
+        $resolver = new ResourceContextResolver(
+            new ParameterBag([
+                'sylius.resources' => [
+                    'app.filter_color' => [
+                        'driver' => 'doctrine/orm',
+                        'classes' => [
+                            'model' => \stdClass::class,
+                            'form' => 'App\Admin\FilterColorAdmin',
+                        ],
+                    ],
+                    'app.filter_style' => [
+                        'driver' => 'doctrine/orm',
+                        'classes' => [
+                            'model' => \stdClass::class,
+                            'form' => 'App\Admin\FilterStyleAdmin',
+                        ],
+                    ],
+                ],
+            ]),
+            $this->requestStackWithCurrentRequest(),
+            $this->requestConfigurationFactory(),
+        );
+
+        $context = $resolver->resolve(\stdClass::class, 'App\Admin\FilterStyleAdmin');
+
+        self::assertNotNull($context);
+        $this->assertSame('app.filter_style', $context->getAlias());
+        $this->assertSame('app.filter_style', $context->getMetadata()->getAlias());
+        $this->assertSame('app_filter_style_index', $context->getRequestConfiguration()->getRouteName('index'));
+
+        // An Admin without its own resource (a form type of the model) keeps the first resource of the model.
+        $this->assertSame('app.filter_color', $resolver->resolve(\stdClass::class, 'App\Admin\OtherAdmin')?->getAlias());
+    }
+
+    #[Test]
     public function it_returns_null_when_no_model_matches(): void
     {
         $resolver = new ResourceContextResolver(

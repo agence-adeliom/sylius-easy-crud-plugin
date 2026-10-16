@@ -99,7 +99,7 @@ abstract class AbstractFormType extends AbstractGridType implements ServiceSubsc
             $validationGroups,
         );
         $this->user = $security->getUser();
-        $this->resourceContext = $this->resourceContextResolver->resolve($this->getResourceClass());
+        $this->resourceContext = $this->resourceContextResolver->resolve($this->getResourceClass(), static::class);
     }
 
     protected function getResourceContext(): ?ResourceContext

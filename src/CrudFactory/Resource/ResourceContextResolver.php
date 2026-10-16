@@ -8,6 +8,7 @@ use Sylius\Bundle\ResourceBundle\Controller\RequestConfigurationFactory;
 use Sylius\Resource\Metadata\Metadata;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class ResourceContextResolver
@@ -19,7 +20,11 @@ final readonly class ResourceContextResolver
     ) {
     }
 
-    public function resolve(string $model): ?ResourceContext
+    /**
+     * @param string            $model      the model of the Admin
+     * @param class-string|null $adminClass the Admin, to pick its own resource when several resources share the model
+     */
+    public function resolve(string $model, ?string $adminClass = null): ?ResourceContext
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -36,6 +41,7 @@ final readonly class ResourceContextResolver
             return null;
         }
 
+        $fallback = null;
         foreach ($resources as $alias => $configuration) {
             if (!is_string($alias) || !is_array($configuration)) {
                 continue;
@@ -46,15 +52,28 @@ final readonly class ResourceContextResolver
                 continue;
             }
 
-            $metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
+            // Several Admins may share a model, each with its own resource: the one whose form is the Admin wins.
+            if (null !== $adminClass && ($classes['form'] ?? null) === $adminClass) {
+                return $this->createContext($alias, $configuration, $request);
+            }
 
-            return new ResourceContext(
-                $alias,
-                $metadata,
-                $this->requestConfigurationFactory->create($metadata, $request),
-            );
+            $fallback ??= [$alias, $configuration];
         }
 
-        return null;
+        return null === $fallback ? null : $this->createContext($fallback[0], $fallback[1], $request);
+    }
+
+    /**
+     * @param array<mixed> $configuration
+     */
+    private function createContext(string $alias, array $configuration, Request $request): ResourceContext
+    {
+        $metadata = Metadata::fromAliasAndConfiguration($alias, $configuration);
+
+        return new ResourceContext(
+            $alias,
+            $metadata,
+            $this->requestConfigurationFactory->create($metadata, $request),
+        );
     }
 }
