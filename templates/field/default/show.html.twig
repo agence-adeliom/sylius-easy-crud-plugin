@@ -2,7 +2,12 @@
     <div class="col-12 col-md-4 fw-bold">{{ (field.label ?? field.property)|trans }}</div>
     <div class="col-12 col-md-8">
         {%- if data is iterable -%}
-            {{ data|serialize }}
+            {#- a collection of entities is displayed item by item: serializing it fails on their circular references -#}
+            {%- if data|filter(item => item is iterable)|length > 0 -%}
+                {{ data|serialize }}
+            {%- else -%}
+                {{ data|map(item => item|display_as_string)|join(', ') }}
+            {%- endif -%}
         {%- else -%}
             {{ data }}
         {%- endif -%}
