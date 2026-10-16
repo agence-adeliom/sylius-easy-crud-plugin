@@ -14,8 +14,28 @@ final class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('adeliom_sylius_easy_crud');
+        $treeBuilder = new TreeBuilder('sylius_easy_crud');
         $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
+            ->children()
+                ->arrayNode('attributes')
+                    ->info('Declare easy-crud resources via #[AsAdmin] on Admin classes instead of YAML.')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')
+                            ->info('Gates both the runtime attribute scan and the maker attribute generation.')
+                            ->defaultFalse()
+                        ->end()
+                        ->arrayNode('paths')
+                            ->info('Directories scanned for Admin classes carrying #[AsAdmin].')
+                            ->scalarPrototype()->end()
+                            ->defaultValue([])
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
 
         return $treeBuilder;
     }

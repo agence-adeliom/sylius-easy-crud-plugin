@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace <?= $namespace ?>;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
-use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CodeEditorField;
@@ -35,17 +34,10 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use <?= $entity ?>;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-final class <?= $entityShortName ?>Admin extends AbstractAdmin implements ServiceSubscriberInterface,
-AdminInterface
+final class <?= $entityShortName ?>Admin extends AbstractAdmin
 {
-
-    public static function getSubscribedServices(): array
-    {
-        return [];
-    }
-
+<?php if (empty($useAttributeMetadata)) { ?>
     public static function getName(): string
     {
         return 'admin_<?= mb_strtolower(Str::asSnakeCase($entity)) ?>';
@@ -61,6 +53,7 @@ AdminInterface
         return '';
     }
 
+<?php } ?>
     /**
     * @return iterable<FieldInterface>
     */

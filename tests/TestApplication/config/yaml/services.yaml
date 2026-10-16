@@ -1,0 +1,14 @@
+# Services of the "test_yaml" environment: the legacy Admin (no #[AsAdmin]) replaces the attribute-declared one.
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Tests\Adeliom\SyliusEasyCrudPlugin\:
+        resource: '../../src/*'
+        exclude: '../../src/{Admin,Entity,Kernel.php}'
+
+    tests_adeliom_syliuseasycrudplugin_menu.admin.menu_builder:
+        class: Tests\Adeliom\SyliusEasyCrudPlugin\Menu\AdminMenuListener
+        tags: [{ name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }]

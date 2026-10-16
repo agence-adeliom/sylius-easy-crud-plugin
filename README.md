@@ -29,7 +29,8 @@
 ![Post CRUD example](docs/screens/easy_crud_posts.png "Post CRUD example")
 
 ```php
-class PostAdmin extends AbstractAdmin
+#[AsAdmin(resourceClass: Post::class)]
+final class PostAdmin extends AbstractAdmin
 {
     /**
      * @return iterable<FieldInterface>
@@ -109,6 +110,10 @@ Alongside this plugin, we migrated our other EasyAdmin-based bundles — which p
 | ^2.0.0         | ^2.0.0         | 8.2, 8.3, 8.4 | 6.4, 7.x |
 | ^2.1.0         | ^2.1.0, ^2.2.0 | 8.3, 8.4, 8.5 | 6.4, 7.x |
 | ^2.3.0         | ^2.3.0         | 8.4, 8.5      | 7.4, 8.x |
+| ^2.4.0         | ^2.3.0         | 8.4, 8.5      | 7.4, 8.x |
+
+Upgrading? Read [UPGRADE.md](UPGRADE.md): 2.4 declares the resources with attributes (the YAML declaration is
+deprecated) and contains backward compatibility breaks for Admins overriding the constructor and custom controllers.
 
 
 ---
@@ -155,17 +160,45 @@ sylius_easy_crud:
     resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
-The plugin routes are then served under the Sylius admin path (`/%sylius_admin.path_name%`, `/admin` by default).
-If your admin uses another prefix or its own host, import the unprefixed admin routes instead:
+The plugin routes, and the routes of the resources declared with `#[AsAdmin]`, are then served under the Sylius
+admin path (`/%sylius_admin.path_name%`, `/admin` by default).
+If your admin uses another prefix or its own host, import the unprefixed admin routes and the `#[AsAdmin]` routes
+loader instead:
 
 ```yaml
 sylius_easy_crud_admin:
     resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
     prefix: /back-office        # or no prefix at all
     host: '%admin_host%'        # optional
+
+sylius_easy_crud_attributes:
+    resource: 'Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader'
+    type: service
+    prefix: /back-office
+    host: '%admin_host%'
 ```
 
-### 5. Install Assets
+### 5. Declare the resources with attributes
+
+Enable the discovery of the `#[AsAdmin]` Admin classes, and the native Sylius discovery of the `#[AsResource]` models:
+
+```yaml
+# config/packages/sylius_easy_crud.yaml
+sylius_easy_crud:
+    attributes:
+        enabled: true                              # a boolean or a %parameter%, not an environment variable
+        paths: ['%kernel.project_dir%/src/Admin']  # existing directories holding the #[AsAdmin] classes
+
+# config/packages/sylius_resource.yaml
+sylius_resource:
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity'] # where the #[AsResource] models live
+```
+
+Without it (`enabled: false`, the default), the resources are declared with the `sylius_resource` +
+`type: sylius.resource` YAML blocks, which is deprecated: see [UPGRADE.md](UPGRADE.md) to migrate.
+
+### 6. Install Assets
 
 ```bash
 php bin/console assets:install
@@ -199,10 +232,12 @@ php bin/console make:easy-crud:create-crud Post
 ```
 
 This generates:
-- `src/Admin/PostAdmin.php` - CRUD configuration class
-- Updates `config/routes.yaml` - Adds admin routes
-- Updates `config/packages/sylius_resources.yaml` - Registers Sylius resource
+- `src/Admin/PostAdmin.php` - CRUD configuration class, with `#[AsAdmin]`
+- Updates `src/Entity/Post.php` - Adds `#[AsResource]`
 - Updates `src/Menu/AdminMenuListener.php` - Adds menu entry
+
+With `sylius_easy_crud.attributes.enabled: false`, it updates `config/routes.yaml` and
+`config/packages/sylius_resource.yaml` instead of adding the attributes (deprecated).
 
 ### Step 3: Configure Your CRUD
 

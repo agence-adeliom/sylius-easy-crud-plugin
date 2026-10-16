@@ -8,7 +8,7 @@ use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Grid\Parser\OptionsParserInterface;
 use Sylius\Component\Grid\Definition\Action;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -17,7 +17,7 @@ use Twig\TwigFunction;
 class CrudRenderExtension extends AbstractExtension
 {
     public function __construct(
-        protected PropertyAccessor $propertyAccessor,
+        protected PropertyAccessorInterface $propertyAccessor,
         protected ParameterBagInterface $parameterBag,
         protected Environment $twig,
         protected OptionsParserInterface $optionsParser,

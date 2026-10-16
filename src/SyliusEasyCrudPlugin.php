@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin;
 
+use Adeliom\SyliusEasyCrudPlugin\CompilerPass\DeprecateLegacyResourcesPass;
 use Adeliom\SyliusEasyCrudPlugin\CompilerPass\RegisterAdminPass;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,6 +19,7 @@ final class SyliusEasyCrudPlugin extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new RegisterAdminPass());
+        $container->addCompilerPass(new DeprecateLegacyResourcesPass());
     }
 
     public function getPath(): string
