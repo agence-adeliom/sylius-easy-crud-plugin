@@ -3,13 +3,12 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Setup\PostContext;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Ui\Admin\ManagingPostsContext;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Page\Admin\Post\CreatePage;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Page\Admin\Post\IndexPage;
 use Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Page\Admin\Post\UpdatePage;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $container): void {
     $services = $container->services()

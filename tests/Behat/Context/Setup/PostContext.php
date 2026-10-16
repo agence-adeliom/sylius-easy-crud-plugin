@@ -7,8 +7,8 @@ namespace Tests\Adeliom\SyliusEasyCrudPlugin\Behat\Context\Setup;
 use Behat\Behat\Context\Context;
 use Behat\Step\Given;
 use Doctrine\ORM\EntityManagerInterface;
-use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Core\Model\ProductInterface;
+use Sylius\Component\Core\Model\TaxonInterface;
 use Sylius\Component\Product\Repository\ProductRepositoryInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
@@ -33,7 +33,7 @@ final class PostContext implements Context
     #[Given('there are :count posts in the database')]
     public function thereArePostsInTheDatabase(int $count): void
     {
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i <= $count; ++$i) {
             $this->createPost(sprintf('Post %d', $i));
         }
     }
@@ -47,7 +47,7 @@ final class PostContext implements Context
     #[Given('there are :count enabled posts')]
     public function thereAreEnabledPosts(int $count): void
     {
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i <= $count; ++$i) {
             $this->createPost(sprintf('Enabled Post %d', $i), true);
         }
     }
@@ -55,7 +55,7 @@ final class PostContext implements Context
     #[Given('there are :count disabled posts')]
     public function thereAreDisabledPosts(int $count): void
     {
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i <= $count; ++$i) {
             $this->createPost(sprintf('Disabled Post %d', $i), false);
         }
     }
