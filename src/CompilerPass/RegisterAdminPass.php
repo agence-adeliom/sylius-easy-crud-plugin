@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\CompilerPass;
 
+use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class RegisterAdminPass implements CompilerPassInterface
 {
@@ -21,6 +24,11 @@ class RegisterAdminPass implements CompilerPassInterface
                 $definition->addArgument($class::getEntityFqcn());
                 $definition->addArgument([]);
                 $definition->setAutowired(true);
+                // The Doctrine type guesser has no autowiring alias: bind it to the Admins only, instead of
+                // registering a global alias in the host application.
+                $definition->setBindings($definition->getBindings() + [
+                    DoctrineOrmTypeGuesser::class => new BoundArgument(new Reference('form.type_guesser.doctrine'), false),
+                ]);
             }
         }
     }
