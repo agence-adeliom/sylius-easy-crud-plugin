@@ -48,7 +48,7 @@
         <div data-form-collection="list"
              class="accordion mb-2 collection-list ea-form-collection-items">
             {% for child in form %}
-                {{ _self.collectionItem(value, id, child, allow_delete, button_delete_label, button_move_label, loop.index0) }}
+                {{ _self.collectionItem(value, id, child, allow_delete, button_delete_label, button_move_label, child.vars.name) }}
             {% endfor %}
         </div>
 

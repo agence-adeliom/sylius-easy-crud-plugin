@@ -10,7 +10,12 @@ window.addEventListener('DOMContentLoaded', () => {
             this.element = element;
             this.element.classList.add('processed');
             this.list = this.element.querySelector('[data-form-collection="list"]');
-            this.count = this.list.children.length;
+            // next index after the highest existing one: entries keep their keys (e.g. 4..7 after deletions), counting
+            // them would give a new entry the index, the inputs and the ids of an existing one
+            const indexes = Array.from(this.list.children)
+                .map((item) => parseInt(item.dataset.formCollectionIndex, 10))
+                .filter((index) => !Number.isNaN(index));
+            this.count = Math.max(this.list.children.length, ...indexes.map((index) => index + 1));
             this.lastChoice = null;
 
             this.element.addEventListener('click', (event) => {
