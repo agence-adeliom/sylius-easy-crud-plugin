@@ -108,6 +108,24 @@ final class SortableCollectionTypeTest extends TestCase
         self::assertSame(['items' => ['B', 'C']], $form->getData());
     }
 
+    public function testEntryTitleIsComputedFromTheEntryData(): void
+    {
+        $form = $this->collection(['A', 'B'], ['entry_title' => static fn (mixed $data): string => 'Item ' . $data]);
+
+        $view = $form->createView();
+
+        self::assertSame('Item A', $view[0]->vars['sortable_collection_entry_title']);
+        self::assertSame('Item B', $view[1]->vars['sortable_collection_entry_title']);
+        self::assertNull($view->vars['prototype']->vars['sortable_collection_entry_title'] ?? null);
+    }
+
+    public function testEntryTitleIsNotSetByDefault(): void
+    {
+        $view = $this->collection(['A'])->createView();
+
+        self::assertNull($view[0]->vars['sortable_collection_entry_title']);
+    }
+
     /**
      * @param array<array-key, mixed>|ArrayCollection<array-key, mixed> $data
      * @param array<string, mixed> $options
