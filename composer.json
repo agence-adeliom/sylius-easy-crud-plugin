@@ -50,7 +50,7 @@
         "symfony/webpack-encore-bundle": "^2.2"
     },
     "conflict": {
-        "agence-adeliom/sylius-happy-cms-plugin": "<2.4"
+        "agence-adeliom/sylius-happy-cms-plugin": "<2.3.1"
     },
     "suggest": {
         "sylius/sylius-mate-extension": "Exposes the easy-crud resources to the Symfony AI Mate tools (easy_crud_list_admins, easy_crud_inspect_admin)"
@@ -68,7 +68,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4.x-dev"
+            "dev-master": "2.3.x-dev"
         },
         "ai-mate": {
             "scan-dirs": [

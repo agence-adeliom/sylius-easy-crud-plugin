@@ -119,7 +119,7 @@ class RegisterAdminPass implements CompilerPassInterface
 
         trigger_deprecation(
             'agence-adeliom/sylius-easy-crud-plugin',
-            '2.4',
+            '2.3.2',
             'The easy-crud admins %s carry #[AsAdmin] while "sylius_easy_crud.attributes.enabled" is false: the attribute ' .
             'only provides the defaults of these Admins (resource class, grid name, sort, limits…), their resources and ' .
             'routes are still read from the YAML blocks, whose route "grid" must equal the grid name above. Set ' .

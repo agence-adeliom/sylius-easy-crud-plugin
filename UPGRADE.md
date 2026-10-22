@@ -1,6 +1,6 @@
 # Upgrade
 
-## 2.4.0
+## 2.3.2
 
 ### Backward compatibility breaks
 
@@ -8,9 +8,9 @@ These changes only affect code that extends the plugin classes: an Admin overrid
 `$this->crudAdminFactory`, a controller extending or replacing `SyliusCrudResourceController`, or services
 referencing the removed ones. Admins that only implement `configure*()` methods are not affected.
 
-#### Conflict with `agence-adeliom/sylius-happy-cms-plugin` < 2.4
+#### Conflict with `agence-adeliom/sylius-happy-cms-plugin` < 2.3.1
 
-happy-cms before 2.4 uses `CrudAdminFactory` (removed below), so the plugin declares a Composer `conflict` with it.
+happy-cms before 2.3.1 uses `CrudAdminFactory` (removed below), so the plugin declares a Composer `conflict` with it.
 Update both packages together:
 
 ```bash
@@ -114,7 +114,7 @@ application — outside the project directory (`kernel.project_dir`, symlinks re
 directory — are declared by another plugin (e.g. happy-cms, including when it is installed from a symlinked path
 repository mounted elsewhere) and are not reported, as the application cannot migrate them. Example:
 
-> Since agence-adeliom/sylius-easy-crud-plugin 2.4: Declaring the easy-crud resource "app.log_cron" through
+> Since agence-adeliom/sylius-easy-crud-plugin 2.3.2: Declaring the easy-crud resource "app.log_cron" through
 > legacy YAML (sylius_resource + "type: sylius.resource") is deprecated and will be removed in 3.0. Set
 > "sylius_easy_crud.attributes.enabled: true" and declare it with #[AsAdmin] on its Admin class instead: see
 > "How to remove the deprecations" in vendor/agence-adeliom/sylius-easy-crud-plugin/UPGRADE.md.

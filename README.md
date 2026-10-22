@@ -110,9 +110,8 @@ Alongside this plugin, we migrated our other EasyAdmin-based bundles — which p
 | ^2.0.0         | ^2.0.0         | 8.2, 8.3, 8.4 | 6.4, 7.x |
 | ^2.1.0         | ^2.1.0, ^2.2.0 | 8.3, 8.4, 8.5 | 6.4, 7.x |
 | ^2.3.0         | ^2.3.0         | 8.4, 8.5      | 7.4, 8.x |
-| ^2.4.0         | ^2.3.0         | 8.4, 8.5      | 7.4, 8.x |
 
-Upgrading? Read [UPGRADE.md](UPGRADE.md): 2.4 declares the resources with attributes (the YAML declaration is
+Upgrading? Read [UPGRADE.md](UPGRADE.md): 2.3.2 declares the resources with attributes (the YAML declaration is
 deprecated) and contains backward compatibility breaks for Admins overriding the constructor and custom controllers.
 
 

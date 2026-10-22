@@ -39,7 +39,7 @@ final class DeprecateLegacyResourcesPassTest extends TestCase
         ]);
 
         self::assertSame(
-            'Since agence-adeliom/sylius-easy-crud-plugin 2.4: Declaring the easy-crud resource "app.post" through legacy YAML ' .
+            'Since agence-adeliom/sylius-easy-crud-plugin 2.3.2: Declaring the easy-crud resource "app.post" through legacy YAML ' .
             '(sylius_resource + "type: sylius.resource") is deprecated and will be removed in 3.0. Set ' .
             '"sylius_easy_crud.attributes.enabled: true" and declare it with #[AsAdmin] on its Admin class instead: see ' .
             '"How to remove the deprecations" in vendor/agence-adeliom/sylius-easy-crud-plugin/UPGRADE.md.',

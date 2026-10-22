@@ -182,7 +182,7 @@ final class CreateEasyCrud extends AbstractMaker
                 // Legacy mode: declare the resource through the generated YAML blocks.
                 trigger_deprecation(
                     'agence-adeliom/sylius-easy-crud-plugin',
-                    '2.4',
+                    '2.3.2',
                     'Declaring easy-crud resources through the generated "config/routes.yaml" and ' .
                     '"config/packages/sylius_resource.yaml" blocks is deprecated and will be removed in 3.0. ' .
                     'Set "sylius_easy_crud.attributes.enabled: true" and declare the resource with the #[AsAdmin] ' .
