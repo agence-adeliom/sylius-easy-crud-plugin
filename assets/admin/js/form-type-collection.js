@@ -153,7 +153,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (item) {
                 item.remove();
             }
-            this.count -= 1;
+            // the count is not decremented: the next entry would take the index, the inputs and the ids of a kept one
 
             document.dispatchEvent(new CustomEvent('collection-form-delete', { detail: event.target }));
         }
