@@ -6,7 +6,8 @@
         "sylius",
         "sylius-plugin",
         "crud builder",
-        "easy admin"
+        "easy admin",
+        "symfony-ux"
     ],
     "license": "MIT",
     "require": {

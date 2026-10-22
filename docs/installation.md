@@ -60,7 +60,9 @@ sylius_easy_crud_admin:
 ### Step 5: Register the Stimulus controllers
 
 The admin fields with a Stimulus controller (`PositionSortableField`) need the plugin's controllers in the admin
-build. Add the plugin assets to the `package.json` of the application:
+build. With Symfony Flex, `composer require` / `composer update` does it (the package has the `symfony-ux` keyword):
+it adds the plugin assets to `package.json` and the controllers to `assets/controllers.json`. Otherwise, add the
+plugin assets to the `package.json` of the application:
 
 ```json
 "dependencies": {
@@ -68,7 +70,7 @@ build. Add the plugin assets to the `package.json` of the application:
 }
 ```
 
-then enable them in the `controllers.json` of the admin build (`assets/admin/controllers.json`):
+then enable them in the `controllers.json` read by the admin build:
 
 ```json
 "@agence-adeliom/sylius-easy-crud-plugin": {
