@@ -1,0 +1,2 @@
+sylius_easy_crud:
+    resource: "@SyliusEasyCrudPlugin/config/routes.yaml"

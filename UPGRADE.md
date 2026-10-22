@@ -1,5 +1,19 @@
 # Upgrade
 
+## 2.3.3
+
+### New `PositionSortableField`
+
+Drag and drop reordering of the list rows, flat list or Gedmo tree (see
+[Discover fields](docs/discover_fields.md#sortable-lists)). Its handle is a Stimulus controller of the plugin: register
+the plugin assets in the application to use it ([Installation, step 5](docs/installation.md#step-5-register-the-stimulus-controllers)).
+
+### `PositionSortableActionTrait` removed
+
+`Adeliom\SyliusEasyCrudPlugin\Traits\Admin\PositionSortableActionTrait` is removed: it depended on
+`CrudFactory\Context\AdminContext`, a class the plugin no longer has, so it could not be used. Replace its
+`sortPositionAction()` by `PositionSortableField::new()->asTree()`, saved by the plugin's own controller.
+
 ## 2.3.2
 
 ### Backward compatibility breaks

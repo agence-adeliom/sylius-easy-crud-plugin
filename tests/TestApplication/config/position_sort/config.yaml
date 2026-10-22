@@ -1,0 +1,41 @@
+# Variant of the test application with a flat list sorted by position and a Gedmo nested tree, the two resources the
+# PositionSortableField sorts by drag and drop: booted in the "test_position_sort" environment by the tests of
+# tests/Integration/PositionSort, which also import position_sort/routes.yaml.
+imports:
+    - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
+
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+
+# A SQLite database, created by the tests, so that the routes can be called without a database server.
+doctrine:
+    dbal:
+        driver: pdo_sqlite
+        url: 'sqlite:///%kernel.cache_dir%/position_sort.db'
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    TestApplication:
+                        is_bundle: false
+                        type: attribute
+                        dir: '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
+                        prefix: Tests\Adeliom\SyliusEasyCrudPlugin
+
+sylius_resource:
+    resources:
+        tests_position_sort.sortable_item:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusEasyCrudPlugin\Entity\PositionSort\SortableItem
+        tests_position_sort.tree_item:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusEasyCrudPlugin\Entity\PositionSort\TreeItem
+
+services:
+    security.csrf.token_manager:
+        class: Tests\Adeliom\SyliusEasyCrudPlugin\Security\FixedCsrfTokenManager
+        public: true

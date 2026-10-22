@@ -15,3 +15,14 @@ sylius_easy_crud.get_oembed:
 sylius_admin_ajax_resources:
     controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController::autocompleteAction
     path: /autocomplete/
+
+# Drag and drop of the PositionSortableField column, `{resource}` being the Sylius alias of the resource
+sylius_easy_crud_admin_position_sort:
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\PositionSortController::flat
+    path: /position-sort/{resource}
+    methods: [POST]
+
+sylius_easy_crud_admin_position_sort_tree:
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\PositionSortController::tree
+    path: /position-sort/{resource}/tree
+    methods: [POST]

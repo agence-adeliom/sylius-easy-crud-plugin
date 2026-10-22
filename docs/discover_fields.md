@@ -34,6 +34,7 @@ The plugin includes 18+ specialized fields:
 | `TabField` | Organize fields into tabs            |
 | `ColumnField` | Create responsive layouts            |
 | `SortableCollectionField` | Drag-and-drop sortable items         |
+| `PositionSortableField` | Drag-and-drop reordering of the list rows |
 | `ChoiceMaskField` | Conditional field visibility         |
 | `OembedField` | Embed external media (YouTube, etc.) |
 | `IconField` | Icon picker                          |
@@ -100,6 +101,43 @@ yield SortableCollectionField::new('data')
         ->setFormTypeOption('keep_as_list', false);
 
 ```
+
+### Sortable lists
+
+`PositionSortableField` adds a drag and drop handle to the rows of the list (index page only). The rows also move
+with the arrow keys once the handle is focused. Each move is saved at once.
+
+**Flat list**: the resource implements `Adeliom\SyliusEasyCrudPlugin\Model\PositionSortableInterface`, with an
+integer Doctrine field named `position`. Sort the list by position; it may be paginated, the new position is taken
+from the neighbours of the dropped row, and only the rows between the old and the new position are shifted.
+
+```php
+public function getDefaultSort(): array
+{
+    return ['position' => 'asc'];
+}
+
+public function configureFields(string $pageName): iterable
+{
+    yield PositionSortableField::new('position', 'Position');
+    // the position field of the form, if needed
+    yield Field::new('position')->setFormType(IntegerType::class)->hideOnIndex();
+}
+```
+
+**Tree**: the resource is a Gedmo nested tree (`#[Gedmo\Tree(type: 'nested')]`, a `NestedTreeRepository`). Sort the
+list by the left value and show every sibling on the same page. A row moves among its siblings only, with its
+descendants; root nodes are not movable. Gedmo writes `$node->sibling` while moving a node: add a `sibling` property
+or `#[\AllowDynamicProperties]` to the entity.
+
+```php
+yield PositionSortableField::new('position', 'Position')->asTree(); // parent property: `parent`
+```
+
+The handle is the `position-sortable` Stimulus controller of the plugin: register it in the application (see
+[Installation](./installation.md#step-5-register-the-stimulus-controllers)). The moves are posted, with a CSRF token,
+to the `sylius_easy_crud_admin_position_sort` and `sylius_easy_crud_admin_position_sort_tree` routes of
+`config/routes/admin.yaml`.
 
 ### CMS Fields
 

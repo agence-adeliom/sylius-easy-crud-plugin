@@ -398,7 +398,7 @@ abstract class AbstractFormType extends AbstractGridType implements ServiceSubsc
                     $field->setOption('template', $fieldDto->getGridTemplatePath());
 
                     $field->addOptions([
-                       'vars' => ['field' => $fieldDto],
+                       'vars' => ['field' => $fieldDto, 'resource_alias' => $this->getResourceAlias()],
                     ]);
 
                     $gridBuilder->addField(
