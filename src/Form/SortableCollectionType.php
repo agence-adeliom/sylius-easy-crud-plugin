@@ -113,7 +113,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         $entryTitle = $options['entry_title'];
         foreach ($view as $entryView) {
             // title of the entry's accordion header (display_as_string of the entry data when not set)
-            $entryView->vars['sortable_collection_entry_title'] = null !== $entryTitle ? $entryTitle($entryView->vars['data']) : null;
+            $entryView->vars['sortable_collection_entry_title'] = \is_callable($entryTitle) ? $entryTitle($entryView->vars['data']) : null;
 
             $blockPrefixes = $entryView->vars['block_prefixes'];
             if (\is_array($blockPrefixes)) {
