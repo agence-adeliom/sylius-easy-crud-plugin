@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus';
  *
  * The row moves among its siblings, the rows of the list with the same `data-position-sortable-parent` (all the rows
  * of a flat list), together with its descendants in a tree (hidden while dragging). While dragging, a copy of the row
- * follows the pointer and the row itself, faded, shows where it will be dropped; Escape cancels the move. The arrow
+ * follows the pointer and the row itself, emptied, leaves a gap where it will be dropped; Escape cancels the move. The arrow
  * keys move it by one sibling. Once dropped, the ids of the row and of its new previous and next siblings are posted to `url`; the page
  * is reloaded when the move fails, to show the saved order again.
  */
@@ -28,7 +28,7 @@ export default class extends Controller {
     this.ghost = this.createGhost(this.row, event.clientY);
     this.block = this.blockOf(this.row);
     this.block.slice(1).forEach((row) => { row.hidden = true; });
-    this.row.style.opacity = '0.4';
+    this.showDropZone(true);
     document.body.style.cursor = 'grabbing';
     document.body.style.userSelect = 'none';
 
@@ -73,7 +73,7 @@ export default class extends Controller {
     window.removeEventListener('keydown', this.onEscape);
     this.ghost.element.remove();
     this.block.forEach((row) => { row.hidden = false; });
-    this.row.style.opacity = '';
+    this.showDropZone(false);
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     this.dragging = false;
@@ -83,6 +83,20 @@ export default class extends Controller {
     } else if (this.siblingIds() !== this.initialOrder) {
       this.save();
     }
+  }
+
+  /**
+   * The dragged row as an empty slot of the same height, outlined: the place where the row will be dropped.
+   */
+  showDropZone(shown) {
+    Array.from(this.row.cells).forEach((cell) => { cell.style.visibility = shown ? 'hidden' : ''; });
+    Object.assign(this.row.style, shown
+      ? {
+          outline: '2px dashed var(--tblr-primary, #206bc4)',
+          outlineOffset: '-2px',
+          backgroundColor: 'var(--tblr-primary-lt, rgba(32, 107, 196, 0.08))',
+        }
+      : { outline: '', outlineOffset: '', backgroundColor: '' });
   }
 
   /**
