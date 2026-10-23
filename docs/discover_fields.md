@@ -35,6 +35,7 @@ The plugin includes 18+ specialized fields:
 | `ColumnField` | Create responsive layouts            |
 | `SortableCollectionField` | Drag-and-drop sortable items         |
 | `PositionSortableField` | Drag-and-drop reordering of the list rows |
+| `CollectionField` | Collection without drag and drop (same accordion entries) |
 | `ChoiceMaskField` | Conditional field visibility         |
 | `OembedField` | Embed external media (YouTube, etc.) |
 | `IconField` | Icon picker                          |
@@ -99,6 +100,11 @@ yield SortableCollectionField::new('data')
 yield SortableCollectionField::new('data')
         ->setEntryType(SubType::class)
         ->setFormTypeOption('keep_as_list', false);
+
+// Same collection, same options, without the drag and drop (the order is not edited)
+yield CollectionField::new('emails')
+        ->setEntryType(EmailType::class)
+        ->setEntryTitle(static fn (?string $email): ?string => $email);
 
 ```
 
