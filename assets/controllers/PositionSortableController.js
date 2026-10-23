@@ -70,18 +70,9 @@ export default class extends Controller {
   }
 
   end(cancel = false) {
-    window.removeEventListener('pointermove', this.onMove);
-    window.removeEventListener('pointerup', this.onEnd);
-    window.removeEventListener('pointercancel', this.onCancel);
-    window.removeEventListener('keydown', this.onEscape);
-    cancelAnimationFrame(this.scrollFrame);
-    this.scrollFrame = null;
-    this.ghost.element.remove();
+    this.stopDragging();
     this.block.forEach((row) => { row.hidden = false; });
     this.showDropZone(false);
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-    this.dragging = false;
 
     if (cancel) {
       this.row.parentElement.append(...this.initialRows);
@@ -172,6 +163,28 @@ export default class extends Controller {
     document.body.append(table);
 
     return { element: table, top: rect.top, pointerY };
+  }
+
+  /**
+   * The row left the page while dragging (the list was rendered again): no move, nothing left on the page.
+   */
+  disconnect() {
+    if (this.dragging) {
+      this.stopDragging();
+    }
+  }
+
+  stopDragging() {
+    window.removeEventListener('pointermove', this.onMove);
+    window.removeEventListener('pointerup', this.onEnd);
+    window.removeEventListener('pointercancel', this.onCancel);
+    window.removeEventListener('keydown', this.onEscape);
+    cancelAnimationFrame(this.scrollFrame);
+    this.scrollFrame = null;
+    this.ghost.element.remove();
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    this.dragging = false;
   }
 
   keydown(event) {
