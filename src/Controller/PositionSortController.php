@@ -56,6 +56,17 @@ final readonly class PositionSortController
         $previousPosition = $previous instanceof PositionSortableInterface ? $previous->getPosition() : null;
         $nextPosition = $next instanceof PositionSortableInterface ? $next->getPosition() : null;
 
+        // positions that cannot express the new order (shared, or missing on a neighbour): renumber the list first
+        $neighbourWithoutPosition = (null !== $previous && null === $previousPosition) || (null !== $next && null === $nextPosition);
+        $sharedPosition = null !== $oldPosition && \in_array($oldPosition, [$previousPosition, $nextPosition], true);
+        $unorderedNeighbours = null !== $previousPosition && null !== $nextPosition && $previousPosition >= $nextPosition;
+        if ($neighbourWithoutPosition || $sharedPosition || $unorderedNeighbours) {
+            $this->positionShifter->renumber($entityManager, $moved::class);
+            $oldPosition = $moved->getPosition();
+            $previousPosition = $previous instanceof PositionSortableInterface ? $previous->getPosition() : null;
+            $nextPosition = $next instanceof PositionSortableInterface ? $next->getPosition() : null;
+        }
+
         // positions of the neighbours, not indexes in the page: the list may be paginated
         if (null !== $previousPosition && null !== $oldPosition && $previousPosition > $oldPosition) {
             $this->positionShifter->move($entityManager, $moved, $previousPosition);

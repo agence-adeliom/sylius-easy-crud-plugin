@@ -14,6 +14,31 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final class PositionShifter
 {
+    /**
+     * Numbers the rows 0 to n-1 in the order of the list (position, rows without position first like in an ascending
+     * SQL sort, then id): positions shared by several rows, or missing, become distinct.
+     *
+     * @param class-string<PositionSortableInterface> $class
+     */
+    public function renumber(EntityManagerInterface $entityManager, string $class): void
+    {
+        $metadata = $entityManager->getClassMetadata($class);
+        /** @var list<PositionSortableInterface> $resources */
+        $resources = $entityManager->createQueryBuilder()
+            ->select('resource')
+            ->from($metadata->getName(), 'resource')
+            ->orderBy('resource.position', 'ASC')
+            ->addOrderBy(sprintf('resource.%s', $metadata->getSingleIdentifierFieldName()), 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        foreach ($resources as $position => $resource) {
+            $resource->setPosition($position);
+        }
+        $entityManager->flush();
+    }
+
     public function move(EntityManagerInterface $entityManager, PositionSortableInterface $resource, int $position): void
     {
         $oldPosition = $resource->getPosition();

@@ -112,6 +112,41 @@ final class PositionSortControllerTest extends WebTestCase
         self::assertSame([0, 2, 3, 1], $this->positions($items));
     }
 
+    /**
+     * Rows with the same position are listed by id: the list is renumbered in that order before the move, otherwise the
+     * new order could not be expressed with the positions of the neighbours.
+     */
+    #[Test]
+    public function rows_with_the_same_position_are_renumbered_before_the_move(): void
+    {
+        $items = $this->createSortableItems(4);
+        foreach ([0, 4, 4, 5] as $index => $position) {
+            $items[$index]->setPosition($position);
+        }
+        $this->entityManager()->flush();
+
+        // the first row at position 4 dropped after the second one
+        $this->sort('sortable_item', $items[1], $items[2], $items[3]);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([0, 2, 1, 3], $this->positions($items));
+    }
+
+    #[Test]
+    public function rows_without_position_are_renumbered_before_the_move(): void
+    {
+        $items = $this->createSortableItems(3);
+        $items[0]->setPosition(null);
+        $items[1]->setPosition(null);
+        $this->entityManager()->flush();
+
+        // the two rows without position are listed first: the last row dropped between them
+        $this->sort('sortable_item', $items[2], $items[0], $items[1]);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([0, 2, 1], $this->positions($items));
+    }
+
     #[Test]
     public function a_child_moves_among_its_siblings(): void
     {
