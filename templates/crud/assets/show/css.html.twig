@@ -1,5 +1,5 @@
 {% if css_assets is defined %}
-    {% for asset in form.vars.css_assets %}
+    {% for asset in css_assets %}
         <link rel="stylesheet" href="{{ asset(asset.value, asset.packageName) }}">
     {% endfor %}
 {% endif %}
