@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Adeliom\SyliusEasyCrudPlugin\Model\PositionSortableInterface;
-use Adeliom\SyliusEasyCrudPlugin\Services\PositionShifter;
-use Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionChecker;
+use Adeliom\SyliusEasyCrudPlugin\Services\PositionShifterInterface;
+use Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionCheckerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
@@ -29,7 +29,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * `id` is dropped between `previousId` and `nextId`, the rows around it in the list (only its siblings in a tree).
  * The resource is given by its Sylius alias in the URL and must opt in: implement {@see PositionSortableInterface}
  * (flat list), or be a Gedmo nested tree (tree). Besides the admin firewall and the CSRF token, the permission of the
- * update route of the resource is required ({@see ResourceUpdatePermissionChecker}).
+ * update route of the resource is required ({@see ResourceUpdatePermissionCheckerInterface}).
  */
 #[AsController]
 final readonly class PositionSortController
@@ -40,8 +40,8 @@ final readonly class PositionSortController
         #[Autowire(service: 'sylius.resource_registry')]
         private RegistryInterface $resourceRegistry,
         private ManagerRegistry $managerRegistry,
-        private PositionShifter $positionShifter,
-        private ResourceUpdatePermissionChecker $updatePermissionChecker,
+        private PositionShifterInterface $positionShifter,
+        private ResourceUpdatePermissionCheckerInterface $updatePermissionChecker,
         private PropertyAccessorInterface $propertyAccessor,
         // null when the CSRF protection of the application is disabled
         private ?CsrfTokenManagerInterface $csrfTokenManager = null,

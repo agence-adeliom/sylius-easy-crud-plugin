@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
  * #[AsAdmin]) is read back and checked like `ResourceController::isGrantedOr403()` does, with the authorization checker
  * of the resource controllers. A resource without update route needs no permission.
  */
-final class ResourceUpdatePermissionChecker
+final class ResourceUpdatePermissionChecker implements ResourceUpdatePermissionCheckerInterface
 {
     /** @var array<string, array<mixed>|null> `_sylius` of the update route, by controller */
     private array $updateRoutes = [];

@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
  * those: moving up pushes them down (+1), moving down pulls them up (-1). A resource without position is inserted,
  * every row from the new position on is pushed down.
  */
-final class PositionShifter
+final class PositionShifter implements PositionShifterInterface
 {
     /**
      * Numbers the rows 0 to n-1 in the order of the list (position, rows without position first like in an ascending

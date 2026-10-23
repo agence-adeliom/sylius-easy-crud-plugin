@@ -152,6 +152,9 @@ its update route is checked like the update page does: when the route has `permi
 `#[AsAdmin(permission: true)]`), the authorization checker of the Sylius resource controllers must grant
 `<application>.<resource>.update`. A resource without update route needs no permission.
 
+**Services**: the positions of a flat list (`Services\PositionShifterInterface`) and the permission check
+(`Services\ResourceUpdatePermissionCheckerInterface`) are services, to decorate or replace by their interface.
+
 **Stimulus**: the handle is the `position-sortable` controller of the plugin, registered by Symfony Flex (see
 [Installation](./installation.md#step-5-register-the-stimulus-controllers)).
 
