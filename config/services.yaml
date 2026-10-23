@@ -10,6 +10,8 @@ services:
         public: true
 
     Adeliom\SyliusEasyCrudPlugin\Services\PositionShifter: ~
+
+    Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionChecker: ~
     
     Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType:
         public: true

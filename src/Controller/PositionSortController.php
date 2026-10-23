@@ -6,6 +6,7 @@ namespace Adeliom\SyliusEasyCrudPlugin\Controller;
 
 use Adeliom\SyliusEasyCrudPlugin\Model\PositionSortableInterface;
 use Adeliom\SyliusEasyCrudPlugin\Services\PositionShifter;
+use Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
@@ -27,7 +28,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * Drag and drop of the {@see \Adeliom\SyliusEasyCrudPlugin\Admin\Field\PositionSortableField} column: the resource
  * `id` is dropped between `previousId` and `nextId`, the rows around it in the list (only its siblings in a tree).
  * The resource is given by its Sylius alias in the URL and must opt in: implement {@see PositionSortableInterface}
- * (flat list), or be a Gedmo nested tree (tree).
+ * (flat list), or be a Gedmo nested tree (tree). Besides the admin firewall and the CSRF token, the permission of the
+ * update route of the resource is required ({@see ResourceUpdatePermissionChecker}).
  */
 #[AsController]
 final readonly class PositionSortController
@@ -39,6 +41,7 @@ final readonly class PositionSortController
         private RegistryInterface $resourceRegistry,
         private ManagerRegistry $managerRegistry,
         private PositionShifter $positionShifter,
+        private ResourceUpdatePermissionChecker $updatePermissionChecker,
         private PropertyAccessorInterface $propertyAccessor,
         // null when the CSRF protection of the application is disabled
         private ?CsrfTokenManagerInterface $csrfTokenManager = null,
@@ -151,10 +154,12 @@ final readonly class PositionSortController
         }
 
         try {
-            $modelClass = $this->resourceRegistry->get($resource)->getClass('model');
+            $metadata = $this->resourceRegistry->get($resource);
         } catch (\InvalidArgumentException) {
             throw new NotFoundHttpException(sprintf('Unknown resource "%s".', $resource));
         }
+        $this->updatePermissionChecker->denyUnlessGranted($metadata, $request);
+        $modelClass = $metadata->getClass('model');
 
         $entityManager = $this->managerRegistry->getManagerForClass($modelClass);
         if (!$entityManager instanceof EntityManagerInterface) {

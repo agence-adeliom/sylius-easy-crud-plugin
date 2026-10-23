@@ -25,6 +25,8 @@ doctrine:
                         prefix: Tests\Adeliom\SyliusEasyCrudPlugin
 
 sylius_resource:
+    # refuses every permission to ROLE_READ_ONLY (the sortable items have an update route with `permission: true`)
+    authorization_checker: Tests\Adeliom\SyliusEasyCrudPlugin\Security\ReadOnlyAuthorizationChecker
     resources:
         tests_position_sort.sortable_item:
             driver: doctrine/orm
@@ -36,6 +38,9 @@ sylius_resource:
                 model: Tests\Adeliom\SyliusEasyCrudPlugin\Entity\PositionSort\TreeItem
 
 services:
+    Tests\Adeliom\SyliusEasyCrudPlugin\Security\ReadOnlyAuthorizationChecker:
+        autowire: true
+
     security.csrf.token_manager:
         class: Tests\Adeliom\SyliusEasyCrudPlugin\Security\FixedCsrfTokenManager
         public: true

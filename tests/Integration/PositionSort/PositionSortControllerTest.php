@@ -249,6 +249,37 @@ final class PositionSortControllerTest extends WebTestCase
         self::assertSame([0, 1, 2], $this->positions($items));
     }
 
+    /**
+     * Moving a row modifies the resource: the permission of its update route is required, checked by the
+     * authorization checker of the resource controllers (here, refused to ROLE_READ_ONLY).
+     */
+    #[Test]
+    public function the_permission_of_the_update_route_is_required(): void
+    {
+        $items = $this->createSortableItems(3);
+        $this->client->loginUser($this->createAdminUser('read-only@example.com', ['ROLE_READ_ONLY']), 'admin');
+
+        $this->sort('sortable_item', $items[2], null, $items[0]);
+
+        self::assertResponseStatusCodeSame(403);
+        self::assertSame([0, 1, 2], $this->positions($items));
+    }
+
+    /**
+     * The tree items have no update route: nothing to check but the access to the admin.
+     */
+    #[Test]
+    public function a_resource_without_update_route_needs_no_permission(): void
+    {
+        [$root, $first, , $third] = $this->createTree();
+        $this->client->loginUser($this->createAdminUser('read-only@example.com', ['ROLE_READ_ONLY']), 'admin');
+
+        $this->sort('tree_item', $third, null, $first);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['third', 'first', 'second'], $this->childrenNames($root));
+    }
+
     #[Test]
     public function an_unknown_resource_is_not_found(): void
     {
@@ -369,20 +400,33 @@ final class PositionSortControllerTest extends WebTestCase
         $locale->setCode('en_US');
         $entityManager->persist($locale);
 
+        $entityManager->flush();
+
+        $client->loginUser($this->createAdminUser('admin@example.com'), 'admin');
+
+        return $client;
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    private function createAdminUser(string $email, array $roles = []): AdminUserInterface
+    {
         /** @var FactoryInterface<AdminUserInterface> $adminUserFactory */
         $adminUserFactory = self::getContainer()->get('sylius.factory.admin_user');
         $adminUser = $adminUserFactory->createNew();
-        $adminUser->setUsername('admin');
-        $adminUser->setEmail('admin@example.com');
+        $adminUser->setUsername($email);
+        $adminUser->setEmail($email);
         $adminUser->setPlainPassword('admin');
         $adminUser->setLocaleCode('en_US');
         $adminUser->setEnabled(true);
-        $entityManager->persist($adminUser);
-        $entityManager->flush();
+        foreach ($roles as $role) {
+            $adminUser->addRole($role);
+        }
+        $this->entityManager()->persist($adminUser);
+        $this->entityManager()->flush();
 
-        $client->loginUser($adminUser, 'admin');
-
-        return $client;
+        return $adminUser;
     }
 
     private function entityManager(): EntityManagerInterface
