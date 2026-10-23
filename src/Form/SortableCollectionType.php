@@ -110,7 +110,11 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             break;
         }
 
+        $entryTitle = $options['entry_title'];
         foreach ($view as $entryView) {
+            // title of the entry's accordion header (display_as_string of the entry data when not set or null)
+            $entryView->vars['sortable_collection_entry_title'] = \is_callable($entryTitle) ? $entryTitle($entryView->vars['data']) : null;
+
             $blockPrefixes = $entryView->vars['block_prefixes'];
             if (\is_array($blockPrefixes)) {
                 array_splice($blockPrefixes, $prefixOffset, 0, 'sortable_collection_entry');
@@ -158,6 +162,9 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
             'allow_drag' => false,
             'allow_add' => false,
             'hide_title' => false,
+            // callable(mixed $entryData): ?string, title of each entry's accordion header (null: the entry data rendered
+            // by display_as_string)
+            'entry_title' => null,
             'allow_delete' => false,
             'prototype' => true,
             'prototype_data' => null,
@@ -176,6 +183,7 @@ class SortableCollectionType extends CollectionType implements AdminFormTypeInte
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
         $resolver->setAllowedTypes('allow_drag', 'bool');
         $resolver->setAllowedTypes('keep_as_list', 'bool');
+        $resolver->setAllowedTypes('entry_title', ['null', 'callable']);
     }
 
     /**
