@@ -7,6 +7,7 @@ namespace Tests\Adeliom\SyliusEasyCrudPlugin\Unit\Admin\Field;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\PositionSortableField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 final class PositionSortableFieldTest extends TestCase
 {
@@ -28,9 +29,20 @@ final class PositionSortableFieldTest extends TestCase
         $this->assertSame('@SyliusEasyCrudPlugin/field/positionsortable/grid.html.twig', $dto->getGridTemplatePath());
     }
 
-    public function testShownOnTheIndexPageOnly(): void
+    public function testFlatListIsAnOptionalIntegerInTheForms(): void
     {
-        $displayedOn = PositionSortableField::new()->getAsDto()->getDisplayedOn();
+        $dto = PositionSortableField::new()->getAsDto();
+
+        foreach ([Crud::PAGE_INDEX, Crud::PAGE_NEW, Crud::PAGE_EDIT, Crud::PAGE_DETAIL] as $page) {
+            $this->assertTrue($dto->getDisplayedOn()->has($page), $page);
+        }
+        $this->assertSame(IntegerType::class, $dto->getFormType());
+        $this->assertFalse($dto->getFormTypeOptions()['required']);
+    }
+
+    public function testTreeIsShownOnTheIndexPageOnly(): void
+    {
+        $displayedOn = PositionSortableField::new()->asTree()->getAsDto()->getDisplayedOn();
 
         $this->assertTrue($displayedOn->has(Crud::PAGE_INDEX));
         $this->assertFalse($displayedOn->has(Crud::PAGE_NEW));

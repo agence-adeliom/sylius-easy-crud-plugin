@@ -16,5 +16,6 @@ interface PositionSortableInterface
 
     public function getPosition(): ?int;
 
-    public function setPosition(int $position): void;
+    // null: no position, the optional field of the forms left empty
+    public function setPosition(?int $position): void;
 }

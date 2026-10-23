@@ -10,6 +10,9 @@ package now has the `symfony-ux` keyword, so Symfony Flex adds the plugin assets
 to `assets/controllers.json` on `composer update`; rebuild the admin assets afterwards
 ([Installation, step 5](docs/installation.md#step-5-register-the-stimulus-controllers)).
 
+For a flat list, the same field is the optional position input of the forms (`IntegerType`): no separate form
+field to declare. `PositionSortableInterface::setPosition()` accepts null (the input left empty).
+
 A move may change other rows than the moved one: the rows in between are shifted, the whole table is renumbered when
 positions are shared or missing, and an inconsistent tree is rebuilt before the move. It requires the permission of
 the update route of the resource.

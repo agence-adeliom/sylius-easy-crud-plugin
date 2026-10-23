@@ -104,8 +104,9 @@ yield SortableCollectionField::new('data')
 
 ### Sortable lists
 
-`PositionSortableField` adds a drag and drop handle to the rows of the list (index page only). Each move is saved
-at once.
+`PositionSortableField` is the position of the resource: a drag and drop handle on the rows of the list, each move
+saved at once, and, for a flat list, an optional integer in the forms (`IntegerType`, empty: no position; change it
+with `setFormType()`, `setHelp()`… or keep the handle only with `onlyOnIndex()`).
 
 - **While dragging**, a copy of the row follows the pointer and the row itself, emptied and outlined, leaves a gap
   where it will be dropped. The page scrolls when the pointer nears the top or the bottom of the window. **Escape**
@@ -128,15 +129,14 @@ public function getDefaultSort(): array
 
 public function configureFields(string $pageName): iterable
 {
+    // the handle in the list, the integer in the forms
     yield PositionSortableField::new('position', 'Position');
-    // the position field of the form, if needed
-    yield Field::new('position')->setFormType(IntegerType::class)->hideOnIndex();
 }
 ```
 
 **Tree**: the resource is a Gedmo nested tree (`#[Gedmo\Tree(type: 'nested')]`, a `NestedTreeRepository`). Sort the
 list by the left value and show every sibling on the same page. A row moves among its siblings only (the rows with the
-same parent), together with its descendants; root nodes have no handle and cannot be moved. When the bounds of the tree
+same parent), together with its descendants; root nodes have no handle and cannot be moved. The field is shown in the list only: the order is the tree itself. When the bounds of the tree
 are inconsistent (`verify()` fails, e.g. after a manual SQL change), they are rebuilt first (`recoverFast()`, siblings
 kept in the order of their left value). Gedmo writes `$node->sibling` while moving a node: add a `sibling` property or
 `#[\AllowDynamicProperties]` to the entity.
