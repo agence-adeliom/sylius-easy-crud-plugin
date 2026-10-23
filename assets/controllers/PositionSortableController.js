@@ -109,7 +109,8 @@ export default class extends Controller {
     this.scrollFrame = requestAnimationFrame(() => {
       this.scrollFrame = null;
       const scrollY = window.scrollY;
-      window.scrollBy(0, step);
+      // instant: the admin theme scrolls smoothly (`scroll-behavior: smooth`), scrollY would not change at once
+      window.scrollBy({ top: step, behavior: 'instant' });
       if (this.dragging && window.scrollY !== scrollY) {
         this.move(this.pointerY);
       }
