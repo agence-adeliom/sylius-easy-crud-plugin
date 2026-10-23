@@ -16,9 +16,9 @@
                 {{ stimulus_controller('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', {
                     url: path(tree ? 'sylius_easy_crud_admin_position_sort_tree' : 'sylius_easy_crud_admin_position_sort', {resource: options.vars.resource_alias}),
                     csrfToken: csrf_token('sylius_easy_crud_position_sort'),
-                }) }}
-                {{ stimulus_action('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', 'start', 'pointerdown') }}
-                {{ stimulus_action('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', 'keydown', 'keydown') }}
+                })
+                    |stimulus_action('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', 'start', 'pointerdown')
+                    |stimulus_action('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', 'keydown', 'keydown') }}
         >
             {{ ux_icon('tabler:grip-vertical', {class: 'icon'}) }}
         </button>
