@@ -5,6 +5,15 @@ services:
     
     Adeliom\SyliusEasyCrudPlugin\Controller\OembedController:
         public: true
+
+    Adeliom\SyliusEasyCrudPlugin\Controller\PositionSortController:
+        public: true
+
+    Adeliom\SyliusEasyCrudPlugin\Services\PositionShifter: ~
+    Adeliom\SyliusEasyCrudPlugin\Services\PositionShifterInterface: '@Adeliom\SyliusEasyCrudPlugin\Services\PositionShifter'
+
+    Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionChecker: ~
+    Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionCheckerInterface: '@Adeliom\SyliusEasyCrudPlugin\Services\ResourceUpdatePermissionChecker'
     
     Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType:
         public: true
@@ -39,9 +48,6 @@ services:
         arguments:
             - "@sylius.easycrud.intlformatter"
         public: true
-    
-    #  Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator\PositionSortableConfigurator:
-    #    public: true
     
     Adeliom\SyliusEasyCrudPlugin\Twig\OembedExtension:
         public: true

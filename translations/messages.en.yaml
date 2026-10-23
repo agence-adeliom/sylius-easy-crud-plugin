@@ -16,6 +16,8 @@ sylius_easy_crud_plugin:
         subheader: Manage en entity
         index: List
         update: Update entity
+      position_sortable:
+        move: Drag to reorder
 
 # test-application
 tests_adeliom_sylius_easy_crud_plugin:

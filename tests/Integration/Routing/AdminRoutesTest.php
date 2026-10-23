@@ -33,6 +33,14 @@ final class AdminRoutesTest extends KernelTestCase
             sprintf('/%s/autocomplete/', $adminPath),
             $router->generate('sylius_admin_ajax_resources'),
         );
+        self::assertSame(
+            sprintf('/%s/position-sort/app.book', $adminPath),
+            $router->generate('sylius_easy_crud_admin_position_sort', ['resource' => 'app.book']),
+        );
+        self::assertSame(
+            sprintf('/%s/position-sort/app.book/tree', $adminPath),
+            $router->generate('sylius_easy_crud_admin_position_sort_tree', ['resource' => 'app.book']),
+        );
     }
 
     /**

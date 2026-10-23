@@ -34,6 +34,7 @@ The plugin includes 18+ specialized fields:
 | `TabField` | Organize fields into tabs            |
 | `ColumnField` | Create responsive layouts            |
 | `SortableCollectionField` | Drag-and-drop sortable items         |
+| `PositionSortableField` | Drag-and-drop reordering of the list rows |
 | `ChoiceMaskField` | Conditional field visibility         |
 | `OembedField` | Embed external media (YouTube, etc.) |
 | `IconField` | Icon picker                          |
@@ -100,6 +101,62 @@ yield SortableCollectionField::new('data')
         ->setFormTypeOption('keep_as_list', false);
 
 ```
+
+### Sortable lists
+
+`PositionSortableField` is the position of the resource: a drag and drop handle on the rows of the list, each move
+saved at once, and, for a flat list, an optional integer in the forms (`IntegerType`, empty: no position; change it
+with `setFormType()`, `setHelp()`… or keep the handle only with `onlyOnIndex()`).
+
+- **While dragging**, a copy of the row follows the pointer and the row itself, emptied and outlined, leaves a gap
+  where it will be dropped. The page scrolls when the pointer nears the top or the bottom of the window. **Escape**
+  cancels the move: the rows go back to their place, nothing is saved.
+- **Keyboard**: once the handle is focused, the arrow keys move the row up or down by one row (one sibling in a tree).
+- **Errors**: when a move is refused or fails, the page is reloaded to show the saved order again.
+
+**Flat list**: the resource implements `Adeliom\SyliusEasyCrudPlugin\Model\PositionSortableInterface`, with an
+integer Doctrine field named `position`. Sort the list by position; it may be paginated: the new position is the
+position of a neighbour of the dropped row (not its index in the page), and only the rows between the old and the new
+position are shifted by one. When the positions cannot express the new order (several rows at the same position, a
+neighbour without position), the rows of the table are first renumbered from 0, in the order of the list (position,
+rows without position first, then id).
+
+```php
+public function getDefaultSort(): array
+{
+    return ['position' => 'asc'];
+}
+
+public function configureFields(string $pageName): iterable
+{
+    // the handle in the list, the integer in the forms
+    yield PositionSortableField::new('position', 'Position');
+}
+```
+
+**Tree**: the resource is a Gedmo nested tree (`#[Gedmo\Tree(type: 'nested')]`, a `NestedTreeRepository`). Sort the
+list by the left value and show every sibling on the same page. A row moves among its siblings only (the rows with the
+same parent), together with its descendants; root nodes have no handle and cannot be moved. The field is shown in the list only: the order is the tree itself. When the bounds of the tree
+are inconsistent (`verify()` fails, e.g. after a manual SQL change), they are rebuilt first (`recoverFast()`, siblings
+kept in the order of their left value). Gedmo writes `$node->sibling` while moving a node: add a `sibling` property or
+`#[\AllowDynamicProperties]` to the entity.
+
+```php
+yield PositionSortableField::new('position', 'Position')->asTree(); // parent property: `parent`
+```
+
+**Security**: the moves are posted to the `sylius_easy_crud_admin_position_sort` and
+`sylius_easy_crud_admin_position_sort_tree` routes of `config/routes/admin.yaml` (import them behind the admin
+firewall), with a CSRF token (`sylius_easy_crud_position_sort`). A move modifies the resource, so the permission of
+its update route is checked like the update page does: when the route has `permission` (YAML resource block or
+`#[AsAdmin(permission: true)]`), the authorization checker of the Sylius resource controllers must grant
+`<application>.<resource>.update`. A resource without update route needs no permission.
+
+**Services**: the positions of a flat list (`Services\PositionShifterInterface`) and the permission check
+(`Services\ResourceUpdatePermissionCheckerInterface`) are services, to decorate or replace by their interface.
+
+**Stimulus**: the handle is the `position-sortable` controller of the plugin, registered by Symfony Flex (see
+[Installation](./installation.md#step-5-register-the-stimulus-controllers)).
 
 ### CMS Fields
 

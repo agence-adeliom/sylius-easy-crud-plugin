@@ -1,0 +1,26 @@
+{#
+    PositionSortableField column: a drag and drop handle (`position-sortable` Stimulus controller of the plugin), on
+    every row of a flat list, on every non-root row of a tree. The id and the parent id of every row are read by the
+    controller to find the siblings of the moved row.
+#}
+{% set field = options.vars.field %}
+{% set tree = field.customOption('tree') %}
+{% set parent = tree ? attribute(data, field.customOption('parentProperty')) : null %}
+<span data-position-sortable-id="{{ data.id }}" data-position-sortable-parent="{{ parent ? parent.id : '' }}">
+    {% if not tree or parent %}
+        <button type="button"
+                class="btn btn-sm btn-icon"
+                style="cursor: grab; touch-action: none;"
+                title="{{ 'sylius_easy_crud_plugin.admin.ui.position_sortable.move'|trans }}"
+                aria-label="{{ 'sylius_easy_crud_plugin.admin.ui.position_sortable.move'|trans }}"
+                {{ stimulus_controller('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', {
+                    url: path(tree ? 'sylius_easy_crud_admin_position_sort_tree' : 'sylius_easy_crud_admin_position_sort', {resource: options.vars.resource_alias}),
+                    csrfToken: csrf_token('sylius_easy_crud_position_sort'),
+                })
+                    |stimulus_action('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', 'start', 'pointerdown')
+                    |stimulus_action('@agence-adeliom/sylius-easy-crud-plugin/position-sortable', 'keydown', 'keydown') }}
+        >
+            {{ ux_icon('tabler:grip-vertical', {class: 'icon'}) }}
+        </button>
+    {% endif %}
+</span>

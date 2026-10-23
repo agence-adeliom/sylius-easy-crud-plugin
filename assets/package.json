@@ -1,0 +1,24 @@
+{
+  "name": "@agence-adeliom/sylius-easy-crud-plugin",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "symfony": {
+    "controllers": {
+      "position-sortable": {
+        "main": "controllers/PositionSortableController.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": true
+      }
+    }
+  },
+  "peerDependencies": {
+    "@hotwired/stimulus": "^3.0.0"
+  },
+  "devDependencies": {
+    "@hotwired/stimulus": "^3.0.0"
+  }
+}

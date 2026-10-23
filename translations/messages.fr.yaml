@@ -16,3 +16,5 @@ sylius_easy_crud_plugin:
         subheader: Gestion de l'entité
         index: Liste des entités
         update: Mettre à jour l'entité
+      position_sortable:
+        move: Glisser pour réordonner

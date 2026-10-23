@@ -4,58 +4,20 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Traits\Admin;
 
-use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Context\AdminContext;
-use Exception;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\PositionSortableField;
 use Symfony\Component\HttpFoundation\Response;
 
+trigger_deprecation('agence-adeliom/sylius-easy-crud-plugin', '2.3.3', 'The "%s" trait is deprecated and will be removed in the next minor version, use "%s::new()->asTree()" instead.', PositionSortableActionTrait::class, PositionSortableField::class);
+
+/**
+ * @deprecated since 2.3.3, removed in the next minor version: use PositionSortableField::new()->asTree(), saved by the
+ *             plugin's own controller. Its action depended on CrudFactory\Context\AdminContext, a class the plugin no
+ *             longer has, so it could not work; kept so that the classes using it still load.
+ */
 trait PositionSortableActionTrait
 {
-    public function sortPositionAction(AdminContext $context): Response
+    public function sortPositionAction(mixed ...$arguments): Response
     {
-        $requestContent = json_decode($context->getRequest()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-        [$leftPrimaryKeyValue, $leftParentProperty] = $requestContent['l'] ? explode(':', $requestContent['l']) : [null, null];
-        [$rightPrimaryKeyValue, $rightParentProperty] = $requestContent['r'] ? explode(':', $requestContent['r']) : [null, null];
-        [$primaryKeyValue, $parentProperty] = $requestContent['c'] ? explode(':', $requestContent['c']) : [null, null];
-        $leftEntity = null;
-        $entity = null;
-        $rightEntity = null;
-        $entity = null;
-
-        if (!empty($leftPrimaryKeyValue) && !empty($leftParentProperty)) {
-            $leftEntity = $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->find($leftPrimaryKeyValue);
-        }
-
-        if (!empty($rightPrimaryKeyValue) && !empty($rightParentProperty)) {
-            $rightEntity = $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->find($rightPrimaryKeyValue);
-        }
-
-        if (!empty($primaryKeyValue) && !empty($parentProperty)) {
-            $entity = $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->find($primaryKeyValue);
-        }
-
-        $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->recover();
-
-        if (!empty($leftEntity)) {
-            try {
-                if ($leftEntity->{'get' . ucfirst($parentProperty)}() !== $entity->{'get' . ucfirst($parentProperty)}()) {
-                    $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsFirstChildOf($entity, $leftEntity);
-                } else {
-                    $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsNextSiblingOf($entity, $leftEntity);
-                }
-            } catch (Exception) {
-                $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsFirstChildOf($entity, $leftEntity);
-            }
-        } elseif (!empty($rightEntity)) {
-            try {
-                $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsPrevSiblingOf($entity, $rightEntity);
-            } catch (Exception) {
-                $this->managerRegistry->getRepository($context->getEntity()->getFqcn())->persistAsNextSiblingOf($rightEntity, $entity);
-            }
-        }
-
-        $this->managerRegistry->getManagerForClass($context->getEntity()->getFqcn())->flush();
-
-        return new JsonResponse(['redirectTo' => null]);
+        throw new \LogicException(sprintf('%s::sortPositionAction() no longer works: use %s::new()->asTree(), saved by the plugin\'s own controller.', PositionSortableActionTrait::class, PositionSortableField::class));
     }
 }

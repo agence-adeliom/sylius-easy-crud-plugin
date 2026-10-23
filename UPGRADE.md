@@ -1,5 +1,32 @@
 # Upgrade
 
+## 2.3.3
+
+### New `PositionSortableField`
+
+Drag and drop reordering of the list rows, flat list or Gedmo tree (see
+[Discover fields](docs/discover_fields.md#sortable-lists)). Its handle is a Stimulus controller of the plugin: the
+package now has the `symfony-ux` keyword, so Symfony Flex adds the plugin assets to `package.json` and the controller
+to `assets/controllers.json` on `composer update`; rebuild the admin assets afterwards
+([Installation, step 5](docs/installation.md#step-5-register-the-stimulus-controllers)).
+
+For a flat list, the same field is the optional position input of the forms (`IntegerType`): no separate form
+field to declare. `PositionSortableInterface::setPosition()` accepts null (the input left empty).
+
+A move may change other rows than the moved one: the rows in between are shifted, the whole table is renumbered when
+positions are shared or missing, and an inconsistent tree is rebuilt before the move. It requires the permission of
+the update route of the resource.
+
+The grid fields of the Admins receive the alias of the resource in their template variables
+(`options.vars.resource_alias`), next to `options.vars.field`.
+
+### `PositionSortableActionTrait` deprecated
+
+`Adeliom\SyliusEasyCrudPlugin\Traits\Admin\PositionSortableActionTrait` is deprecated and will be removed in the next
+minor version. Its `sortPositionAction()` depended on `CrudFactory\Context\AdminContext`, a class the plugin no longer
+has, so it could not work: it now throws a `LogicException` pointing to its replacement. Replace it by
+`PositionSortableField::new()->asTree()`, saved by the plugin's own controller.
+
 ## 2.3.2
 
 ### Backward compatibility breaks

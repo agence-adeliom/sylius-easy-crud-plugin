@@ -1,0 +1,12 @@
+sylius_easy_crud:
+    resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
+
+# the update route of the sortable items, whose permission the drag and drop checks; the tree items have none
+tests_position_sort_admin_sortable_item:
+    resource: |
+        alias: tests_position_sort.sortable_item
+        section: admin
+        only: ['update']
+        permission: true
+    type: sylius.resource
+    prefix: /admin
