@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusEasyCrudPlugin\Admin\Field\Configurator;
 
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CollectionField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\SortableCollectionField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\FieldDto;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
@@ -20,7 +21,7 @@ final class SortableCollectionConfigurator implements FieldConfiguratorInterface
 {
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool
     {
-        return SortableCollectionField::class === $field->getFieldFqcn();
+        return \in_array($field->getFieldFqcn(), [SortableCollectionField::class, CollectionField::class], true);
     }
 
     public function configure(FieldDto $field, ?ResourceInterface $resource = null): void
