@@ -4,8 +4,9 @@ import { Controller } from '@hotwired/stimulus';
  * Drag and drop handle of the PositionSortableField column (one controller per row).
  *
  * The row moves among its siblings, the rows of the list with the same `data-position-sortable-parent` (all the rows
- * of a flat list), together with its descendants in a tree (hidden while dragging). The arrow keys move it by one
- * sibling. Once dropped, the ids of the row and of its new previous and next siblings are posted to `url`; the page
+ * of a flat list), together with its descendants in a tree (hidden while dragging). While dragging, a copy of the row
+ * follows the pointer and the row itself, faded, shows where it will be dropped; Escape cancels the move. The arrow
+ * keys move it by one sibling. Once dropped, the ids of the row and of its new previous and next siblings are posted to `url`; the page
  * is reloaded when the move fails, to show the saved order again.
  */
 export default class extends Controller {
@@ -22,20 +23,33 @@ export default class extends Controller {
 
     this.dragging = true;
     this.row = this.element.closest('tr');
+    this.initialRows = Array.from(this.row.parentElement.rows);
     this.initialOrder = this.siblingIds();
+    this.ghost = this.createGhost(this.row, event.clientY);
     this.block = this.blockOf(this.row);
     this.block.slice(1).forEach((row) => { row.hidden = true; });
-    this.row.classList.add('table-active');
-    this.element.style.cursor = 'grabbing';
+    this.row.style.opacity = '0.4';
+    document.body.style.cursor = 'grabbing';
+    document.body.style.userSelect = 'none';
 
     this.onMove = (moveEvent) => this.move(moveEvent.clientY);
     this.onEnd = () => this.end();
+    this.onCancel = () => this.end(true);
+    this.onEscape = (keyEvent) => {
+      if ('Escape' === keyEvent.key) {
+        keyEvent.preventDefault();
+        this.end(true);
+      }
+    };
     window.addEventListener('pointermove', this.onMove);
     window.addEventListener('pointerup', this.onEnd);
-    window.addEventListener('pointercancel', this.onEnd);
+    window.addEventListener('pointercancel', this.onCancel);
+    window.addEventListener('keydown', this.onEscape);
   }
 
   move(y) {
+    this.ghost.element.style.top = `${this.ghost.top + y - this.ghost.pointerY}px`;
+
     const sibling = this.siblings().find((row) => {
       const rect = row.getBoundingClientRect();
       return row !== this.row && y >= rect.top && y <= rect.bottom;
@@ -52,18 +66,66 @@ export default class extends Controller {
     }
   }
 
-  end() {
+  end(cancel = false) {
     window.removeEventListener('pointermove', this.onMove);
     window.removeEventListener('pointerup', this.onEnd);
-    window.removeEventListener('pointercancel', this.onEnd);
+    window.removeEventListener('pointercancel', this.onCancel);
+    window.removeEventListener('keydown', this.onEscape);
+    this.ghost.element.remove();
     this.block.forEach((row) => { row.hidden = false; });
-    this.row.classList.remove('table-active');
-    this.element.style.cursor = 'grab';
+    this.row.style.opacity = '';
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
     this.dragging = false;
 
-    if (this.siblingIds() !== this.initialOrder) {
+    if (cancel) {
+      this.row.parentElement.append(...this.initialRows);
+    } else if (this.siblingIds() !== this.initialOrder) {
       this.save();
     }
+  }
+
+  /**
+   * A copy of the row in a table of its own, fixed above the list and moved with the pointer, with the widths of the
+   * original cells.
+   */
+  createGhost(row, pointerY) {
+    const rect = row.getBoundingClientRect();
+    const table = document.createElement('table');
+    table.className = row.closest('table').className;
+    table.setAttribute('aria-hidden', 'true');
+    Object.assign(table.style, {
+      position: 'fixed',
+      top: `${rect.top}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      margin: '0',
+      zIndex: '1080',
+      pointerEvents: 'none',
+      opacity: '0.9',
+      boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.15)',
+      cursor: 'grabbing',
+    });
+
+    const copy = row.cloneNode(true);
+    // a copy without Stimulus controller nor row marker: not another handle, not a sibling
+    copy.querySelectorAll('[data-controller], [data-action], [data-position-sortable-id]').forEach((element) => {
+      element.removeAttribute('data-controller');
+      element.removeAttribute('data-action');
+      element.removeAttribute('data-position-sortable-id');
+    });
+    Array.from(row.cells).forEach((cell, index) => {
+      copy.cells[index].style.width = `${cell.getBoundingClientRect().width}px`;
+    });
+    // opaque over the list: the surface colour of the Sylius admin theme (Tabler)
+    copy.style.backgroundColor = 'var(--tblr-bg-surface, #fff)';
+
+    const body = document.createElement('tbody');
+    body.append(copy);
+    table.append(body);
+    document.body.append(table);
+
+    return { element: table, top: rect.top, pointerY };
   }
 
   keydown(event) {
