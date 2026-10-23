@@ -1,6 +1,6 @@
 {% if resources.definition.driverConfiguration.js_assets is defined %}
-    {% for path in resources.definition.driverConfiguration.js_assets %}
-        <script src="{{ path }}"></script>
+    {% for asset in resources.definition.driverConfiguration.js_assets %}
+        <script src="{{ asset(asset.value, asset.packageName) }}"></script>
     {% endfor %}
 {% endif %}
 {% if resources.definition.driverConfiguration.webpack_encore_assets is defined %}
