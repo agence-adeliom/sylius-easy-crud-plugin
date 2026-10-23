@@ -5,7 +5,8 @@ import { Controller } from '@hotwired/stimulus';
  *
  * The row moves among its siblings, the rows of the list with the same `data-position-sortable-parent` (all the rows
  * of a flat list), together with its descendants in a tree (hidden while dragging). While dragging, a copy of the row
- * follows the pointer and the row itself, emptied, leaves a gap where it will be dropped; Escape cancels the move. The arrow
+ * follows the pointer and the row itself, emptied, leaves a gap where it will be dropped; the page scrolls when the
+ * pointer nears the top or the bottom of the window; Escape cancels the move. The arrow
  * keys move it by one sibling. Once dropped, the ids of the row and of its new previous and next siblings are posted to `url`; the page
  * is reloaded when the move fails, to show the saved order again.
  */
@@ -48,7 +49,9 @@ export default class extends Controller {
   }
 
   move(y) {
+    this.pointerY = y;
     this.ghost.element.style.top = `${this.ghost.top + y - this.ghost.pointerY}px`;
+    this.autoScroll();
 
     const sibling = this.siblings().find((row) => {
       const rect = row.getBoundingClientRect();
@@ -71,6 +74,8 @@ export default class extends Controller {
     window.removeEventListener('pointerup', this.onEnd);
     window.removeEventListener('pointercancel', this.onCancel);
     window.removeEventListener('keydown', this.onEscape);
+    cancelAnimationFrame(this.scrollFrame);
+    this.scrollFrame = null;
     this.ghost.element.remove();
     this.block.forEach((row) => { row.hidden = false; });
     this.showDropZone(false);
@@ -83,6 +88,32 @@ export default class extends Controller {
     } else if (this.siblingIds() !== this.initialOrder) {
       this.save();
     }
+  }
+
+  /**
+   * Scrolls the page, one step per frame, while the pointer is near the top or the bottom of the window (faster
+   * closer to the edge), and moves the row under the pointer again after each step.
+   */
+  autoScroll() {
+    const edge = 60;
+    let step = 0;
+    if (this.pointerY < edge) {
+      step = -Math.ceil((edge - this.pointerY) / 3);
+    } else if (this.pointerY > window.innerHeight - edge) {
+      step = Math.ceil((this.pointerY - window.innerHeight + edge) / 3);
+    }
+    if (0 === step || this.scrollFrame) {
+      return;
+    }
+
+    this.scrollFrame = requestAnimationFrame(() => {
+      this.scrollFrame = null;
+      const scrollY = window.scrollY;
+      window.scrollBy(0, step);
+      if (this.dragging && window.scrollY !== scrollY) {
+        this.move(this.pointerY);
+      }
+    });
   }
 
   /**
