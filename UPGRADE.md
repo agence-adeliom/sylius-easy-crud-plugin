@@ -5,8 +5,17 @@
 ### New `PositionSortableField`
 
 Drag and drop reordering of the list rows, flat list or Gedmo tree (see
-[Discover fields](docs/discover_fields.md#sortable-lists)). Its handle is a Stimulus controller of the plugin: register
-the plugin assets in the application to use it ([Installation, step 5](docs/installation.md#step-5-register-the-stimulus-controllers)).
+[Discover fields](docs/discover_fields.md#sortable-lists)). Its handle is a Stimulus controller of the plugin: the
+package now has the `symfony-ux` keyword, so Symfony Flex adds the plugin assets to `package.json` and the controller
+to `assets/controllers.json` on `composer update`; rebuild the admin assets afterwards
+([Installation, step 5](docs/installation.md#step-5-register-the-stimulus-controllers)).
+
+A move may change other rows than the moved one: the rows in between are shifted, the whole table is renumbered when
+positions are shared or missing, and an inconsistent tree is rebuilt before the move. It requires the permission of
+the update route of the resource.
+
+The grid fields of the Admins receive the alias of the resource in their template variables
+(`options.vars.resource_alias`), next to `options.vars.field`.
 
 ### `PositionSortableActionTrait` removed
 

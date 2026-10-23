@@ -104,12 +104,21 @@ yield SortableCollectionField::new('data')
 
 ### Sortable lists
 
-`PositionSortableField` adds a drag and drop handle to the rows of the list (index page only). The rows also move
-with the arrow keys once the handle is focused. Each move is saved at once.
+`PositionSortableField` adds a drag and drop handle to the rows of the list (index page only). Each move is saved
+at once.
+
+- **While dragging**, a copy of the row follows the pointer and the row itself, emptied and outlined, leaves a gap
+  where it will be dropped. The page scrolls when the pointer nears the top or the bottom of the window. **Escape**
+  cancels the move: the rows go back to their place, nothing is saved.
+- **Keyboard**: once the handle is focused, the arrow keys move the row up or down by one row (one sibling in a tree).
+- **Errors**: when a move is refused or fails, the page is reloaded to show the saved order again.
 
 **Flat list**: the resource implements `Adeliom\SyliusEasyCrudPlugin\Model\PositionSortableInterface`, with an
-integer Doctrine field named `position`. Sort the list by position; it may be paginated, the new position is taken
-from the neighbours of the dropped row, and only the rows between the old and the new position are shifted.
+integer Doctrine field named `position`. Sort the list by position; it may be paginated: the new position is the
+position of a neighbour of the dropped row (not its index in the page), and only the rows between the old and the new
+position are shifted by one. When the positions cannot express the new order (several rows at the same position, a
+neighbour without position), the rows of the table are first renumbered from 0, in the order of the list (position,
+rows without position first, then id).
 
 ```php
 public function getDefaultSort(): array
@@ -126,18 +135,25 @@ public function configureFields(string $pageName): iterable
 ```
 
 **Tree**: the resource is a Gedmo nested tree (`#[Gedmo\Tree(type: 'nested')]`, a `NestedTreeRepository`). Sort the
-list by the left value and show every sibling on the same page. A row moves among its siblings only, with its
-descendants; root nodes are not movable. Gedmo writes `$node->sibling` while moving a node: add a `sibling` property
-or `#[\AllowDynamicProperties]` to the entity.
+list by the left value and show every sibling on the same page. A row moves among its siblings only (the rows with the
+same parent), together with its descendants; root nodes have no handle and cannot be moved. When the bounds of the tree
+are inconsistent (`verify()` fails, e.g. after a manual SQL change), they are rebuilt first (`recoverFast()`, siblings
+kept in the order of their left value). Gedmo writes `$node->sibling` while moving a node: add a `sibling` property or
+`#[\AllowDynamicProperties]` to the entity.
 
 ```php
 yield PositionSortableField::new('position', 'Position')->asTree(); // parent property: `parent`
 ```
 
-The handle is the `position-sortable` Stimulus controller of the plugin: register it in the application (see
-[Installation](./installation.md#step-5-register-the-stimulus-controllers)). The moves are posted, with a CSRF token,
-to the `sylius_easy_crud_admin_position_sort` and `sylius_easy_crud_admin_position_sort_tree` routes of
-`config/routes/admin.yaml`.
+**Security**: the moves are posted to the `sylius_easy_crud_admin_position_sort` and
+`sylius_easy_crud_admin_position_sort_tree` routes of `config/routes/admin.yaml` (import them behind the admin
+firewall), with a CSRF token (`sylius_easy_crud_position_sort`). A move modifies the resource, so the permission of
+its update route is checked like the update page does: when the route has `permission` (YAML resource block or
+`#[AsAdmin(permission: true)]`), the authorization checker of the Sylius resource controllers must grant
+`<application>.<resource>.update`. A resource without update route needs no permission.
+
+**Stimulus**: the handle is the `position-sortable` controller of the plugin, registered by Symfony Flex (see
+[Installation](./installation.md#step-5-register-the-stimulus-controllers)).
 
 ### CMS Fields
 
