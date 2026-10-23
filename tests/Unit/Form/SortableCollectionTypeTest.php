@@ -119,6 +119,17 @@ final class SortableCollectionTypeTest extends TestCase
         self::assertNull($view->vars['prototype']->vars['sortable_collection_entry_title'] ?? null);
     }
 
+    public function testANullEntryTitleFallsBackToTheEntryDataAsString(): void
+    {
+        $form = $this->collection(['A', 'B'], ['entry_title' => static fn (mixed $data): ?string => 'A' === $data ? 'Item A' : null]);
+
+        $view = $form->createView();
+
+        self::assertSame('Item A', $view[0]->vars['sortable_collection_entry_title']);
+        // the accordion header then shows the entry data rendered by display_as_string
+        self::assertNull($view[1]->vars['sortable_collection_entry_title']);
+    }
+
     public function testEntryTitleIsNotSetByDefault(): void
     {
         $view = $this->collection(['A'])->createView();

@@ -119,9 +119,9 @@ final class SortableCollectionField implements FieldInterface
 
     /**
      * Title of each entry's accordion header, computed from the entry data
-     * (the data rendered by the display_as_string filter when not set).
+     * (the data rendered by the display_as_string filter when not set, or when the callable returns null).
      *
-     * @param callable(mixed): string $entryTitle
+     * @param callable(mixed): ?string $entryTitle
      */
     public function setEntryTitle(callable $entryTitle): self
     {
