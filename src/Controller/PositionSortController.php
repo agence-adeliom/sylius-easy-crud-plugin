@@ -87,6 +87,14 @@ final readonly class PositionSortController
             throw new BadRequestHttpException(sprintf('The repository of the resource "%s" is not a Gedmo %s.', $resource, NestedTreeRepository::class));
         }
 
+        // inconsistent tree bounds (as happy-cms does before moving a node): rebuild them, siblings kept in their order
+        if (true !== $repository->verify()) {
+            $repository->recoverFast(['sortByField' => 'lft', 'sortDirection' => 'ASC']);
+            $entityManager->clear();
+            $reload = static fn (?object $node): ?object => null === $node ? null : $entityManager->find($node::class, $entityManager->getUnitOfWork()->getSingleIdentifierValue($node) ?? throw new \LogicException('A node without identifier.'));
+            [$moved, $previous, $next] = [$reload($moved) ?? throw new NotFoundHttpException('The moved node no longer exists.'), $reload($previous), $reload($next)];
+        }
+
         $parentProperty = $this->treeParentProperty($entityManager, $moved::class);
         $parent = $this->propertyAccessor->getValue($moved, $parentProperty);
         if (null === $parent) {

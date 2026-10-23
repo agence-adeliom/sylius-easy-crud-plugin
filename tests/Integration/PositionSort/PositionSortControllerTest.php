@@ -170,6 +170,27 @@ final class PositionSortControllerTest extends WebTestCase
         self::assertSame(['third', 'first', 'second'], $this->childrenNames($root));
     }
 
+    /**
+     * Bounds broken outside the tree listener (a node with a left value outside its parent): rebuilt before the move.
+     */
+    #[Test]
+    public function an_inconsistent_tree_is_recovered_before_the_move(): void
+    {
+        [$root, $first, $second, $third] = $this->createTree();
+        $this->entityManager()->createQuery(sprintf('UPDATE %s node SET node.rgt = 1000 WHERE node.id = :id', TreeItem::class))
+            ->setParameter('id', $second->getId())
+            ->execute()
+        ;
+
+        $this->sort('tree_item', $third, null, $first);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['third', 'first', 'second'], $this->childrenNames($root));
+        $repository = $this->entityManager()->getRepository(TreeItem::class);
+        \assert($repository instanceof \Gedmo\Tree\Entity\Repository\NestedTreeRepository);
+        self::assertTrue($repository->verify());
+    }
+
     #[Test]
     public function a_node_cannot_be_moved_next_to_a_node_of_another_parent(): void
     {
