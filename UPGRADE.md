@@ -20,11 +20,12 @@ the update route of the resource.
 The grid fields of the Admins receive the alias of the resource in their template variables
 (`options.vars.resource_alias`), next to `options.vars.field`.
 
-### `PositionSortableActionTrait` removed
+### `PositionSortableActionTrait` deprecated
 
-`Adeliom\SyliusEasyCrudPlugin\Traits\Admin\PositionSortableActionTrait` is removed: it depended on
-`CrudFactory\Context\AdminContext`, a class the plugin no longer has, so it could not be used. Replace its
-`sortPositionAction()` by `PositionSortableField::new()->asTree()`, saved by the plugin's own controller.
+`Adeliom\SyliusEasyCrudPlugin\Traits\Admin\PositionSortableActionTrait` is deprecated and will be removed in the next
+minor version. Its `sortPositionAction()` depended on `CrudFactory\Context\AdminContext`, a class the plugin no longer
+has, so it could not work: it now throws a `LogicException` pointing to its replacement. Replace it by
+`PositionSortableField::new()->asTree()`, saved by the plugin's own controller.
 
 ## 2.3.2
 
